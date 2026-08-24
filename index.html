@@ -40,6 +40,12 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; }
 
+        /* Nút ẩn/hiện Dashboard trên Mobile */
+        #mobileMenuToggle {
+            display: none; width: 100%; margin-bottom: 10px; 
+            height: 36px; font-size: 14px; background-color: var(--secondary-color);
+        }
+
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
 
         .panel {
@@ -104,8 +110,21 @@
         .master-wrapper {
             display: flex; border: 2px solid #555; background-color: white;
             flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px;
+            position: relative; /* Cho phép chứa nút Fullscreen */
         }
 
+        /* Nút Fullscreen */
+        #fullscreenBtn {
+            position: absolute; top: 5px; right: 5px; z-index: 100;
+            background: rgba(0, 0, 0, 0.4); color: white; border: none; border-radius: 4px;
+            width: 30px; height: 30px; font-size: 16px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(2px); transition: background 0.2s;
+        }
+        #fullscreenBtn:hover { background: rgba(0, 0, 0, 0.7); }
+
+        /* Ẩn nút toàn màn hình khi đang ở chế độ toàn màn hình mặc định của trình duyệt để tránh trùng lặp */
+        :fullscreen #fullscreenBtn { background: rgba(220, 53, 69, 0.7); content: "✖"; }
+        
         .left-scrollbar {
             overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0;
             background-color: #f1f1f1; border-right: 1px solid #ccc;
@@ -118,26 +137,18 @@
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
-        /* Đổi table-layout thành auto để cột có thể tự dãn ra khi có nội dung dài */
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
 
         th, td {
-            border: 1px solid var(--border-color); 
-            padding: 5px; 
-            text-align: center;
-            min-width: 45px; 
-            font-size: 13px; 
-            white-space: pre-wrap; /* Vẫn giữ dấu xuống dòng \n */
-            /* Đã bỏ word-wrap và overflow-wrap để cột tự dãn khớp với chữ */
+            border: 1px solid var(--border-color); padding: 5px; text-align: center;
+            min-width: 45px; font-size: 13px; white-space: pre-wrap; 
             cursor: cell;
         }
 
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
-            user-select: text;
-            cursor: text;
+            user-select: text; cursor: text;
             background-color: rgba(255, 255, 255, 0.9) !important;
-            outline: 2px solid var(--primary-color) !important;
-            outline-offset: -2px;
+            outline: 2px solid var(--primary-color) !important; outline-offset: -2px;
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
         }
 
@@ -221,10 +232,20 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
+        /* ĐIỀU CHỈNH CSS CHO MOBILE */
         @media (max-width: 768px) {
+            #mobileMenuToggle { display: block; }
+            .dashboard { display: none; }
+            .dashboard.show-dashboard { display: flex; } /* Class để toggle hiển thị */
+
             #cellPopupMenu { max-width: 100%; } 
             .popup-row button { font-size: 11px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
+
+            /* CSS vừa khít 1 Tuần (Cột vị trí 75px, Cột ngày 40px) */
+            th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
+            .header-col { min-width: 75px !important; font-size: 12px !important; }
+            thead th.header-col { font-size: 12px !important; }
         }
     </style>
 </head>
@@ -233,7 +254,10 @@
     <div class="container">
         <h2>Bảng Xếp Lịch Trực Tùy Chỉnh</h2>
 
-        <div class="dashboard">
+        <!-- NÚT TOGGLE MOBILE -->
+        <button id="mobileMenuToggle" onclick="toggleMobileDashboard()">⚙️ Bảng Điều Khiển</button>
+
+        <div class="dashboard" id="mainDashboard">
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
@@ -395,7 +419,10 @@
 
         <div id="statusMessage"></div>
 
-        <div class="master-wrapper">
+        <div class="master-wrapper" id="masterWrapper">
+            <!-- Nút Fullscreen -->
+            <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Bật/Tắt Toàn Màn Hình">⛶</button>
+
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
             <div class="right-content" id="captureArea"> 
                 <div class="top-scrollbar" id="topScroll"><div id="topScrollContent" style="height: 1px;"></div></div>
@@ -433,6 +460,23 @@
         
         let historyStack = [];
         let currentStep = -1;
+
+        /* HÀM ẨN/HIỆN DASHBOARD TRÊN MOBILE */
+        function toggleMobileDashboard() {
+            document.getElementById('mainDashboard').classList.toggle('show-dashboard');
+        }
+
+        /* HÀM TOÀN MÀN HÌNH */
+        function toggleFullscreen() {
+            let elem = document.getElementById("masterWrapper");
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().catch((err) => {
+                    showMessage('error', `Lỗi khi mở toàn màn hình: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
 
         function saveState() {
             const table = document.getElementById('scheduleTable');
