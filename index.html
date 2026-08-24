@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
-    <!-- Thêm thư viện html2canvas để chụp ảnh -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -39,18 +38,18 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; }
 
-        /* --- DASHBOARD ĐIỀU KHIỂN (CỐ ĐỊNH HIỂN THỊ) --- */
+        /* --- DASHBOARD ĐIỀU KHIỂN --- */
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
 
         .panel {
             flex: 1; min-width: 300px;
-            background: white; padding: 10px;
+            background: white; padding: 12px;
             border-radius: 8px; border: 1px solid #ddd;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .panel h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
         .input-group:last-child { margin-bottom: 0; }
 
         select, input[type="month"], input[type="number"], input[type="color"] {
@@ -67,7 +66,8 @@
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
         button.jpg-btn { background-color: var(--jpg-color); }
-        button.save-btn { background-color: var(--save-color); color: #000; }
+        button.save-btn { background-color: var(--save-color); color: #000; flex: 1;}
+        button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
 
@@ -130,7 +130,6 @@
         td.selected-cell, th.selected-cell {
             outline: 2px dashed var(--primary-color) !important; outline-offset: -2px; box-shadow: inset 0 0 0 1px rgba(13,110,253,0.3);
         }
-
         .header-col:focus { background-color: #c3e6cb !important; }
 
         /* --- NÚT FLOATING ACTION BUTTON (FAB) --- */
@@ -191,7 +190,7 @@
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
         .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
-        /* --- MODAL NGÀY LỄ --- */
+        /* Modal Styles */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);}
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
@@ -204,6 +203,7 @@
         @media (max-width: 768px) {
             #cellPopupMenu { max-width: 100%; } 
             .popup-row button { font-size: 11px; }
+            .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
         }
     </style>
 </head>
@@ -219,11 +219,15 @@
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
                     <button onclick="handleGenerateNewTable()">🔄 Tạo Mới Trắng</button>
-                    <!-- NÚT NGÀY LỄ ĐƯỢC ĐẶT Ở ĐÂY -->
                     <button class="secondary" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
                     
                     <button class="secondary" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
                     <button class="secondary" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
+                </div>
+                <!-- NÚT LƯU VÀ TẢI DỮ LIỆU ĐƯỢC NHÓM XUỐNG DƯỚI -->
+                <div class="input-group" style="margin-top: 10px;">
+                    <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Sheet</button>
+                    <button class="save-btn" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
                 </div>
             </div>
 
@@ -253,12 +257,11 @@
                     </select>
                 </div>
                 
-                <div class="input-group">
+                <div class="input-group" style="margin-top: 10px;">
                     <label style="font-size: 12px; cursor: pointer; color: #555;">
                         <input type="checkbox" id="showRoleCol" checked onchange="toggleRoleCol()"> Hiện Cột Vị trí
                     </label>
-                    <button class="save-btn" onclick="saveToGoogleSheets()" style="margin-left: auto;">💾 Lưu GG Sheets</button>
-                    <button class="capture" onclick="takeScreenshot('share')">📤 Share</button>
+                    <button class="capture" style="margin-left: auto;" onclick="takeScreenshot('share')">📤 Chụp & Share</button>
                     <button class="jpg-btn" onclick="takeScreenshot('download')">⬇️ Lưu JPG</button>
                 </div>
             </div>
@@ -378,12 +381,12 @@
         </div>
     </div>
 
-    <!-- MODAL QUẢN LÝ NGÀY LỄ (ĐÃ ĐƯỢC KHÔI PHỤC VÀ TỐI ƯU) -->
+    <!-- MODAL QUẢN LÝ NGÀY LỄ -->
     <div id="holidayModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeHolidayModal()">&times;</span>
             <h3 style="margin-top: 0; color: var(--primary-color);">🏖️ Quản lý Ngày Lễ</h3>
-            <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Danh sách ngày lễ (Định dạng tự động lặp lại hàng năm MM/DD hoặc ngày cụ thể YYYY-MM-DD):</p>
+            <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Danh sách ngày lễ (Định dạng tự động lặp lại hàng năm MM-DD hoặc ngày cụ thể YYYY-MM-DD):</p>
             
             <ul id="holidayList" class="holiday-list">
                 <!-- Danh sách ngày lễ sẽ được tải vào đây -->
@@ -484,7 +487,6 @@
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Mặc định load dữ liệu từ Google Sheets
             loadFromGoogleSheets();
             renderHolidayList();
             syncScrollbars();
@@ -496,16 +498,11 @@
             const table = document.getElementById('scheduleTable');
             const modalElement = document.getElementById('holidayModal');
             
-            // Xử lý ẩn popup menu của bảng
             if (!popup.contains(event.target) && !fab.contains(event.target) && !table.contains(event.target)) {
                 closePopup(); fab.style.display = 'none';
                 if (selectedCell) { selectedCell.classList.remove('selected-cell'); selectedCell = null; }
             }
-
-            // Xử lý ẩn Modal Ngày lễ nếu click ra ngoài (vào phần nền đen mờ)
-            if (event.target == modalElement) {
-                closeHolidayModal();
-            }
+            if (event.target == modalElement) { closeHolidayModal(); }
         });
 
         function toggleSection(sectionId, headerElement) {
@@ -1092,14 +1089,15 @@
             showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
             
             const table = document.getElementById('scheduleTable');
+
             const [year, month] = document.getElementById('monthYearPicker').value.split('-');
             const mode = document.getElementById('captureMode').value;
             let fileNameBase = `Lich_Truc_${month}_${year}`;
-            
             if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`;
             else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
 
             html2canvas(table, { scale: 2, backgroundColor: "#ffffff", windowWidth: table.scrollWidth + 50 }).then(canvas => {
+                
                 if (actionType === 'download') {
                     canvas.toBlob(blob => {
                         const url = URL.createObjectURL(blob);
@@ -1121,8 +1119,11 @@
                         }
                     }, 'image/png');
                 }
+                
                 if(selectedCell) { selectedCell.classList.add('selected-cell'); document.getElementById('fabBtn').style.display = 'block'; }
-            }).catch(err => { showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); });
+            }).catch(err => {
+                showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.');
+            });
         }
 
         // --- LƯU GG SHEET ---
@@ -1152,18 +1153,14 @@
             .catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
         }
 
-        // --- QUẢN LÝ NGÀY LỄ ---
         const modal = document.getElementById("holidayModal");
         function openHolidayModal() { modal.style.display = "block"; renderHolidayList(); }
         function closeHolidayModal() { 
             modal.style.display = "none"; 
             
-            // Xử lý tạo lại bảng sau khi đóng modal để cập nhật màu sắc ngày lễ
-            // Lấy dữ liệu hiện tại trên bảng để không bị mất khi load lại
             let currentTableData = [];
             const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
             if(tbodyRows.length > 0) {
-                 // Đọc dữ liệu ra mảng 2D (như cấu trúc trả về từ Server)
                  const header1 = []; Array.from(document.getElementById('dateHeaderRow1').children).forEach(th => header1.push(th.innerText));
                  const header2 = []; Array.from(document.getElementById('dateHeaderRow2').children).forEach(th => header2.push(th.innerText));
                  currentTableData.push(header1); currentTableData.push(header2);
@@ -1173,7 +1170,6 @@
                      Array.from(row.children).forEach(td => rowData.push(td.innerText));
                      currentTableData.push(rowData);
                  });
-                 // Render lại bằng hàm chuyên dụng để áp màu lễ mới
                  renderTableFromData(currentTableData);
             } else {
                  handleGenerateNewTable(true); 
