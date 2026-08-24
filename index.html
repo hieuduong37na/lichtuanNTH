@@ -118,7 +118,8 @@
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
-        table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: fixed;}
+        /* Đổi table-layout thành auto để cột có thể tự dãn ra khi có nội dung dài */
+        table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
 
         th, td {
             border: 1px solid var(--border-color); 
@@ -126,9 +127,8 @@
             text-align: center;
             min-width: 45px; 
             font-size: 13px; 
-            white-space: pre-wrap; 
-            word-wrap: break-word; /* Tự động ngắt dòng nếu từ quá dài */
-            overflow-wrap: anywhere; /* Ép chữ ngắt dòng để khớp với chiều rộng ô */
+            white-space: pre-wrap; /* Vẫn giữ dấu xuống dòng \n */
+            /* Đã bỏ word-wrap và overflow-wrap để cột tự dãn khớp với chữ */
             cursor: cell;
         }
 
