@@ -20,7 +20,7 @@
             --weekend-bg: #fff2cc; 
             --holiday-bg: #f8d7da;
             --header-bg: #d9ead3; 
-            --select-bg: rgba(13, 110, 253, 0.15); /* Màu nền khi quét chọn nhiều ô */
+            --select-bg: rgba(13, 110, 253, 0.15); 
         }
 
         * { box-sizing: border-box; }
@@ -29,7 +29,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 10px;
             background-color: var(--bg-color); color: var(--text-color);
-            user-select: none; /* Chống bôi đen text thừa khi kéo chuột */
+            user-select: none;
         }
 
         .container {
@@ -38,32 +38,24 @@
             height: calc(100vh - 20px);
         }
 
-        h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+        h2 { color: var(--primary-color); margin: 0; font-size: 22px; user-select: text; text-align: center; flex: 1;}
+        
+        .login-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
+        .login-btn:hover { background-color: #23272b; }
 
-        /* --- DASHBOARD ĐIỀU KHIỂN --- */
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
 
-        .panel {
-            flex: 1; min-width: 300px;
-            background: white; padding: 10px;
-            border-radius: 8px; border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
+        .panel { flex: 1; min-width: 300px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .panel h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
         .input-group:last-child { margin-bottom: 0; }
 
-        select, input[type="month"], input[type="number"], input[type="color"] {
+        select, input[type="month"], input[type="number"], input[type="color"], input[type="password"] {
             padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; height: 28px;
         }
 
-        button {
-            padding: 4px 10px; font-size: 12px; font-weight: 600; color: white;
-            background-color: var(--primary-color); border: none; border-radius: 4px;
-            cursor: pointer; transition: opacity 0.2s; white-space: nowrap; height: 28px;
-        }
-
+        button { padding: 4px 10px; font-size: 12px; font-weight: 600; color: white; background-color: var(--primary-color); border: none; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; height: 28px;}
         button:hover { opacity: 0.85; }
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
@@ -72,152 +64,82 @@
         button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
-        
-        /* Định dạng style cho các nút chữ */
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
-        /* --- GHI CHÚ --- */
-        .collapsible-header {
-            background-color: #e9ecef; color: #444; cursor: pointer;
-            padding: 8px 12px; width: 100%;
-            border: 1px solid #ced4da; border-radius: 6px;
-            text-align: left; font-size: 13px; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;
-        }
+        .admin-only { display: none; } 
+        .guest-mode-disable { pointer-events: none; opacity: 0.5; }
 
+        .collapsible-header { background-color: #e9ecef; color: #444; cursor: pointer; padding: 8px 12px; width: 100%; border: 1px solid #ced4da; border-radius: 6px; text-align: left; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;}
         .collapsible-header:hover { background-color: #dde2e6; }
         .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
         .collapsible-header.active:after { content: '\25B2'; }
 
-        .collapsible-content {
-            padding: 0; max-height: 1000px;
-            overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease;
-            background-color: transparent; margin-bottom: 10px;
-        }
+        .collapsible-content { padding: 0; max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease; background-color: transparent; margin-bottom: 10px; }
         .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
 
-        #topNotesArea {
-            width: 100%; min-height: 60px; border: 1px solid #ccc;
-            border-radius: 4px; padding: 8px; font-family: inherit;
-            font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text;
-        }
+        #topNotesArea { width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text; }
 
-        /* --- XỬ LÝ THANH CUỘN KÉP --- */
-        .master-wrapper {
-            display: flex; border: 2px solid #555; background-color: white;
-            flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px;
-        }
-
-        .left-scrollbar {
-            overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0;
-            background-color: #f1f1f1; border-right: 1px solid #ccc;
-        }
-
+        .master-wrapper { display: flex; border: 2px solid #555; background-color: white; flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px; }
+        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
-        
         .table-container { overflow: auto; flex: 1; width: 100%; position: relative;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: fixed;}
+        th, td { border: 1px solid var(--border-color); padding: 5px; text-align: center; min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell; }
 
-        th, td {
-            border: 1px solid var(--border-color); padding: 5px; text-align: center;
-            min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell;
-        }
-
-        /* Hiệu ứng focus khi đang nhập chữ */
-        td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
-            user-select: text; /* Cho phép bôi đen chữ khi đang sửa */
-            cursor: text;
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            outline: 2px solid var(--primary-color) !important;
-            outline-offset: -2px;
-            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
-        }
+        body:not(.is-admin) td, body:not(.is-admin) th { pointer-events: none; }
+        
+        td[contenteditable="true"]:focus, th[contenteditable="true"]:focus { user-select: text; cursor: text; background-color: rgba(255, 255, 255, 0.9) !important; outline: 2px solid var(--primary-color) !important; outline-offset: -2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);}
 
         thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; }
         .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
         thead th.header-col { z-index: 12; font-size: 15px; }
 
-        /* MULTI-SELECT STYLES */
-        .selected-cell {
-            background-color: var(--select-bg) !important;
-        }
-        /* Tạo đường viền xanh bao quanh vùng chọn (giả lập excel) */
+        .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
         .selection-bottom { border-bottom: 2px solid var(--primary-color) !important; }
         .selection-left { border-left: 2px solid var(--primary-color) !important; }
         .selection-right { border-right: 2px solid var(--primary-color) !important; }
 
         .header-col:focus { background-color: #c3e6cb !important; }
-        
         .weekend { background-color: var(--weekend-bg) !important; }
         .holiday { background-color: var(--holiday-bg) !important; font-weight: bold; color: #721c24 !important; }
         .red-separator { border-bottom: 3px solid red !important; }
 
-        /* --- NÚT FLOATING ACTION BUTTON (FAB) --- */
-        #fabBtn {
-            display: none; position: fixed; bottom: 20px; right: 20px;
-            width: 50px; height: 50px; background-color: var(--primary-color);
-            color: white; border-radius: 50%; text-align: center; line-height: 50px;
-            font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer; z-index: 2000; transition: transform 0.2s, background-color 0.2s;
-        }
+        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 50px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 2000; transition: transform 0.2s, background-color 0.2s; }
         #fabBtn:hover { background-color: #0b5ed7; transform: scale(1.05); }
 
-        /* --- POPUP (BOTTOM SHEET) CHỈNH SỬA Ô --- */
-        #cellPopupMenu {
-            display: none; position: fixed; z-index: 2001; bottom: -400px; 
-            left: 50%; transform: translateX(-50%);
-            background-color: #ffffff; border: 1px solid #ced4da;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.2); border-radius: 12px 12px 0 0;
-            width: 100%; max-width: 500px; font-size: 13px;
-            transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text;
-        }
+        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -400px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); border-radius: 12px 12px 0 0; width: 100%; max-width: 500px; font-size: 13px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
         #cellPopupMenu.show { bottom: 0; }
-
-        .popup-header {
-            background-color: #f1f3f5; padding: 10px 15px; border-bottom: 1px solid #ddd;
-            border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;
-            font-weight: bold; color: #333;
-        }
+        .popup-header { background-color: #f1f3f5; padding: 10px 15px; border-bottom: 1px solid #ddd; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; }
         .popup-close { cursor: pointer; color: #888; font-size: 20px; font-weight: bold; line-height: 1; }
         .popup-close:hover { color: #dc3545; }
-
         .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
         .popup-tab { flex: 1; text-align: center; padding: 10px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
         .popup-tab:hover { background: #f0f0f0; }
         .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
-
         .popup-body { padding: 15px; max-height: 60vh; overflow-y: auto; }
         .popup-section { display: none; flex-direction: column; gap: 12px; }
         .popup-section.active { display: flex; }
-
         .popup-item { display: flex; flex-direction: column; gap: 5px; }
         .popup-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 0.5px;}
         .popup-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
         .popup-row button { flex: 1; min-width: 80px; height: 34px; font-size: 12px;}
         .popup-row select { flex: 1; min-width: 100px; height: 34px;}
         .popup-row input[type="color"] { width: 40px; height: 34px; padding: 0; cursor: pointer;}
-        
         .color-picker-wrapper { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; justify-content: center;}
         .color-picker-wrapper label { font-size: 11px; color: #555; }
 
-        /* Thông báo */
-        #statusMessage {
-            position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; 
-            padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
+        #statusMessage { position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
         .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
-        /* MODAL NGÀY LỄ */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
@@ -227,33 +149,52 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
+        #loginModal .modal-content { max-width: 300px; text-align: center; }
+
         @media (max-width: 768px) {
             #cellPopupMenu { max-width: 100%; } 
             .popup-row button { font-size: 11px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
+            h2 {font-size: 18px;}
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Bảng Xếp Lịch Trực Tùy Chỉnh</h2>
+    <!-- MODAL ĐĂNG NHẬP -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+            <h3 style="margin-top: 0;">Đăng Nhập Quản Trị</h3>
+            <!-- SỰ KIỆN ENTER ĐƯỢC THÊM VÀO ĐÂY -->
+            <input type="password" id="adminPassword" placeholder="Nhập mật khẩu..." style="width: 100%; margin-bottom: 10px; text-align: center;" onkeydown="if(event.key === 'Enter') checkLogin()">
+            <button onclick="checkLogin()" style="width: 100%; height: 35px; font-size: 14px;">Đăng Nhập</button>
+            <p id="loginError" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Sai mật khẩu!</p>
+        </div>
+    </div>
 
-        <!-- SECTION: BẢNG ĐIỀU KHIỂN & CẮT ẢNH -->
+    <div class="container">
+        <div class="header-container">
+            <h2>Bảng Xếp Lịch Trực</h2>
+            <button id="authBtn" class="login-btn" onclick="openLoginModal()">Đăng nhập Edit</button>
+        </div>
+
         <div class="dashboard">
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
-                    <button onclick="handleGenerateNewTable()">🔄 Tạo Mới</button>
-                    <button class="secondary" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
                     
-                    <button class="secondary" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
-                    <button class="secondary" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
+                    <button class="admin-only" onclick="handleGenerateNewTable()">🔄 Tạo Mới Trắng</button>
+                    <button class="secondary admin-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
+                    <button class="secondary admin-only" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
+                    <button class="secondary admin-only" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
+                    
+                    <button class="load-btn" onclick="loadFromGoogleSheets()" style="margin-left: auto;">⬇️ Tải Dữ liệu</button>
                 </div>
-                <div class="input-group" style="margin-top: 10px;">
-                    <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Sheet</button>
-                    <button class="save-btn" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
+                
+                <div class="input-group admin-only" style="margin-top: 10px;">
+                    <button class="save-btn" onclick="saveToGoogleSheets()" style="width: 100%;">💾 Lưu tất cả lên Google Sheets</button>
                 </div>
             </div>
 
@@ -293,17 +234,16 @@
             </div>
         </div>
 
-        <!-- SECTION: GHI CHÚ CHUNG -->
-        <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
-        <div id="notesSection" class="collapsible-content collapsed">
-            <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
+        <div class="admin-only" style="width: 100%;">
+            <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
+            <div id="notesSection" class="collapsible-content collapsed">
+                <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
+            </div>
         </div>
 
-        <!-- FAB BUTTON -->
-        <div id="fabBtn" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
+        <div id="fabBtn" onclick="openPopup()" title="Chỉnh sửa ô">✏️</div>
 
-        <!-- FLOATING POPUP MENU CHỈNH SỬA Ô -->
-        <div id="cellPopupMenu">
+        <div id="cellPopupMenu" class="admin-only">
             <div class="popup-header">
                 <span id="popupCellName">Tùy chọn Ô</span>
                 <span class="popup-close" onclick="closePopup()">&times;</span>
@@ -401,7 +341,6 @@
 
         <div id="statusMessage"></div>
 
-        <!-- BẢNG NỘI DUNG -->
         <div class="master-wrapper">
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
             <div class="right-content" id="captureArea"> 
@@ -439,94 +378,132 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFGDOJ4xblxTg-lnL0klZTZCnZUmec7YkkBtEZVZnMqwwyVDNDizKYsiPXY4LljuJQ6Q/exec'; 
         
-        // --- HỆ THỐNG LƯU TRỮ LỊCH SỬ (UNDO / REDO) ---
-        let historyStack = [];
-        let currentStep = -1;
+        // --- CHỨC NĂNG AUTH (ĐĂNG NHẬP / ĐĂNG XUẤT) ---
+        const ADMIN_PASSWORD = "123"; // Đổi mật khẩu tại đây
+        let isAdmin = false;
+
+        function checkAuthStatus() {
+            if(localStorage.getItem('isScheduleAdmin') === 'true') {
+                isAdmin = true;
+                document.body.classList.add('is-admin');
+                document.getElementById('authBtn').innerText = "Đăng xuất";
+                document.getElementById('authBtn').style.backgroundColor = "#dc3545";
+                
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+                enableTableEdit(true);
+            } else {
+                isAdmin = false;
+                document.body.classList.remove('is-admin');
+                document.getElementById('authBtn').innerText = "Đăng nhập Edit";
+                document.getElementById('authBtn').style.backgroundColor = "#343a40";
+                
+                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                closePopup(); document.getElementById('fabBtn').style.display = 'none'; clearSelection();
+                
+                enableTableEdit(false);
+            }
+        }
+
+        function openLoginModal() {
+            if(isAdmin) {
+                localStorage.removeItem('isScheduleAdmin'); checkAuthStatus(); showMessage('success', 'Đã đăng xuất!');
+            } else {
+                document.getElementById('loginModal').style.display = "block";
+                setTimeout(() => document.getElementById('adminPassword').focus(), 100);
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = "none";
+            document.getElementById('loginError').style.display = "none";
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function checkLogin() {
+            // SỬA LỖI TRIM DẤU CÁCH
+            const pwd = document.getElementById('adminPassword').value.trim();
+            if(pwd === ADMIN_PASSWORD) {
+                localStorage.setItem('isScheduleAdmin', 'true');
+                closeLoginModal();
+                checkAuthStatus();
+                showMessage('success', 'Đăng nhập thành công! Đã mở khóa tính năng.');
+            } else {
+                document.getElementById('loginError').style.display = "block";
+            }
+        }
+
+        function enableTableEdit(enable) {
+            document.getElementById('scheduleTable').querySelectorAll('td, th').forEach(cell => {
+                if(enable && cell.id !== 'dateHeaderRow1' && cell.id !== 'dateHeaderRow2') {
+                    cell.setAttribute("contenteditable", "true");
+                } else {
+                    cell.removeAttribute("contenteditable");
+                }
+            });
+        }
+
+        // --- HỆ THỐNG LƯU TRỮ LỊCH SỬ ---
+        let historyStack = []; let currentStep = -1;
 
         function saveState() {
+            if(!isAdmin) return;
             const table = document.getElementById('scheduleTable');
             const htmlState = table.innerHTML;
-            
             if (currentStep >= 0 && historyStack[currentStep] === htmlState) return;
-
-            historyStack = historyStack.slice(0, currentStep + 1);
-            historyStack.push(htmlState);
-            currentStep++;
-
+            historyStack = historyStack.slice(0, currentStep + 1); historyStack.push(htmlState); currentStep++;
             if (historyStack.length > 50) { historyStack.shift(); currentStep--; }
         }
 
         function undo() {
-            if (currentStep > 0) {
-                currentStep--;
-                document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
-                clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!');
-            } else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
+            if (currentStep > 0) { currentStep--; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!'); } 
+            else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
         }
 
         function redo() {
-            if (currentStep < historyStack.length - 1) {
-                currentStep++;
-                document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
-                clearSelection(); showMessage('success', 'Đã khôi phục thao tác!');
-            } else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
+            if (currentStep < historyStack.length - 1) { currentStep++; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã khôi phục thao tác!'); } 
+            else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
         }
 
         document.addEventListener('keydown', function(e) {
+            if(!isAdmin) return;
             if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
             if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('scheduleTable').addEventListener('focusout', function(e) {
-                if(e.target.isContentEditable) saveState();
-            });
+            checkAuthStatus();
+            document.getElementById('scheduleTable').addEventListener('focusout', function(e) { if(e.target.isContentEditable) saveState(); });
         });
 
-        // --- HỆ THỐNG CHỌN NHIỀU Ô (MULTI-SELECT) ---
-        let isMouseDown = false;
-        let startCell = null;
-        let selectedCells = []; // Mảng chứa các ô đang được chọn
-
+        // --- HỆ THỐNG CHỌN NHIỀU Ô ---
+        let isMouseDown = false; let startCell = null; let selectedCells = []; 
         const table = document.getElementById('scheduleTable');
 
         function clearSelection() {
-            selectedCells.forEach(cell => {
-                cell.classList.remove('selected-cell', 'selection-top', 'selection-bottom', 'selection-left', 'selection-right');
-            });
-            selectedCells = [];
-            document.getElementById('fabBtn').style.display = 'none';
+            selectedCells.forEach(cell => { cell.classList.remove('selected-cell', 'selection-top', 'selection-bottom', 'selection-left', 'selection-right'); });
+            selectedCells = []; document.getElementById('fabBtn').style.display = 'none';
         }
 
         function getCellCoords(cell) {
             const row = cell.closest('tr');
-            return {
-                r: Array.from(row.parentElement.children).indexOf(row) + (row.parentElement.tagName === 'TBODY' ? 2 : 0),
-                c: Array.from(row.children).indexOf(cell)
-            };
+            return { r: Array.from(row.parentElement.children).indexOf(row) + (row.parentElement.tagName === 'TBODY' ? 2 : 0), c: Array.from(row.children).indexOf(cell) };
         }
 
         function getCellAt(r, c) {
-            let theadRows = table.querySelectorAll('thead tr');
-            let tbodyRows = table.querySelectorAll('tbody tr');
-            let row = r < 2 ? theadRows[r] : tbodyRows[r - 2];
-            return row ? row.children[c] : null;
+            let theadRows = table.querySelectorAll('thead tr'); let tbodyRows = table.querySelectorAll('tbody tr');
+            let row = r < 2 ? theadRows[r] : tbodyRows[r - 2]; return row ? row.children[c] : null;
         }
 
         function selectRange(cell1, cell2) {
+            if(!isAdmin) return; 
             clearSelection();
-            const pos1 = getCellCoords(cell1);
-            const pos2 = getCellCoords(cell2);
-            
-            const rMin = Math.min(pos1.r, pos2.r);
-            const rMax = Math.max(pos1.r, pos2.r);
-            const cMin = Math.min(pos1.c, pos2.c);
-            const cMax = Math.max(pos1.c, pos2.c);
+            const pos1 = getCellCoords(cell1); const pos2 = getCellCoords(cell2);
+            const rMin = Math.min(pos1.r, pos2.r); const rMax = Math.max(pos1.r, pos2.r);
+            const cMin = Math.min(pos1.c, pos2.c); const cMax = Math.max(pos1.c, pos2.c);
 
             for (let r = rMin; r <= rMax; r++) {
                 for (let c = cMin; c <= cMax; c++) {
                     let cell = getCellAt(r, c);
-                    // Bỏ qua nếu ô bị ẩn (do gộp ô)
                     if (cell && cell.style.display !== 'none') {
                         cell.classList.add('selected-cell');
                         if (r === rMin) cell.classList.add('selection-top');
@@ -538,190 +515,108 @@
                 }
             }
 
-            // Hiển thị nút FAB khi có ô được chọn
-            if(selectedCells.length > 0) {
-                document.getElementById('fabBtn').style.display = 'block';
-                updatePopupUI();
-            }
+            if(selectedCells.length > 0) { document.getElementById('fabBtn').style.display = 'block'; updatePopupUI(); }
         }
 
-        // Sự kiện Kéo chuột
         table.addEventListener('mousedown', (e) => {
-            let cell = e.target.closest('td, th');
-            if (!cell) return;
-            
-            // Đóng popup nếu đang mở
+            if(!isAdmin) return;
+            let cell = e.target.closest('td, th'); if (!cell) return;
             closePopup();
-
-            if (e.shiftKey && startCell) {
-                selectRange(startCell, cell);
-            } else {
-                isMouseDown = true;
-                startCell = cell;
-                selectRange(cell, cell);
-            }
+            if (e.shiftKey && startCell) { selectRange(startCell, cell); } 
+            else { isMouseDown = true; startCell = cell; selectRange(cell, cell); }
         });
 
         table.addEventListener('mouseover', (e) => {
-            if (!isMouseDown) return;
-            let cell = e.target.closest('td, th');
-            if (cell && startCell) {
-                selectRange(startCell, cell);
-            }
+            if (!isMouseDown || !isAdmin) return;
+            let cell = e.target.closest('td, th'); if (cell && startCell) selectRange(startCell, cell);
         });
 
-        document.addEventListener('mouseup', () => {
-            isMouseDown = false;
-        });
+        document.addEventListener('mouseup', () => { isMouseDown = false; });
 
-        // Click ra ngoài để bỏ chọn
         document.addEventListener('mousedown', function(event) {
-            const popup = document.getElementById('cellPopupMenu');
-            const fab = document.getElementById('fabBtn');
-            const modalElement = document.getElementById('holidayModal');
+            const popup = document.getElementById('cellPopupMenu'); const fab = document.getElementById('fabBtn');
+            const loginModal = document.getElementById('loginModal'); const holidayModal = document.getElementById('holidayModal');
             const isClickInsideTable = table.contains(event.target);
             
-            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable) {
-                closePopup();
-                clearSelection();
+            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable && !loginModal.contains(event.target) && !holidayModal.contains(event.target)) {
+                closePopup(); clearSelection();
             }
-            if (event.target == modalElement) { closeHolidayModal(); }
+            if (event.target == loginModal) closeLoginModal();
+            if (event.target == holidayModal) closeHolidayModal();
         });
 
 
-        // --- CẬP NHẬT GIAO DIỆN POPUP DỰA TRÊN VÙNG CHỌN ---
+        // --- CẬP NHẬT GIAO DIỆN POPUP ---
         function updatePopupUI() {
             if (selectedCells.length === 0) return;
-            
-            // Lấy ô đầu tiên làm chuẩn cho màu sắc
-            const targetCell = selectedCells[0];
-            const comp = window.getComputedStyle(targetCell);
+            const targetCell = selectedCells[0]; const comp = window.getComputedStyle(targetCell);
             
             document.getElementById('textColorPicker').value = rgbToHex(comp.color);
-            let bg = comp.backgroundColor;
-            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
+            let bg = comp.backgroundColor; document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
 
-            // Cập nhật trạng thái các nút Style (B, I, U)
             document.getElementById('btnBold').classList.toggle('active', comp.fontWeight === 'bold' || comp.fontWeight >= 700);
             document.getElementById('btnItalic').classList.toggle('active', comp.fontStyle === 'italic');
             document.getElementById('btnUnderline').classList.toggle('active', comp.textDecorationLine === 'underline');
 
-            // Cập nhật nút Gộp ô
             const mergeBtn = document.getElementById('btnMerge');
             if (selectedCells.length > 1) {
-                mergeBtn.innerText = "◧ Gộp các ô đã chọn";
-                mergeBtn.style.backgroundColor = "#6f42c1";
-                mergeBtn.onclick = mergeCells;
-                mergeBtn.disabled = false;
-                mergeBtn.style.opacity = "1";
+                mergeBtn.innerText = "◧ Gộp các ô đã chọn"; mergeBtn.style.backgroundColor = "#6f42c1"; mergeBtn.onclick = mergeCells; mergeBtn.disabled = false; mergeBtn.style.opacity = "1";
             } else {
-                // Kiểm tra xem 1 ô duy nhất này có phải là ô đã gộp không
                 if (targetCell.colSpan > 1 || targetCell.rowSpan > 1) {
-                    mergeBtn.innerText = "◨ Hủy gộp ô này";
-                    mergeBtn.style.backgroundColor = "#dc3545";
-                    mergeBtn.onclick = unmergeCell;
-                    mergeBtn.disabled = false;
-                    mergeBtn.style.opacity = "1";
+                    mergeBtn.innerText = "◨ Hủy gộp ô này"; mergeBtn.style.backgroundColor = "#dc3545"; mergeBtn.onclick = unmergeCell; mergeBtn.disabled = false; mergeBtn.style.opacity = "1";
                 } else {
-                    mergeBtn.innerText = "◧ Cần chọn nhiều ô để gộp";
-                    mergeBtn.style.backgroundColor = "#6c757d";
-                    mergeBtn.onclick = null;
-                    mergeBtn.disabled = true;
-                    mergeBtn.style.opacity = "0.6";
+                    mergeBtn.innerText = "◧ Cần chọn nhiều ô để gộp"; mergeBtn.style.backgroundColor = "#6c757d"; mergeBtn.onclick = null; mergeBtn.disabled = true; mergeBtn.style.opacity = "0.6";
                 }
             }
             
-            // Tên ô trên popup
             let cellName = selectedCells.length > 1 ? `Đã chọn ${selectedCells.length} ô` : "Tùy chọn Ô";
             document.getElementById('popupCellName').innerText = cellName;
         }
 
         function openPopup() {
-            if(selectedCells.length === 0) return;
-            updatePopupUI();
-            const popup = document.getElementById('cellPopupMenu');
-            popup.style.display = 'block';
-            setTimeout(() => { popup.classList.add('show'); }, 10);
+            if(selectedCells.length === 0) return; updatePopupUI();
+            const popup = document.getElementById('cellPopupMenu'); popup.style.display = 'block'; setTimeout(() => { popup.classList.add('show'); }, 10);
             document.getElementById('fabBtn').style.display = 'none';
         }
 
         function closePopup() {
-            const popup = document.getElementById('cellPopupMenu');
-            popup.classList.remove('show');
-            setTimeout(() => { popup.style.display = 'none'; }, 300);
+            const popup = document.getElementById('cellPopupMenu'); popup.classList.remove('show'); setTimeout(() => { popup.style.display = 'none'; }, 300);
             if(selectedCells.length > 0) document.getElementById('fabBtn').style.display = 'block';
         }
 
         function switchPopupTab(tabId) {
-            document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active')); document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active'); document.getElementById(tabId).classList.add('active');
         }
 
         // --- CÁC HÀM XỬ LÝ ĐỊNH DẠNG ---
-        // Hàm Lấy danh sách ô dựa theo Scope (Ô, Hàng, Cột)
         function getCellsToFormat() {
-            const scope = document.getElementById('colorScope').value;
-            let cellsToFormat = [];
-            
-            if (scope === 'cell') {
-                cellsToFormat = [...selectedCells];
-            } else if (scope === 'row') {
-                // Lấy tất cả các ô trên các hàng chứa ô đang chọn
-                const rows = new Set();
-                selectedCells.forEach(cell => rows.add(cell.closest('tr')));
-                rows.forEach(row => {
-                    Array.from(row.children).forEach(c => cellsToFormat.push(c));
-                });
+            const scope = document.getElementById('colorScope').value; let cellsToFormat = [];
+            if (scope === 'cell') { cellsToFormat = [...selectedCells]; } 
+            else if (scope === 'row') {
+                const rows = new Set(); selectedCells.forEach(cell => rows.add(cell.closest('tr')));
+                rows.forEach(row => { Array.from(row.children).forEach(c => cellsToFormat.push(c)); });
             } else if (scope === 'col') {
-                const colIndexes = new Set();
-                selectedCells.forEach(cell => colIndexes.add(Array.from(cell.closest('tr').children).indexOf(cell)));
-                document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
-                    colIndexes.forEach(index => {
-                        if(row.children[index]) cellsToFormat.push(row.children[index]);
-                    });
-                });
+                const colIndexes = new Set(); selectedCells.forEach(cell => colIndexes.add(Array.from(cell.closest('tr').children).indexOf(cell)));
+                document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => { colIndexes.forEach(index => { if(row.children[index]) cellsToFormat.push(row.children[index]); }); });
             }
             return cellsToFormat;
         }
 
         function updateSelectedScope() {
-            // Hiển thị lại vùng chọn giả lập khi đổi scope để người dùng dễ hình dung
-            if(selectedCells.length === 0) return;
-            const cells = getCellsToFormat();
-            
-            // Xóa hiệu ứng vùng chọn cũ (Không xóa selectedCells thật)
+            if(selectedCells.length === 0) return; const cells = getCellsToFormat();
             document.querySelectorAll('.selected-cell-preview').forEach(c => c.classList.remove('selected-cell-preview'));
-            
-            cells.forEach(cell => {
-                // Thêm hiệu ứng nhấp nháy tạm thời
-                cell.style.transition = "background-color 0.2s";
-                const oldBg = cell.style.backgroundColor;
-                cell.style.backgroundColor = "rgba(13, 110, 253, 0.2)";
-                setTimeout(() => { cell.style.backgroundColor = oldBg; }, 400);
-            });
+            cells.forEach(cell => { cell.style.transition = "background-color 0.2s"; const oldBg = cell.style.backgroundColor; cell.style.backgroundColor = "rgba(13, 110, 253, 0.2)"; setTimeout(() => { cell.style.backgroundColor = oldBg; }, 400); });
         }
 
         function applyColorFormat(type) {
-            const cells = getCellsToFormat();
-            const color = type === 'text' ? document.getElementById('textColorPicker').value : document.getElementById('bgColorPicker').value;
-            
-            cells.forEach(el => {
-                if(type === 'text') el.style.color = color;
-                else el.style.setProperty('background-color', color, 'important');
-            });
-            saveState(); 
+            const cells = getCellsToFormat(); const color = type === 'text' ? document.getElementById('textColorPicker').value : document.getElementById('bgColorPicker').value;
+            cells.forEach(el => { if(type === 'text') el.style.color = color; else el.style.setProperty('background-color', color, 'important'); }); saveState(); 
         }
 
-        // Hàm Đa Năng Toggle B/I/U
         function toggleFormat(styleProperty, activeValue, inactiveValue) {
-            const cells = getCellsToFormat();
-            if(cells.length === 0) return;
-
-            // Kiểm tra trạng thái của ô đầu tiên để làm chuẩn
-            const targetCell = cells[0];
-            const comp = window.getComputedStyle(targetCell);
+            const cells = getCellsToFormat(); if(cells.length === 0) return;
+            const targetCell = cells[0]; const comp = window.getComputedStyle(targetCell);
             
             let isCurrentlyActive = false;
             if(styleProperty === 'fontWeight') isCurrentlyActive = (comp.fontWeight === 'bold' || comp.fontWeight >= 700);
@@ -729,185 +624,85 @@
             else if(styleProperty === 'textDecoration') isCurrentlyActive = (comp.textDecorationLine === 'underline');
 
             const newValue = isCurrentlyActive ? inactiveValue : activeValue;
-
-            cells.forEach(el => { el.style[styleProperty] = newValue; });
-            updatePopupUI();
-            saveState();
+            cells.forEach(el => { el.style[styleProperty] = newValue; }); updatePopupUI(); saveState();
         }
 
         function clearCellFormat() {
             const cells = getCellsToFormat();
-            cells.forEach(el => { 
-                el.style.color = ''; 
-                el.style.removeProperty('background-color'); 
-                el.style.fontWeight = 'normal';
-                el.style.fontStyle = 'normal';
-                el.style.textDecoration = 'none';
-            });
-            updatePopupUI();
-            saveState();
+            cells.forEach(el => { el.style.color = ''; el.style.removeProperty('background-color'); el.style.fontWeight = 'normal'; el.style.fontStyle = 'normal'; el.style.textDecoration = 'none'; });
+            updatePopupUI(); saveState();
         }
 
-        // --- GỘP Ô (MERGE) VÀ HỦY GỘP (UNMERGE) ---
+        // --- GỘP Ô ---
         function mergeCells() {
             if (selectedCells.length < 2) return;
-            
-            // Xác định hình chữ nhật bao quanh các ô được chọn
             let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
-            
-            selectedCells.forEach(cell => {
-                const pos = getCellCoords(cell);
-                if (pos.r < minR) minR = pos.r;
-                if (pos.r > maxR) maxR = pos.r;
-                if (pos.c < minC) minC = pos.c;
-                if (pos.c > maxC) maxC = pos.c;
-            });
+            selectedCells.forEach(cell => { const pos = getCellCoords(cell); if (pos.r < minR) minR = pos.r; if (pos.r > maxR) maxR = pos.r; if (pos.c < minC) minC = pos.c; if (pos.c > maxC) maxC = pos.c; });
 
-            const rowSpan = maxR - minR + 1;
-            const colSpan = maxC - minC + 1;
-
-            // Ô giữ lại là ô trên cùng bên trái
-            const top_left_cell = getCellAt(minR, minC);
+            const rowSpan = maxR - minR + 1; const colSpan = maxC - minC + 1; const top_left_cell = getCellAt(minR, minC);
             
-            // Thu thập text của các ô khác (nếu có) để gom vào ô đầu
             let mergedText = "";
             for (let r = minR; r <= maxR; r++) {
                 for (let c = minC; c <= maxC; c++) {
                     let cell = getCellAt(r, c);
                     if (cell) {
-                        let text = cell.innerText.trim();
-                        if(text !== "") {
-                            mergedText += (mergedText === "" ? "" : "\n") + text;
-                        }
-                        // Xóa các ô bị gộp đi thay vì ẩn (để HTML sạch, export Google Sheet dễ)
-                        if (r !== minR || c !== minC) {
-                            cell.style.display = 'none'; // Tạm ẩn để không phá vỡ colIndex
-                            cell.innerHTML = "";
-                            cell.classList.add('merged-hidden');
-                        }
+                        let text = cell.innerText.trim(); if(text !== "") { mergedText += (mergedText === "" ? "" : "\n") + text; }
+                        if (r !== minR || c !== minC) { cell.style.display = 'none'; cell.innerHTML = ""; cell.classList.add('merged-hidden'); }
                     }
                 }
             }
 
-            top_left_cell.rowSpan = rowSpan;
-            top_left_cell.colSpan = colSpan;
-            top_left_cell.innerText = mergedText;
-            
-            // Xóa vùng chọn cũ, chọn lại ô mới gộp
-            selectRange(top_left_cell, top_left_cell);
-            saveState();
+            top_left_cell.rowSpan = rowSpan; top_left_cell.colSpan = colSpan; top_left_cell.innerText = mergedText;
+            selectRange(top_left_cell, top_left_cell); saveState();
         }
 
         function unmergeCell() {
-            if (selectedCells.length !== 1) return;
-            let cell = selectedCells[0];
-            
-            const rSpan = cell.rowSpan;
-            const cSpan = cell.colSpan;
-
-            if (rSpan <= 1 && cSpan <= 1) return; // Không có gì để hủy gộp
-
+            if (selectedCells.length !== 1) return; let cell = selectedCells[0];
+            const rSpan = cell.rowSpan; const cSpan = cell.colSpan; if (rSpan <= 1 && cSpan <= 1) return; 
             const pos = getCellCoords(cell);
 
-            // Phục hồi lại các ô bị ẩn
             for (let r = pos.r; r < pos.r + rSpan; r++) {
                 for (let c = pos.c; c < pos.c + cSpan; c++) {
-                    if (r === pos.r && c === pos.c) continue; // Bỏ qua ô gốc
+                    if (r === pos.r && c === pos.c) continue; 
                     let hiddenCell = getCellAt(r, c);
-                    if (hiddenCell && hiddenCell.classList.contains('merged-hidden')) {
-                        hiddenCell.style.display = '';
-                        hiddenCell.classList.remove('merged-hidden');
-                    }
+                    if (hiddenCell && hiddenCell.classList.contains('merged-hidden')) { hiddenCell.style.display = ''; hiddenCell.classList.remove('merged-hidden'); }
                 }
             }
-
-            cell.rowSpan = 1;
-            cell.colSpan = 1;
-            
-            selectRange(cell, cell);
-            saveState();
+            cell.rowSpan = 1; cell.colSpan = 1; selectRange(cell, cell); saveState();
         }
 
-        // --- THÊM/XÓA CẤU TRÚC (Sửa lại cho chọn nhiều ô) ---
+        // --- THÊM/XÓA CẤU TRÚC ---
         function insertRow(position) {
-            if (selectedCells.length === 0) return;
-            // Lấy ô mốc (ô cuối cùng trong danh sách chọn)
-            const currentRow = selectedCells[selectedCells.length-1].closest('tr');
+            if (selectedCells.length === 0) return; const currentRow = selectedCells[selectedCells.length-1].closest('tr');
             if (currentRow.parentElement.tagName === 'THEAD') return alert("Không chèn vào vùng Tiêu đề!");
-
-            const colCount = document.getElementById('dateHeaderRow1').children.length;
-            const newRow = document.createElement('tr');
-            for (let i = 0; i < colCount; i++) {
-                const td = document.createElement('td'); td.contentEditable = "true";
-                if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; }
-                newRow.appendChild(td);
-            }
-
-            if (position === 'above') currentRow.parentNode.insertBefore(newRow, currentRow);
-            else currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
-            
+            const colCount = document.getElementById('dateHeaderRow1').children.length; const newRow = document.createElement('tr');
+            for (let i = 0; i < colCount; i++) { const td = document.createElement('td'); td.contentEditable = "true"; if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; } newRow.appendChild(td); }
+            if (position === 'above') currentRow.parentNode.insertBefore(newRow, currentRow); else currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
             updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState();
         }
 
         function insertColumn(position) {
-            if (selectedCells.length === 0) return;
-            const tr = selectedCells[selectedCells.length-1].closest('tr');
-            const colIndex = Array.from(tr.children).indexOf(selectedCells[selectedCells.length-1]);
+            if (selectedCells.length === 0) return; const tr = selectedCells[selectedCells.length-1].closest('tr'); const colIndex = Array.from(tr.children).indexOf(selectedCells[selectedCells.length-1]);
             if (colIndex === 0 && position === 'left') return alert("Không chèn trước Cột Vị trí!");
-
             const targetIndex = position === 'left' ? colIndex : colIndex + 1;
-
-            const thead1 = document.getElementById('dateHeaderRow1');
-            const th1 = document.createElement('th'); th1.contentEditable = "true"; th1.innerText = "MỚI";
-            thead1.insertBefore(th1, thead1.children[targetIndex] || null);
-
-            const thead2 = document.getElementById('dateHeaderRow2');
-            const th2 = document.createElement('th'); th2.contentEditable = "true"; th2.innerText = "00";
-            thead2.insertBefore(th2, thead2.children[targetIndex] || null);
-
-            document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => {
-                const td = document.createElement('td'); td.contentEditable = "true";
-                row.insertBefore(td, row.children[targetIndex] || null);
-            });
+            const thead1 = document.getElementById('dateHeaderRow1'); const th1 = document.createElement('th'); th1.contentEditable = "true"; th1.innerText = "MỚI"; thead1.insertBefore(th1, thead1.children[targetIndex] || null);
+            const thead2 = document.getElementById('dateHeaderRow2'); const th2 = document.createElement('th'); th2.contentEditable = "true"; th2.innerText = "00"; thead2.insertBefore(th2, thead2.children[targetIndex] || null);
+            document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => { const td = document.createElement('td'); td.contentEditable = "true"; row.insertBefore(td, row.children[targetIndex] || null); });
             syncScrollbars(true); closePopup(); clearSelection(); saveState();
         }
 
         function deleteSelectedRow() {
-            if (selectedCells.length === 0) return;
-            
-            // Xóa tất cả các hàng chứa các ô được chọn
-            const rowsToDelete = new Set();
-            selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr')));
-            
-            // Kiem tra thead
-            let hasHeader = false;
-            rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; });
-            if(hasHeader) return alert("Không xóa hàng Tiêu đề!");
-
-            if (confirm(`Bạn có chắc chắn muốn xóa ${rowsToDelete.size} Hàng này?`)) {
-                rowsToDelete.forEach(row => row.remove());
-                updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState();
-            }
+            if (selectedCells.length === 0) return; const rowsToDelete = new Set(); selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr')));
+            let hasHeader = false; rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; }); if(hasHeader) return alert("Không xóa hàng Tiêu đề!");
+            if (confirm(`Bạn có chắc chắn muốn xóa ${rowsToDelete.size} Hàng này?`)) { rowsToDelete.forEach(row => row.remove()); updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState(); }
         }
 
         function deleteSelectedColumn() {
-            if (selectedCells.length === 0) return;
-            
-            const colsToDelete = new Set();
-            selectedCells.forEach(cell => colsToDelete.add(Array.from(cell.closest('tr').children).indexOf(cell)));
-            
+            if (selectedCells.length === 0) return; const colsToDelete = new Set(); selectedCells.forEach(cell => colsToDelete.add(Array.from(cell.closest('tr').children).indexOf(cell)));
             if (colsToDelete.has(0)) return alert("Không xóa Cột Vị trí (cột đầu tiên)!");
-
             if (confirm(`Bạn có chắc chắn muốn xóa ${colsToDelete.size} Cột này?`)) {
-                const table = document.getElementById('scheduleTable');
-                // Sắp xếp giảm dần để xóa không bị sai index
-                const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a);
-                
-                table.querySelectorAll('thead tr, tbody tr').forEach(tr => {
-                    sortedCols.forEach(colIndex => {
-                        if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]);
-                    });
-                });
+                const table = document.getElementById('scheduleTable'); const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a);
+                table.querySelectorAll('thead tr, tbody tr').forEach(tr => { sortedCols.forEach(colIndex => { if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]); }); });
                 syncScrollbars(true); closePopup(); clearSelection(); saveState();
             }
         }
@@ -919,439 +714,208 @@
         }
 
         function executeClearContent() {
-            const mode = document.getElementById('clearScopeMode').value;
-            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
-            
-            if (mode === 'cell') {
-                if (selectedCells.length === 0) return;
-                selectedCells.forEach(cell => { if(cell.tagName === 'TD') cell.innerText = ''; });
-            } else if (mode === 'row') {
-                if (selectedCells.length === 0) return;
-                const rows = new Set();
-                selectedCells.forEach(cell => rows.add(cell.closest('tr')));
-                
-                let hasHeader = false;
-                rows.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; });
-                if(hasHeader) return alert("Không xóa nội dung Tiêu đề!");
-                
-                rows.forEach(row => {
-                    Array.from(row.children).forEach((td, i) => { if (i > 0 && td.tagName === 'TD') td.innerText = ''; });
-                });
+            const mode = document.getElementById('clearScopeMode').value; const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            if (mode === 'cell') { if (selectedCells.length === 0) return; selectedCells.forEach(cell => { if(cell.tagName === 'TD') cell.innerText = ''; }); } 
+            else if (mode === 'row') {
+                if (selectedCells.length === 0) return; const rows = new Set(); selectedCells.forEach(cell => rows.add(cell.closest('tr')));
+                let hasHeader = false; rows.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; }); if(hasHeader) return alert("Không xóa nội dung Tiêu đề!");
+                rows.forEach(row => { Array.from(row.children).forEach((td, i) => { if (i > 0 && td.tagName === 'TD') td.innerText = ''; }); });
             } else if (mode === 'col') {
-                if (selectedCells.length === 0) return;
-                const cols = new Set();
-                selectedCells.forEach(cell => cols.add(Array.from(cell.closest('tr').children).indexOf(cell)));
+                if (selectedCells.length === 0) return; const cols = new Set(); selectedCells.forEach(cell => cols.add(Array.from(cell.closest('tr').children).indexOf(cell)));
                 if (cols.has(0)) return alert("Không xóa nội dung Cột Vị trí!");
-                
-                tbodyRows.forEach(row => { 
-                    cols.forEach(colIndex => {
-                        if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') row.children[colIndex].innerText = ''; 
-                    });
-                });
+                tbodyRows.forEach(row => { cols.forEach(colIndex => { if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') row.children[colIndex].innerText = ''; }); });
             } else {
-                let start = 1, end = 999;
-                const [year, month] = document.getElementById('monthYearPicker').value.split('-');
-                const daysInMonth = new Date(year, parseInt(month), 0).getDate();
-
-                if (mode === 'week') {
-                    const w = parseInt(document.getElementById('clearWeekSelect').value);
-                    start = (w - 1) * 7 + 1; end = Math.min(w * 7, daysInMonth);
-                } else if (mode === 'range') {
-                    start = parseInt(document.getElementById('clearStart').value) || 1;
-                    end = parseInt(document.getElementById('clearEnd').value) || daysInMonth;
-                } else if (mode === 'all') {
-                    if(!confirm("CẢNH BÁO: Xóa TOÀN BỘ dữ liệu. Vẫn tiếp tục?")) return;
-                    start = 1; end = 999; 
-                }
-
-                tbodyRows.forEach(row => {
-                    const cells = row.children;
-                    for (let i = 1; i < cells.length; i++) { 
-                        if (mode === 'all' || (i >= start && i <= end)) { if (cells[i].tagName === 'TD') cells[i].innerText = ''; }
-                    }
-                });
+                let start = 1, end = 999; const [year, month] = document.getElementById('monthYearPicker').value.split('-'); const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+                if (mode === 'week') { const w = parseInt(document.getElementById('clearWeekSelect').value); start = (w - 1) * 7 + 1; end = Math.min(w * 7, daysInMonth); } 
+                else if (mode === 'range') { start = parseInt(document.getElementById('clearStart').value) || 1; end = parseInt(document.getElementById('clearEnd').value) || daysInMonth; } 
+                else if (mode === 'all') { if(!confirm("CẢNH BÁO: Xóa TOÀN BỘ dữ liệu. Vẫn tiếp tục?")) return; start = 1; end = 999; }
+                tbodyRows.forEach(row => { const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all' || (i >= start && i <= end)) { if (cells[i].tagName === 'TD') cells[i].innerText = ''; } } });
             }
             showMessage('success', 'Đã xóa nội dung!'); closePopup(); saveState();
         }
 
         function toggleSection(sectionId, headerElement) {
             const content = document.getElementById(sectionId);
-            if (content.classList.contains('collapsed')) {
-                content.classList.remove('collapsed'); headerElement.classList.add('active');
-            } else {
-                content.classList.add('collapsed'); headerElement.classList.remove('active');
-            }
+            if (content.classList.contains('collapsed')) { content.classList.remove('collapsed'); headerElement.classList.add('active'); } 
+            else { content.classList.add('collapsed'); headerElement.classList.remove('active'); }
             setTimeout(() => syncScrollbars(true), 350);
         }
 
         // --- CẤU HÌNH BẢNG MẶC ĐỊNH ---
         const jobRolesTemplate = [
-            { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" },
-            { name: " ", headerColor: "#000", dataColor: "#000" }, 
-            { name: "LẦU 12", headerColor: "#000", dataColor: "#000" },
-            { name: "KHU C", headerColor: "#673ab7", dataColor: "#673ab7" },
-            { name: "TRẦN CC", headerColor: "#673ab7", dataColor: "#673ab7" },
-            { name: "TRỰC", headerColor: "#28a745", dataColor: "#28a745" }, 
-            { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, 
-            { name: "RA TRỰC", headerColor: "#e83e8c", dataColor: "#e83e8c" }, 
-            { name: "PK 121", headerColor: "red", dataColor: "#e83e8c" }, 
-            { name: "PK 120s", headerColor: "#000", dataColor: "#000" },
-            { name: "PK 120c", headerColor: "#000", dataColor: "#000" },
-            { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" },
-            { name: "HỘI CHẨN", headerColor: "#17a2b8", dataColor: "#17a2b8" }, 
-            { name: "TRẠI CHIỀU", headerColor: "#673ab7", dataColor: "#000" },
-            { name: "53\n54", headerColor: "#673ab7", dataColor: "#000", separator: true }, 
-            { name: "33-34", headerColor: "#000", dataColor: "#000" },
-            { name: "35-36", headerColor: "#000", dataColor: "#000" },
-            { name: "37-38", headerColor: "#000", dataColor: "#000" },
-            { name: "46", headerColor: "#000", dataColor: "#000" }
+            { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" }, { name: " ", headerColor: "#000", dataColor: "#000" }, 
+            { name: "LẦU 12", headerColor: "#000", dataColor: "#000" }, { name: "KHU C", headerColor: "#673ab7", dataColor: "#673ab7" },
+            { name: "TRẦN CC", headerColor: "#673ab7", dataColor: "#673ab7" }, { name: "TRỰC", headerColor: "#28a745", dataColor: "#28a745" }, 
+            { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, { name: "RA TRỰC", headerColor: "#e83e8c", dataColor: "#e83e8c" }, 
+            { name: "PK 121", headerColor: "red", dataColor: "#e83e8c" }, { name: "PK 120s", headerColor: "#000", dataColor: "#000" },
+            { name: "PK 120c", headerColor: "#000", dataColor: "#000" }, { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" },
+            { name: "HỘI CHẨN", headerColor: "#17a2b8", dataColor: "#17a2b8" }, { name: "TRẠI CHIỀU", headerColor: "#673ab7", dataColor: "#000" },
+            { name: "53\n54", headerColor: "#673ab7", dataColor: "#000", separator: true }, { name: "33-34", headerColor: "#000", dataColor: "#000" },
+            { name: "35-36", headerColor: "#000", dataColor: "#000" }, { name: "37-38", headerColor: "#000", dataColor: "#000" }, { name: "46", headerColor: "#000", dataColor: "#000" }
         ];
 
         let holidays = JSON.parse(localStorage.getItem('holidays')) || [
-            { date: "09-02", name: "Quốc khánh" }, { date: "01-01", name: "Tết Dương lịch" },
-            { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" }
+            { date: "09-02", name: "Quốc khánh" }, { date: "01-01", name: "Tết Dương lịch" }, { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFromGoogleSheets();
-            renderHolidayList();
-            syncScrollbars();
-        });
+        document.addEventListener('DOMContentLoaded', () => { loadFromGoogleSheets(); renderHolidayList(); syncScrollbars(); });
 
         function rgbToHex(rgb) {
-            if (rgb.startsWith('#')) return rgb;
-            let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+            if (rgb.startsWith('#')) return rgb; let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
             if(m) return "#" + ("0" + parseInt(m[1],10).toString(16)).slice(-2) + ("0" + parseInt(m[2],10).toString(16)).slice(-2) + ("0" + parseInt(m[3],10).toString(16)).slice(-2);
             return "#000000";
         }
 
         function syncScrollbars(forceUpdate = false) {
-            const table = document.getElementById('scheduleTable');
-            const bottomScroll = document.getElementById('bottomScroll'); 
-            const topScrollContent = document.getElementById('topScrollContent');
-            const leftScroll = document.getElementById('leftScroll');
-            const leftScrollContent = document.getElementById('leftScrollContent');
-
-            const updateScrollDimensions = () => {
-                topScrollContent.style.width = table.offsetWidth + 'px';
-                leftScrollContent.style.height = table.offsetHeight + 'px';
-                leftScroll.style.height = bottomScroll.clientHeight + 'px';
-            };
-
+            const table = document.getElementById('scheduleTable'); const bottomScroll = document.getElementById('bottomScroll'); const topScrollContent = document.getElementById('topScrollContent'); const leftScroll = document.getElementById('leftScroll'); const leftScrollContent = document.getElementById('leftScrollContent');
+            const updateScrollDimensions = () => { topScrollContent.style.width = table.offsetWidth + 'px'; leftScrollContent.style.height = table.offsetHeight + 'px'; leftScroll.style.height = bottomScroll.clientHeight + 'px'; };
             if(forceUpdate) updateScrollDimensions();
-
-            const resizeObserver = new ResizeObserver(updateScrollDimensions);
-            resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
-
-            document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
-            bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; });
-            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
-            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
+            const resizeObserver = new ResizeObserver(updateScrollDimensions); resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
+            document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; }); bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; }); leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; }); bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
         }
 
         function updateRowSelectDropdown() {
-            const select = document.getElementById('rowSelectEnd');
-            select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
-            document.getElementById('scheduleBody').querySelectorAll('tr').forEach((row, index) => {
-                const firstCellText = row.children.length > 0 ? row.children[0].innerText.replace('\n', ' ').trim() : "Trống";
-                const option = document.createElement('option');
-                option.value = index; option.innerText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`;
-                select.appendChild(option);
-            });
-            select.value = "all";
+            const select = document.getElementById('rowSelectEnd'); select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
+            document.getElementById('scheduleBody').querySelectorAll('tr').forEach((row, index) => { const firstCellText = row.children.length > 0 ? row.children[0].innerText.replace('\n', ' ').trim() : "Trống"; const option = document.createElement('option'); option.value = index; option.innerText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`; select.appendChild(option); }); select.value = "all";
         }
 
         function checkIsHoliday(year, month, day) {
-            const mmStr = String(month + 1).padStart(2, '0');
-            const ddStr = String(day).padStart(2, '0');
-            const formatMMDD = `${mmStr}-${ddStr}`; 
-            const formatYYYYMMDD = `${year}-${mmStr}-${ddStr}`;
-            
-            return holidays.some(h => {
-                let hDate = h.date;
-                if(hDate.length === 10) { 
-                   if (hDate === formatYYYYMMDD) return true;
-                   if (hDate.substring(5) === formatMMDD) return true;
-                } else if (hDate.length === 5) { 
-                   if (hDate === formatMMDD) return true;
-                }
-                return false;
-            });
+            const mmStr = String(month + 1).padStart(2, '0'); const ddStr = String(day).padStart(2, '0'); const formatMMDD = `${mmStr}-${ddStr}`; const formatYYYYMMDD = `${year}-${mmStr}-${ddStr}`;
+            return holidays.some(h => { let hDate = h.date; if(hDate.length === 10) { if (hDate === formatYYYYMMDD) return true; if (hDate.substring(5) === formatMMDD) return true; } else if (hDate.length === 5) { if (hDate === formatMMDD) return true; } return false; });
         }
 
-        // --- GIAO TIẾP VỚI GOOGLE SHEETS VÀ TẠO BẢNG ---
+        // --- GIAO TIẾP VỚI GOOGLE SHEETS ---
         function loadFromGoogleSheets() {
-            const pickerValue = document.getElementById('monthYearPicker').value;
-            if (!pickerValue) return;
-            const [year, month] = pickerValue.split('-');
-            const sheetName = `Thang_${month}_${year}`;
-
-            showMessage('loading', 'Đang tải dữ liệu từ Google Sheets...');
-            clearSelection();
+            const pickerValue = document.getElementById('monthYearPicker').value; if (!pickerValue) return;
+            const [year, month] = pickerValue.split('-'); const sheetName = `Thang_${month}_${year}`;
+            showMessage('loading', 'Đang tải dữ liệu từ Google Sheets...'); clearSelection();
 
             fetch(`${SCRIPT_URL}?sheetName=${sheetName}`)
             .then(response => response.json())
             .then(result => {
-                if (result.status === "success" && result.data && result.data.text && result.data.text.length > 0) {
-                    renderTableFromData(result.data);
-                    showMessage('success', 'Đã tải dữ liệu thành công!');
-                } else {
-                    fetchPreviousMonthHeader(year, month);
-                }
+                if (result.status === "success" && result.data && result.data.text && result.data.text.length > 0) { renderTableFromData(result.data); showMessage('success', 'Đã tải dữ liệu thành công!'); } 
+                else { fetchPreviousMonthHeader(year, month); }
             })
-            .catch(error => {
-                handleGenerateNewTable(true);
-                showMessage('warning-toast', 'Lỗi kết nối. Tạo bảng trắng mặc định.');
-            });
+            .catch(error => { handleGenerateNewTable(true); showMessage('warning-toast', 'Lỗi kết nối. Tạo bảng trắng mặc định.'); });
         }
 
         function fetchPreviousMonthHeader(currentYearStr, currentMonthStr) {
-            let yearNum = parseInt(currentYearStr);
-            let monthNum = parseInt(currentMonthStr) - 1; 
-
+            let yearNum = parseInt(currentYearStr); let monthNum = parseInt(currentMonthStr) - 1; 
             if (monthNum === 0) { monthNum = 12; yearNum -= 1; }
             const prevSheetName = `Thang_${("0" + monthNum).slice(-2)}_${yearNum}`;
-
             showMessage('loading', 'Đang tạo bảng từ cấu trúc tháng trước...');
 
             fetch(`${SCRIPT_URL}?action=getFirstColumn&sheetName=${prevSheetName}`)
             .then(response => response.json())
             .then(result => {
-                if (result.status === "success" && result.data && result.data.length > 0) {
-                    generateTableWithCustomRoles(result.data);
-                    showMessage('success', 'Đã copy cấu trúc từ tháng trước!');
-                } else {
-                    generateTable(true); 
-                    showMessage('success', 'Chưa có dữ liệu. Đã tạo bảng trắng mặc định!');
-                }
+                if (result.status === "success" && result.data && result.data.length > 0) { generateTableWithCustomRoles(result.data); showMessage('success', 'Đã copy cấu trúc từ tháng trước!'); } 
+                else { generateTable(true); showMessage('success', 'Chưa có dữ liệu. Đã tạo bảng trắng mặc định!'); }
             })
-            .catch(error => {
-                generateTable(true);
-            });
+            .catch(error => { generateTable(true); });
         }
 
         function renderTableFromData(payload) {
-            const dataText = payload.text;
-            const dataBgColors = payload.bgColors;
-            const dataFontColors = payload.fontColors;
-            const dataFontWeights = payload.fontWeights;
-
-            const pickerValue = document.getElementById('monthYearPicker').value;
-            const [yearStr, monthStr] = pickerValue.split('-');
-            const yearNum = parseInt(yearStr); 
-            const monthNum = parseInt(monthStr) - 1;
-
-            const thead1 = document.getElementById('dateHeaderRow1');
-            const thead2 = document.getElementById('dateHeaderRow2');
-            const tbody = document.getElementById('scheduleBody');
+            const dataText = payload.text; const dataBgColors = payload.bgColors; const dataFontColors = payload.fontColors; const dataFontWeights = payload.fontWeights;
+            const pickerValue = document.getElementById('monthYearPicker').value; const [yearStr, monthStr] = pickerValue.split('-'); const yearNum = parseInt(yearStr); const monthNum = parseInt(monthStr) - 1;
+            const thead1 = document.getElementById('dateHeaderRow1'); const thead2 = document.getElementById('dateHeaderRow2'); const tbody = document.getElementById('scheduleBody');
             
-            thead1.innerHTML = ''; thead2.innerHTML = ''; tbody.innerHTML = '';
-            if (!dataText || dataText.length < 2) return; 
+            thead1.innerHTML = ''; thead2.innerHTML = ''; tbody.innerHTML = ''; if (!dataText || dataText.length < 2) return; 
 
             dataText[0].forEach((cellText, index) => {
                 const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
-                else {
-                    const dayNum = parseInt(dataText[1][index]);
-                    if (!isNaN(dayNum)) {
-                        const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
-                        if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday');
-                        else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend');
-                    }
-                }
+                else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } }
                 thead1.appendChild(th);
             });
 
             dataText[1].forEach((cellText, index) => {
                 const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
-                else {
-                    const dayNum = parseInt(cellText);
-                    if (!isNaN(dayNum)) {
-                        const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
-                        if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday');
-                        else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend');
-                    }
-                }
+                else { const dayNum = parseInt(cellText); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } }
                 thead2.appendChild(th);
             });
 
             for (let i = 2; i < dataText.length; i++) {
-                const rowData = dataText[i];
-                const tr = document.createElement('tr');
-                
+                const rowData = dataText[i]; const tr = document.createElement('tr');
                 const roleTemplate = jobRolesTemplate.find(r => r.name === rowData[0]);
                 if (roleTemplate && roleTemplate.separator) tr.classList.add('red-separator');
 
                 rowData.forEach((cellText, index) => {
                     const td = document.createElement('td'); td.contentEditable = "true"; td.innerText = cellText;
                     
-                    if (index === 0) {
-                        td.classList.add('header-col');
-                    } else {
-                        const dayNum = parseInt(dataText[1][index]);
-                        if (!isNaN(dayNum)) {
-                            const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
-                            if (checkIsHoliday(yearNum, monthNum, dayNum)) td.classList.add('holiday');
-                            else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
-                        }
-                    }
+                    if (index === 0) { td.classList.add('header-col'); } 
+                    else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend'); } }
 
-                    if (dataBgColors && dataBgColors[i] && dataBgColors[i][index] !== '#ffffff') {
-                        td.style.setProperty('background-color', dataBgColors[i][index], 'important');
-                    }
-                    if (dataFontColors && dataFontColors[i] && dataFontColors[i][index] !== '#000000') {
-                        td.style.color = dataFontColors[i][index];
-                    }
-                    if (dataFontWeights && dataFontWeights[i] && dataFontWeights[i][index] === 'bold') {
-                        td.style.fontWeight = 'bold';
-                    }
-
+                    if (dataBgColors && dataBgColors[i] && dataBgColors[i][index] !== '#ffffff') { td.style.setProperty('background-color', dataBgColors[i][index], 'important'); }
+                    if (dataFontColors && dataFontColors[i] && dataFontColors[i][index] !== '#000000') { td.style.color = dataFontColors[i][index]; }
+                    if (dataFontWeights && dataFontWeights[i] && dataFontWeights[i][index] === 'bold') { td.style.fontWeight = 'bold'; }
                     tr.appendChild(td);
                 });
                 tbody.appendChild(tr);
             }
-
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); enableTableEdit(isAdmin); closePopup(); clearSelection(); historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
         function generateTableWithCustomRoles(customRolesArray) {
-            const pickerValue = document.getElementById('monthYearPicker').value;
-            const [year, month] = pickerValue.split('-');
-            const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; 
-            const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-            
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`;
-            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
-
+            const pickerValue = document.getElementById('monthYearPicker').value; const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex];
-                const thNum = document.createElement('th'); thNum.innerText = day;
-                
-                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } 
-                else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
-
+                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day;
+                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
                 document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum);
             }
-
-            const scheduleBody = document.getElementById('scheduleBody');
-            scheduleBody.innerHTML = ''; 
+            const scheduleBody = document.getElementById('scheduleBody'); scheduleBody.innerHTML = ''; 
             
             customRolesArray.forEach((roleObj) => {
-                const tr = document.createElement('tr');
-                const template = jobRolesTemplate.find(r => r.name === roleObj.text);
-                if (template && template.separator) tr.classList.add('red-separator');
-                
-                const tdRole = document.createElement('td');
-                tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; 
-                tdRole.innerText = roleObj.text; 
-                if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color;
-                if(roleObj.bold) tdRole.style.fontWeight = "bold";
-
-                let dataColor = roleObj.color || "#000";
-
-                tr.appendChild(tdRole);
+                const tr = document.createElement('tr'); const template = jobRolesTemplate.find(r => r.name === roleObj.text); if (template && template.separator) tr.classList.add('red-separator');
+                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; tdRole.innerText = roleObj.text; 
+                if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color; if(roleObj.bold) tdRole.style.fontWeight = "bold";
+                let dataColor = roleObj.color || "#000"; tr.appendChild(tdRole);
 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                    const td = document.createElement('td'); td.contentEditable = "true";
-
-                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
-                    else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
-                    
-                    td.style.color = dataColor; td.style.fontWeight = roleObj.bold ? "bold" : "normal";
-                    tr.appendChild(td);
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = "true";
+                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
+                    td.style.color = dataColor; td.style.fontWeight = roleObj.bold ? "bold" : "normal"; tr.appendChild(td);
                 }
                 scheduleBody.appendChild(tr);
             });
-
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); enableTableEdit(isAdmin); closePopup(); clearSelection(); historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        function handleGenerateNewTable(hideConfirm = false) {
-            if(hideConfirm || confirm("Hành động này sẽ TẠO BẢNG TRẮNG. \nNhững dữ liệu bạn chưa lưu vào GG Sheets sẽ bị mất. Tiếp tục?")) {
-                generateTable(true);
-            }
-        }
+        function handleGenerateNewTable(hideConfirm = false) { if(hideConfirm || confirm("Hành động này sẽ TẠO BẢNG TRẮNG. \nNhững dữ liệu bạn chưa lưu vào GG Sheets sẽ bị mất. Tiếp tục?")) { generateTable(true); } }
 
         function generateTable(forceReset = false) {
-            const pickerValue = document.getElementById('monthYearPicker').value;
-            if (!pickerValue) return;
+            const pickerValue = document.getElementById('monthYearPicker').value; if (!pickerValue) return; const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
+            let savedJobRoles = []; const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            if (!forceReset && tbodyRows.length > 0) { tbodyRows.forEach(row => { const firstCell = row.children[0]; if (firstCell) { savedJobRoles.push({ name: firstCell.innerText, headerColor: firstCell.style.color || "#000", isBold: firstCell.style.fontWeight === "bold" }); } }); } 
+            else { savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator })); }
 
-            const [year, month] = pickerValue.split('-');
-            const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; 
-            const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-            
-            let savedJobRoles = [];
-            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
-            
-            if (!forceReset && tbodyRows.length > 0) {
-                tbodyRows.forEach(row => {
-                    const firstCell = row.children[0];
-                    if (firstCell) {
-                        savedJobRoles.push({ name: firstCell.innerText, headerColor: firstCell.style.color || "#000", isBold: firstCell.style.fontWeight === "bold" });
-                    }
-                });
-            } else {
-                savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator }));
-            }
-
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`;
-            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
-
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex];
-                const thNum = document.createElement('th'); thNum.innerText = day;
-                
-                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } 
-                else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
-
+                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day;
+                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
                 document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum);
             }
 
-            const scheduleBody = document.getElementById('scheduleBody');
-            scheduleBody.innerHTML = ''; 
-            
+            const scheduleBody = document.getElementById('scheduleBody'); scheduleBody.innerHTML = ''; 
             savedJobRoles.forEach((role, i) => {
                 const tr = document.createElement('tr');
-                if (forceReset && jobRolesTemplate[i] && jobRolesTemplate[i].separator) tr.classList.add('red-separator');
-                else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
-                
-                const tdRole = document.createElement('td');
-                tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; 
-                tdRole.innerText = role.name; tdRole.style.color = role.headerColor;
-                if (role.isBold) tdRole.style.fontWeight = "bold";
-                tr.appendChild(tdRole);
-
-                let dataColor = "#000";
-                if(forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor;
-                else if (!forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; 
+                if (forceReset && jobRolesTemplate[i] && jobRolesTemplate[i].separator) tr.classList.add('red-separator'); else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
+                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; tdRole.innerText = role.name; tdRole.style.color = role.headerColor; if (role.isBold) tdRole.style.fontWeight = "bold"; tr.appendChild(tdRole);
+                let dataColor = "#000"; if(forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; else if (!forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; 
 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                    const td = document.createElement('td'); td.contentEditable = "true";
-
-                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
-                    else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
-                    
-                    td.style.color = dataColor; td.style.fontWeight = "bold";
-                    if(role.name.trim() === "") td.style.backgroundColor = "#fff";
-                    tr.appendChild(td);
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = "true";
+                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
+                    td.style.color = dataColor; td.style.fontWeight = "bold"; if(role.name.trim() === "") td.style.backgroundColor = "#fff"; tr.appendChild(td);
                 }
                 scheduleBody.appendChild(tr);
             });
-
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); enableTableEdit(isAdmin); closePopup(); clearSelection(); historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        // --- CÁC HÀM XUẤT ẢNH ---
         function toggleCaptureInputs() {
             const mode = document.getElementById('captureMode').value;
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
@@ -1360,250 +924,113 @@
 
         function toggleRoleCol() {
             const isChecked = document.getElementById('showRoleCol').checked;
-            document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
-                if (row.children.length > 0) row.children[0].style.display = isChecked ? '' : 'none';
-            });
-            syncScrollbars(true); closePopup();
+            document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => { if (row.children.length > 0) row.children[0].style.display = isChecked ? '' : 'none'; });
+            syncScrollbars(true); closePopup(); clearSelection();
         }
 
         function updateCropPreview() {
-            const mode = document.getElementById('captureMode').value;
-            const rowEndValue = document.getElementById('rowSelectEnd').value;
-            const pickerValue = document.getElementById('monthYearPicker').value;
-            if (!pickerValue) return;
+            const mode = document.getElementById('captureMode').value; const rowEndValue = document.getElementById('rowSelectEnd').value; const pickerValue = document.getElementById('monthYearPicker').value; if (!pickerValue) return;
+            const [year, month] = pickerValue.split('-'); const daysInMonth = new Date(year, parseInt(month), 0).getDate(); let startDay = 1, endDay = daysInMonth; 
             
-            const [year, month] = pickerValue.split('-');
-            const daysInMonth = new Date(year, parseInt(month), 0).getDate();
-            let startDay = 1, endDay = daysInMonth; 
-            
-            if (mode === 'week') {
-                const w = parseInt(document.getElementById('weekSelect').value);
-                startDay = (w - 1) * 7 + 1; endDay = Math.min(w * 7, daysInMonth);
-            } else if (mode === 'date') {
-                startDay = parseInt(document.getElementById('startDay').value) || 1;
-                endDay = parseInt(document.getElementById('endDay').value) || daysInMonth;
-            }
+            if (mode === 'week') { const w = parseInt(document.getElementById('weekSelect').value); startDay = (w - 1) * 7 + 1; endDay = Math.min(w * 7, daysInMonth); } 
+            else if (mode === 'date') { startDay = parseInt(document.getElementById('startDay').value) || 1; endDay = parseInt(document.getElementById('endDay').value) || daysInMonth; }
 
-            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
-            let maxRowIndex = tbodyRows.length - 1; 
-            if (rowEndValue !== 'all') maxRowIndex = parseInt(rowEndValue);
+            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr'); let maxRowIndex = tbodyRows.length - 1; if (rowEndValue !== 'all') maxRowIndex = parseInt(rowEndValue);
 
             tbodyRows.forEach((row, rowIndex) => {
                 if (rowIndex > maxRowIndex) { row.style.display = 'none'; } 
-                else {
-                    row.style.display = '';
-                    const cells = row.children;
-                    for (let i = 1; i < cells.length; i++) {
-                        if (mode === 'all') { cells[i].style.display = ''; } 
-                        else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; }
-                    }
-                }
+                else { row.style.display = ''; const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all') { cells[i].style.display = ''; } else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; } } }
             });
-
-            document.querySelectorAll('thead tr').forEach(row => {
-                const cells = row.children;
-                for (let i = 1; i < cells.length; i++) {
-                    if (mode === 'all') { cells[i].style.display = ''; } 
-                    else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; }
-                }
-            });
-            syncScrollbars(true); closePopup();
+            document.querySelectorAll('thead tr').forEach(row => { const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all') { cells[i].style.display = ''; } else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; } } });
+            syncScrollbars(true); closePopup(); clearSelection();
         }
 
-        function showMessage(type, text) {
-            const status = document.getElementById('statusMessage');
-            status.className = type; status.innerText = text; status.style.display = 'block';
-            if(type !== 'loading') setTimeout(() => { status.style.display = 'none'; }, 4000);
-        }
+        function showMessage(type, text) { const status = document.getElementById('statusMessage'); status.className = type; status.innerText = text; status.style.display = 'block'; if(type !== 'loading') setTimeout(() => { status.style.display = 'none'; }, 4000); }
 
         function takeScreenshot(actionType) {
-            closePopup(); 
-            // Lưu lại danh sách ô đang chọn để phục hồi sau khi chụp
-            const backupSelection = [...selectedCells];
-            clearSelection();
-            
-            showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
-            
-            const table = document.getElementById('scheduleTable');
-            const [year, month] = document.getElementById('monthYearPicker').value.split('-');
-            const mode = document.getElementById('captureMode').value;
-            let fileNameBase = `Lich_Truc_${month}_${year}`;
-            
-            if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`;
-            else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
+            closePopup(); const backupSelection = [...selectedCells]; clearSelection(); showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
+            const table = document.getElementById('scheduleTable'); const [year, month] = document.getElementById('monthYearPicker').value.split('-'); const mode = document.getElementById('captureMode').value;
+            let fileNameBase = `Lich_Truc_${month}_${year}`; if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`; else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
 
             html2canvas(table, { scale: 2, backgroundColor: "#ffffff", windowWidth: table.scrollWidth + 50 }).then(canvas => {
                 if (actionType === 'download') {
-                    canvas.toBlob(blob => {
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url);
-                        showMessage('success', 'Đã tải xuống ảnh JPG thành công!');
-                    }, 'image/jpeg', 0.92);
+                    canvas.toBlob(blob => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Đã tải xuống ảnh JPG thành công!'); }, 'image/jpeg', 0.92);
                 } else if (actionType === 'share') {
                     canvas.toBlob(blob => {
-                        if (!blob) throw new Error('Lỗi tạo ảnh');
-                        const file = new File([blob], `${fileNameBase}.png`, { type: 'image/png' });
-                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                            navigator.share({ title: 'Lịch Trực', files: [file] })
-                                .then(() => showMessage('success', 'Đã mở bảng chia sẻ ảnh!'))
-                                .catch(() => document.getElementById('statusMessage').style.display = 'none');
-                        } else {
-                            const url = URL.createObjectURL(blob);
-                            const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url);
-                            showMessage('success', 'Thiết bị không hỗ trợ share. Đã tự động tải ảnh!');
-                        }
+                        if (!blob) throw new Error('Lỗi tạo ảnh'); const file = new File([blob], `${fileNameBase}.png`, { type: 'image/png' });
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ title: 'Lịch Trực', files: [file] }).then(() => showMessage('success', 'Đã mở bảng chia sẻ ảnh!')).catch(() => document.getElementById('statusMessage').style.display = 'none'); } 
+                        else { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Thiết bị không hỗ trợ share. Đã tự động tải ảnh!'); }
                     }, 'image/png');
                 }
-                
-                // Phục hồi lại vùng chọn
-                if(backupSelection.length > 0) {
-                    selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
-                }
+                if(backupSelection.length > 0) { selectRange(backupSelection[0], backupSelection[backupSelection.length-1]); }
             }).catch(err => { showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); });
         }
 
         // --- LƯU GG SHEET ---
         function saveToGoogleSheets() {
-            closePopup(); clearSelection();
-            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
-            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
-            
-            const table = document.getElementById('scheduleTable');
-            const [year, month] = document.getElementById('monthYearPicker').value.split('-');
-            const sheetName = `Thang_${month}_${year}`;
-            
-            const payloadData = [];
-            const payloadBgColors = [];
-            const payloadFontColors = [];
-            const payloadFontWeights = [];
+            closePopup(); clearSelection(); document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all'; document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
+            const table = document.getElementById('scheduleTable'); const [year, month] = document.getElementById('monthYearPicker').value.split('-'); const sheetName = `Thang_${month}_${year}`;
+            const payloadData = []; const payloadBgColors = []; const payloadFontColors = []; const payloadFontWeights = [];
 
             table.querySelectorAll('tr').forEach(row => {
-                const rowData = [];
-                const rowBg = [];
-                const rowFont = [];
-                const rowWeight = [];
-
+                const rowData = []; const rowBg = []; const rowFont = []; const rowWeight = [];
                 row.querySelectorAll('th, td').forEach(cell => {
-                    // Nếu ô bị ẩn do gộp, chèn ô rỗng vào mảng để GG sheet tự hiểu
-                    if(cell.style.display === 'none') {
-                        rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal");
-                    } else {
+                    if(cell.style.display === 'none') { rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal"); } 
+                    else {
                         rowData.push(cell.innerText.trim());
-                        
                         let computedStyle = window.getComputedStyle(cell);
-                        let bg = computedStyle.backgroundColor;
-                        let hexBg = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? "#ffffff" : rgbToHex(bg);
-                        rowBg.push(hexBg);
-
-                        let color = computedStyle.color;
-                        let hexColor = color ? rgbToHex(color) : "#000000";
-                        rowFont.push(hexColor);
-                        
-                        let fw = computedStyle.fontWeight;
-                        rowWeight.push((fw === 'bold' || fw >= 700) ? "bold" : "normal");
+                        let bg = computedStyle.backgroundColor; let hexBg = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? "#ffffff" : rgbToHex(bg); rowBg.push(hexBg);
+                        let color = computedStyle.color; let hexColor = color ? rgbToHex(color) : "#000000"; rowFont.push(hexColor);
+                        let fw = computedStyle.fontWeight; rowWeight.push((fw === 'bold' || fw >= 700) ? "bold" : "normal");
                     }
                 });
-
-                payloadData.push(rowData);
-                payloadBgColors.push(rowBg);
-                payloadFontColors.push(rowFont);
-                payloadFontWeights.push(rowWeight);
+                payloadData.push(rowData); payloadBgColors.push(rowBg); payloadFontColors.push(rowFont); payloadFontWeights.push(rowWeight);
             });
 
-            const payload = { 
-                sheetName: sheetName, 
-                data: payloadData, 
-                styles: {
-                    bgColors: payloadBgColors,
-                    fontColors: payloadFontColors,
-                    fontWeights: payloadFontWeights
-                }
-            };
+            const payload = { sheetName: sheetName, data: payloadData, styles: { bgColors: payloadBgColors, fontColors: payloadFontColors, fontWeights: payloadFontWeights } };
 
             showMessage('loading', 'Đang cập nhật Sheet...');
             fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-            .then(response => response.json())
-            .then(result => {
-                if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!');
-                else showMessage('error', 'Lỗi từ Server: ' + result.message);
-            })
-            .catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
+            .then(response => response.json()).then(result => { if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!'); else showMessage('error', 'Lỗi từ Server: ' + result.message); }).catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
         }
 
         const modal = document.getElementById("holidayModal");
         function openHolidayModal() { modal.style.display = "block"; renderHolidayList(); }
         function closeHolidayModal() { 
             modal.style.display = "none"; 
-            
-            // Re-render lại mảng hiện tại để cập nhật lễ
             let currentPayload = { text: [], bgColors: [], fontColors: [], fontWeights: [] };
-            
             const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
             if(tbodyRows.length > 0) {
                  const header1Text = []; const header1Bg = []; const header1Color = []; const header1Weight = [];
-                 Array.from(document.getElementById('dateHeaderRow1').children).forEach(th => {
-                     let comp = window.getComputedStyle(th);
-                     header1Text.push(th.innerText); 
-                     header1Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
-                     header1Color.push(rgbToHex(comp.color)); 
-                     header1Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
-                 });
+                 Array.from(document.getElementById('dateHeaderRow1').children).forEach(th => { let comp = window.getComputedStyle(th); header1Text.push(th.innerText); header1Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor)); header1Color.push(rgbToHex(comp.color)); header1Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal'); });
                  currentPayload.text.push(header1Text); currentPayload.bgColors.push(header1Bg); currentPayload.fontColors.push(header1Color); currentPayload.fontWeights.push(header1Weight);
                  
                  const header2Text = []; const header2Bg = []; const header2Color = []; const header2Weight = [];
-                 Array.from(document.getElementById('dateHeaderRow2').children).forEach(th => {
-                     let comp = window.getComputedStyle(th);
-                     header2Text.push(th.innerText); 
-                     header2Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
-                     header2Color.push(rgbToHex(comp.color)); 
-                     header2Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
-                 });
+                 Array.from(document.getElementById('dateHeaderRow2').children).forEach(th => { let comp = window.getComputedStyle(th); header2Text.push(th.innerText); header2Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor)); header2Color.push(rgbToHex(comp.color)); header2Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal'); });
                  currentPayload.text.push(header2Text); currentPayload.bgColors.push(header2Bg); currentPayload.fontColors.push(header2Color); currentPayload.fontWeights.push(header2Weight);
 
                  tbodyRows.forEach(row => {
                      const rText = []; const rBg = []; const rColor = []; const rWeight = [];
-                     Array.from(row.children).forEach(td => {
-                         let comp = window.getComputedStyle(td);
-                         rText.push(td.innerText); 
-                         rBg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
-                         rColor.push(rgbToHex(comp.color)); 
-                         rWeight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
-                     });
+                     Array.from(row.children).forEach(td => { let comp = window.getComputedStyle(td); rText.push(td.innerText); rBg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor)); rColor.push(rgbToHex(comp.color)); rWeight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal'); });
                      currentPayload.text.push(rText); currentPayload.bgColors.push(rBg); currentPayload.fontColors.push(rColor); currentPayload.fontWeights.push(rWeight);
                  });
                  renderTableFromData(currentPayload);
-            } else {
-                 handleGenerateNewTable(true); 
-            }
+            } else { handleGenerateNewTable(true); }
         }
         
         function renderHolidayList() {
-            const list = document.getElementById('holidayList'); list.innerHTML = '';
-            holidays.sort((a, b) => a.date.localeCompare(b.date));
+            const list = document.getElementById('holidayList'); list.innerHTML = ''; holidays.sort((a, b) => a.date.localeCompare(b.date));
             holidays.forEach((h, index) => {
-                const li = document.createElement('li');
-                let displayDate = "";
-                if(h.date.length === 10) {
-                    const [y, m, d] = h.date.split('-');
-                    displayDate = `${d}/${m}/${y}`;
-                } else if(h.date.length === 5) {
-                    const [m, d] = h.date.split('-');
-                    displayDate = `${d}/${m} (Hàng năm)`;
-                } else displayDate = h.date;
-                
-                li.innerHTML = `<span><b>${displayDate}</b> - ${h.name}</span> <button onclick="removeHoliday(${index})">Xóa</button>`;
-                list.appendChild(li);
+                const li = document.createElement('li'); let displayDate = "";
+                if(h.date.length === 10) { const [y, m, d] = h.date.split('-'); displayDate = `${d}/${m}/${y}`; } else if(h.date.length === 5) { const [m, d] = h.date.split('-'); displayDate = `${d}/${m} (Hàng năm)`; } else displayDate = h.date;
+                li.innerHTML = `<span><b>${displayDate}</b> - ${h.name}</span> <button onclick="removeHoliday(${index})">Xóa</button>`; list.appendChild(li);
             });
             localStorage.setItem('holidays', JSON.stringify(holidays));
         }
 
         function addHoliday() {
-            const dateInput = document.getElementById('newHolidayDate').value; 
-            const nameInput = document.getElementById('newHolidayName').value;
-            if (!dateInput || !nameInput) return alert("Nhập đủ ngày và tên lễ!");
-            holidays.push({ date: dateInput, name: nameInput }); 
-            renderHolidayList();
-            document.getElementById('newHolidayName').value = '';
+            const dateInput = document.getElementById('newHolidayDate').value; const nameInput = document.getElementById('newHolidayName').value;
+            if (!dateInput || !nameInput) return alert("Nhập đủ ngày và tên lễ!"); holidays.push({ date: dateInput, name: nameInput }); renderHolidayList(); document.getElementById('newHolidayName').value = '';
         }
         function removeHoliday(index) { holidays.splice(index, 1); renderHolidayList(); }
     </script>
