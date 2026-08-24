@@ -67,8 +67,8 @@
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
-        .admin-only { display: none; } 
-        .guest-mode-disable { pointer-events: none; opacity: 0.5; }
+        /* CLASS ĐIỀU KHIỂN QUYỀN */
+        .admin-only { display: none !important; } 
 
         .collapsible-header { background-color: #e9ecef; color: #444; cursor: pointer; padding: 8px 12px; width: 100%; border: 1px solid #ced4da; border-radius: 6px; text-align: left; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;}
         .collapsible-header:hover { background-color: #dde2e6; }
@@ -140,6 +140,7 @@
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
         .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
+        /* MODAL */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
@@ -166,7 +167,6 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
             <h3 style="margin-top: 0;">Đăng Nhập Quản Trị</h3>
-            <!-- SỰ KIỆN ENTER ĐƯỢC THÊM VÀO ĐÂY -->
             <input type="password" id="adminPassword" placeholder="Nhập mật khẩu..." style="width: 100%; margin-bottom: 10px; text-align: center;" onkeydown="if(event.key === 'Enter') checkLogin()">
             <button onclick="checkLogin()" style="width: 100%; height: 35px; font-size: 14px;">Đăng Nhập</button>
             <p id="loginError" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Sai mật khẩu!</p>
@@ -180,24 +180,29 @@
         </div>
 
         <div class="dashboard">
+            <!-- PANEL DỮ LIỆU -->
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
                     
-                    <button class="admin-only" onclick="handleGenerateNewTable()">🔄 Tạo Mới Trắng</button>
+                    <!-- Các công cụ ẩn/hiện theo quyền -->
+                    <button class="admin-only" onclick="handleGenerateNewTable()" title="Tạo trắng lại từ đầu">🔄 Tạo Mới</button>
                     <button class="secondary admin-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
                     <button class="secondary admin-only" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
                     <button class="secondary admin-only" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
-                    
-                    <button class="load-btn" onclick="loadFromGoogleSheets()" style="margin-left: auto;">⬇️ Tải Dữ liệu</button>
                 </div>
                 
-                <div class="input-group admin-only" style="margin-top: 10px;">
-                    <button class="save-btn" onclick="saveToGoogleSheets()" style="width: 100%;">💾 Lưu tất cả lên Google Sheets</button>
+                <div class="input-group" style="margin-top: 10px;">
+                    <!-- Nút Tải hiển thị cho tất cả -->
+                    <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu về bảng</button>
+                    
+                    <!-- Nút Lưu chỉ hiện cho Admin -->
+                    <button class="save-btn admin-only" onclick="saveToGoogleSheets()" style="margin-left: 5px;">💾 Lưu lên Google Sheets</button>
                 </div>
             </div>
 
+            <!-- PANEL CẮT ẢNH -->
             <div class="panel">
                 <h4>📸 Công cụ Cắt & Xuất Ảnh</h4>
                 <div class="input-group">
@@ -378,8 +383,9 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFGDOJ4xblxTg-lnL0klZTZCnZUmec7YkkBtEZVZnMqwwyVDNDizKYsiPXY4LljuJQ6Q/exec'; 
         
-        // --- CHỨC NĂNG AUTH (ĐĂNG NHẬP / ĐĂNG XUẤT) ---
-        const ADMIN_PASSWORD = "123"; // Đổi mật khẩu tại đây
+        // --- CHỨC NĂNG AUTH ---
+        // THAY ĐỔI MẬT KHẨU TẠI ĐÂY (NẾU CẦN)
+        const ADMIN_PASSWORD = "123"; 
         let isAdmin = false;
 
         function checkAuthStatus() {
@@ -389,7 +395,7 @@
                 document.getElementById('authBtn').innerText = "Đăng xuất";
                 document.getElementById('authBtn').style.backgroundColor = "#dc3545";
                 
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+                document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', '', 'important'));
                 enableTableEdit(true);
             } else {
                 isAdmin = false;
@@ -397,7 +403,7 @@
                 document.getElementById('authBtn').innerText = "Đăng nhập Edit";
                 document.getElementById('authBtn').style.backgroundColor = "#343a40";
                 
-                document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'none', 'important'));
                 closePopup(); document.getElementById('fabBtn').style.display = 'none'; clearSelection();
                 
                 enableTableEdit(false);
@@ -420,7 +426,6 @@
         }
 
         function checkLogin() {
-            // SỬA LỖI TRIM DẤU CÁCH
             const pwd = document.getElementById('adminPassword').value.trim();
             if(pwd === ADMIN_PASSWORD) {
                 localStorage.setItem('isScheduleAdmin', 'true');
@@ -442,7 +447,7 @@
             });
         }
 
-        // --- HỆ THỐNG LƯU TRỮ LỊCH SỬ ---
+        // --- LƯU TRỮ LỊCH SỬ ---
         let historyStack = []; let currentStep = -1;
 
         function saveState() {
@@ -471,7 +476,6 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuthStatus();
             document.getElementById('scheduleTable').addEventListener('focusout', function(e) { if(e.target.isContentEditable) saveState(); });
         });
 
@@ -546,7 +550,6 @@
         });
 
 
-        // --- CẬP NHẬT GIAO DIỆN POPUP ---
         function updatePopupUI() {
             if (selectedCells.length === 0) return;
             const targetCell = selectedCells[0]; const comp = window.getComputedStyle(targetCell);
@@ -758,7 +761,7 @@
             { date: "09-02", name: "Quốc khánh" }, { date: "01-01", name: "Tết Dương lịch" }, { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => { loadFromGoogleSheets(); renderHolidayList(); syncScrollbars(); });
+        document.addEventListener('DOMContentLoaded', () => { checkAuthStatus(); loadFromGoogleSheets(); renderHolidayList(); syncScrollbars(); });
 
         function rgbToHex(rgb) {
             if (rgb.startsWith('#')) return rgb; let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
@@ -822,14 +825,14 @@
             thead1.innerHTML = ''; thead2.innerHTML = ''; tbody.innerHTML = ''; if (!dataText || dataText.length < 2) return; 
 
             dataText[0].forEach((cellText, index) => {
-                const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
+                const th = document.createElement('th'); th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
                 else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } }
                 thead1.appendChild(th);
             });
 
             dataText[1].forEach((cellText, index) => {
-                const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
+                const th = document.createElement('th'); th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
                 else { const dayNum = parseInt(cellText); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } }
                 thead2.appendChild(th);
@@ -841,7 +844,7 @@
                 if (roleTemplate && roleTemplate.separator) tr.classList.add('red-separator');
 
                 rowData.forEach((cellText, index) => {
-                    const td = document.createElement('td'); td.contentEditable = "true"; td.innerText = cellText;
+                    const td = document.createElement('td'); td.innerText = cellText;
                     
                     if (index === 0) { td.classList.add('header-col'); } 
                     else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend'); } }
@@ -858,7 +861,7 @@
 
         function generateTableWithCustomRoles(customRolesArray) {
             const pickerValue = document.getElementById('monthYearPicker').value; const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col">${monthNum + 1}</th>`;
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day;
@@ -869,12 +872,12 @@
             
             customRolesArray.forEach((roleObj) => {
                 const tr = document.createElement('tr'); const template = jobRolesTemplate.find(r => r.name === roleObj.text); if (template && template.separator) tr.classList.add('red-separator');
-                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; tdRole.innerText = roleObj.text; 
+                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.innerText = roleObj.text; 
                 if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color; if(roleObj.bold) tdRole.style.fontWeight = "bold";
                 let dataColor = roleObj.color || "#000"; tr.appendChild(tdRole);
 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = "true";
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td');
                     if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
                     td.style.color = dataColor; td.style.fontWeight = roleObj.bold ? "bold" : "normal"; tr.appendChild(td);
                 }
@@ -891,7 +894,7 @@
             if (!forceReset && tbodyRows.length > 0) { tbodyRows.forEach(row => { const firstCell = row.children[0]; if (firstCell) { savedJobRoles.push({ name: firstCell.innerText, headerColor: firstCell.style.color || "#000", isBold: firstCell.style.fontWeight === "bold" }); } }); } 
             else { savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator })); }
 
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col">${monthNum + 1}</th>`;
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day;
@@ -903,11 +906,11 @@
             savedJobRoles.forEach((role, i) => {
                 const tr = document.createElement('tr');
                 if (forceReset && jobRolesTemplate[i] && jobRolesTemplate[i].separator) tr.classList.add('red-separator'); else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
-                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; tdRole.innerText = role.name; tdRole.style.color = role.headerColor; if (role.isBold) tdRole.style.fontWeight = "bold"; tr.appendChild(tdRole);
+                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.innerText = role.name; tdRole.style.color = role.headerColor; if (role.isBold) tdRole.style.fontWeight = "bold"; tr.appendChild(tdRole);
                 let dataColor = "#000"; if(forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; else if (!forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; 
 
                 for (let day = 1; day <= daysInMonth; day++) {
-                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = "true";
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td');
                     if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
                     td.style.color = dataColor; td.style.fontWeight = "bold"; if(role.name.trim() === "") td.style.backgroundColor = "#fff"; tr.appendChild(td);
                 }
