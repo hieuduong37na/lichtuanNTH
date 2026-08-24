@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
+    <title>Bảng Xếp Lịch Trực</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -33,94 +33,89 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .container {
-            max-width: 1500px; margin: 0 auto;
-            display: flex; flex-direction: column;
-            height: calc(100vh - 20px);
-        }
+        .container { max-width: 1500px; margin: 0 auto; display: flex; flex-direction: column; height: calc(100vh - 20px); }
 
         /* --- Header & Auth --- */
-        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
-        h2 { color: var(--primary-color); margin: 0; font-size: 22px; user-select: text; text-align: center; flex: 1;}
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+        h2 { color: var(--primary-color); margin: 0; font-size: 20px; user-select: text; flex: 1; text-transform: uppercase; font-weight: 800;}
         
         .login-btn { 
-            background-color: #343a40; color: white; border: none; padding: 8px 16px; 
-            border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: #343a40; color: white; border: none; padding: 6px 12px; 
+            border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;
         }
+        .login-btn:hover { opacity: 0.9; }
 
         /* --- DASHBOARD ĐIỀU KHIỂN --- */
-        .dashboard { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; user-select: text;}
+        .dashboard { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; user-select: text;}
 
         .panel { 
-            flex: 1; min-width: 300px; background: white; padding: 12px; 
+            flex: 1; min-width: 300px; background: white; padding: 10px; 
             border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .panel h4 { margin: 0 0 10px 0; color: #444; font-size: 15px; border-bottom: 2px solid #f1f1f1; padding-bottom: 6px; }
+        .panel h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; border-bottom: 2px solid #f1f1f1; padding-bottom: 4px; display: flex; align-items: center;}
         
-        .input-group { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin-bottom: 10px; }
+        .input-group { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px; margin-bottom: 8px; }
         .input-group:last-child { margin-bottom: 0; }
 
         select, input[type="month"], input[type="number"], input[type="color"], input[type="password"] {
-            padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; min-height: 36px;
+            padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; min-height: 32px;
         }
 
         button { 
-            padding: 8px 12px; font-size: 13px; font-weight: 600; color: white; 
+            padding: 6px 10px; font-size: 12px; font-weight: bold; color: white; 
             background-color: var(--primary-color); border: none; border-radius: 4px; 
-            cursor: pointer; transition: opacity 0.2s; min-height: 36px;
-            display: flex; align-items: center; justify-content: center; line-height: 1.2;
-            word-break: break-word; white-space: normal;
+            cursor: pointer; transition: opacity 0.2s; min-height: 32px;
+            display: flex; align-items: center; justify-content: center;
         }
 
         button:active { opacity: 0.7; transform: scale(0.98); }
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
         button.jpg-btn { background-color: var(--jpg-color); }
-        button.save-btn { background-color: var(--save-color); color: #000;}
-        button.load-btn { background-color: #17a2b8; color: white;}
+        button.save-btn { background-color: var(--save-color); color: #000; flex: 1;}
+        button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
         
-        button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 40px !important;}
+        button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
         /* CLASS ĐIỀU KHIỂN QUYỀN */
-        .admin-only { display: none !important; } 
+        body:not(.is-admin) .admin-only { display: none !important; } 
 
         /* --- GHI CHÚ --- */
         .collapsible-header { 
-            background-color: #e9ecef; color: #444; cursor: pointer; padding: 10px 12px; 
+            background-color: #e9ecef; color: #444; cursor: pointer; padding: 8px 10px; 
             width: 100%; border: 1px solid #ced4da; border-radius: 6px; text-align: left; 
-            font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; 
+            font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; 
             align-items: center; margin-bottom: 5px; user-select: text;
         }
         .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
         .collapsible-header.active:after { content: '\25B2'; }
-
-        .collapsible-content { padding: 0; max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease; background-color: transparent; margin-bottom: 10px; }
+        .collapsible-content { padding: 0; max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease; background-color: transparent; margin-bottom: 8px; }
         .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
-        #topNotesArea { width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-family: inherit; font-size: 14px; resize: vertical; background-color: #fff8dc; user-select: text; }
+        #topNotesArea { width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text; }
 
         /* --- XỬ LÝ THANH CUỘN BẢNG --- */
         .master-wrapper { display: flex; border: 2px solid #555; background-color: white; flex: 1; overflow: hidden; border-radius: 6px; min-height: 250px; }
-        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 16px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
+        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 12px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 16px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
+        .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 12px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         .table-container { overflow: auto; flex: 1; width: 100%; position: relative;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
-        .table-container::-webkit-scrollbar:horizontal { height: 12px; }
+        .table-container::-webkit-scrollbar:horizontal { height: 10px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: fixed;}
-        th, td { border: 1px solid var(--border-color); padding: 6px 4px; text-align: center; min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell; word-wrap: break-word;}
+        th, td { border: 1px solid var(--border-color); padding: 5px 4px; text-align: center; min-width: 42px; font-size: 13px; white-space: pre-wrap; cursor: cell; word-wrap: break-word; line-height: 1.2;}
 
         body:not(.is-admin) td, body:not(.is-admin) th { pointer-events: none; }
         
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus { user-select: text; cursor: text; background-color: rgba(255, 255, 255, 0.9) !important; outline: 2px solid var(--primary-color) !important; outline-offset: -2px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);}
 
         thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; }
-        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
-        thead th.header-col { z-index: 12; font-size: 15px; }
+        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 80px; }
+        thead th.header-col { z-index: 12; font-size: 14px; }
 
         .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
@@ -134,72 +129,77 @@
         .red-separator { border-bottom: 3px solid red !important; }
 
         /* --- NÚT FAB MỞ POPUP --- */
-        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 55px; font-size: 26px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 2000; transition: transform 0.2s; }
+        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 50px; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 2000; transition: transform 0.2s; }
         #fabBtn:active { transform: scale(0.9); }
 
         /* --- POPUP CHỈNH SỬA Ô --- */
-        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -500px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); border-radius: 16px 16px 0 0; width: 100%; max-width: 600px; font-size: 14px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
+        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -500px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); border-radius: 16px 16px 0 0; width: 100%; max-width: 600px; font-size: 13px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
         #cellPopupMenu.show { bottom: 0; }
-        .popup-header { background-color: #f8f9fa; padding: 12px 18px; border-bottom: 1px solid #ddd; border-radius: 16px 16px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; font-size: 15px;}
-        .popup-close { cursor: pointer; color: #888; font-size: 24px; font-weight: bold; line-height: 1; padding: 0 5px;}
+        .popup-header { background-color: #f8f9fa; padding: 10px 15px; border-bottom: 1px solid #ddd; border-radius: 16px 16px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; font-size: 14px;}
+        .popup-close { cursor: pointer; color: #888; font-size: 22px; font-weight: bold; line-height: 1; padding: 0 5px;}
         .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
-        .popup-tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent;}
+        .popup-tab { flex: 1; text-align: center; padding: 10px 5px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent;}
         .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
         
-        .popup-body { padding: 18px; max-height: 65vh; overflow-y: auto; }
-        .popup-section { display: none; flex-direction: column; gap: 16px; }
+        .popup-body { padding: 15px; max-height: 60vh; overflow-y: auto; }
+        .popup-section { display: none; flex-direction: column; gap: 14px; }
         .popup-section.active { display: flex; }
-        .popup-item { display: flex; flex-direction: column; gap: 6px; }
-        .popup-title { font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 0.5px;}
-        .popup-row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap;}
+        .popup-item { display: flex; flex-direction: column; gap: 5px; }
+        .popup-title { font-size: 11px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 0.5px;}
+        .popup-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap;}
         .popup-row button { flex: 1; min-width: 80px; }
         .popup-row select { flex: 1; min-width: 100px; }
         
-        .color-picker-wrapper { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; justify-content: center;}
-        .color-picker-wrapper label { font-size: 13px; color: #555; font-weight: 600;}
-        input[type="color"] { width: 45px; height: 38px; padding: 0; cursor: pointer; border-radius: 4px; border: 1px solid #aaa;}
+        .color-picker-wrapper { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; justify-content: center;}
+        .color-picker-wrapper label { font-size: 12px; color: #555; font-weight: 600;}
+        input[type="color"] { width: 35px; height: 32px; padding: 0; cursor: pointer; border-radius: 4px; border: 1px solid #aaa;}
 
-        #statusMessage { position: fixed; top: 15px; right: 15px; z-index: 9999; font-weight: bold; padding: 14px 24px; border-radius: 8px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 14px;}
+        #statusMessage { position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 13px;}
 
-        /* MODAL */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);}
-        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 24px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); user-select: text;}
-        .close-modal { color: #aaa; float: right; font-size: 30px; font-weight: bold; cursor: pointer; line-height: 20px;}
-        .holiday-list { list-style-type: none; padding: 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px;}
-        .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px;}
-        .holiday-list button { padding: 6px 10px; background-color: #dc3545; font-size: 12px; min-height: 30px;}
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(2px);}
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 350px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); user-select: text;}
+        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
+        .holiday-list { list-style-type: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px;}
+        .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; font-size: 13px;}
+        .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; min-height: 28px;}
 
         /* ========================================================
            TỐI ƯU HÓA HOÀN TOÀN CHO ĐIỆN THOẠI (MOBILE RESPONSIVE)
            ======================================================== */
         @media (max-width: 768px) {
-            body { padding: 6px; }
-            h2 { font-size: 18px; }
-            .login-btn { padding: 8px; flex: 0.4; text-align: center; }
+            body { padding: 5px; }
+            .container { height: calc(100vh - 10px); }
+            h2 { font-size: 17px; }
+            .login-btn { padding: 6px; flex: 0.35; text-align: center; font-size: 11px;}
 
-            .dashboard { flex-direction: column; gap: 8px;}
-            .panel { width: 100%; min-width: 100%; padding: 10px; }
+            .dashboard { flex-direction: column; gap: 6px;}
+            .panel { width: 100%; min-width: 100%; padding: 8px; margin-bottom: 0;}
+            .panel h4 { font-size: 13px; margin-bottom: 6px;}
             
-            /* Sắp xếp các nút Full Width và Half Width trên Mobile */
-            .input-group { justify-content: space-between; gap: 8px;}
+            .input-group { justify-content: space-between; gap: 6px; margin-bottom: 6px;}
             
-            /* Các input/select mặc định tràn viền */
-            .input-group > select, .input-group > input { flex: 1 1 100%; width: 100%; min-height: 40px;}
+            /* Inputs / Selects dàn đều */
+            .input-group > select, .input-group > input { flex: 1 1 100%; width: 100%; min-height: 36px;}
             
-            .full-btn { flex: 1 1 100% !important; width: 100%; min-height: 40px; margin-bottom: 0;}
-            .half-btn { flex: 1 1 48% !important; width: 48%; min-height: 40px;}
+            /* Các nút full/half width */
+            .full-mobile { flex: 1 1 100% !important; width: 100%; min-height: 36px;}
+            .half-mobile { flex: 1 1 48% !important; width: 48%; min-height: 36px;}
+            .third-mobile { flex: 1 1 30% !important; width: 30%; min-height: 36px; padding: 2px;}
 
-            /* Tối ưu chữ trong Bảng để không chồng lấp */
-            table { table-layout: fixed; }
-            th, td { font-size: 12px; min-width: 40px; padding: 5px 2px; line-height: 1.3;}
-            .header-col { min-width: 65px; font-size: 12px !important; }
-            thead th.header-col { font-size: 13px !important; }
+            /* --- ĐÂY LÀ PHẦN ÉP VỪA 1 TUẦN TRÊN MOBILE --- */
+            /* 1 Cột Tên (65px) + 7 Cột Ngày (~42px) = Vừa vặn màn ~360px */
+            table { width: 100%; }
+            th, td { font-size: 11px !important; min-width: 42px !important; max-width: 45px !important; padding: 4px 1px !important; word-wrap: break-word;}
+            .header-col { min-width: 65px !important; max-width: 65px !important; font-size: 11px !important; padding: 4px 2px !important;}
+            thead th.header-col { font-size: 12px !important; }
+            
+            /* Thu gọn thanh cuộn trên mobile */
+            .top-scrollbar { display: none; } /* Ẩn thanh cuộn trên ở mobile cho đỡ rối */
 
-            /* Tối ưu Popup Menu tràn viền dưới */
-            #cellPopupMenu { max-width: 100%; width: 100%; border-radius: 20px 20px 0 0; }
-            .popup-row button, .popup-row select { min-height: 42px; font-size: 13px; }
-            .color-picker-wrapper { padding: 8px; }
-            input[type="color"] { width: 100%; height: 38px; }
+            /* Tối ưu Popup Menu */
+            #cellPopupMenu { max-width: 100%; width: 100%; border-radius: 16px 16px 0 0; }
+            .popup-row button, .popup-row select { min-height: 38px; font-size: 12px; }
+            input[type="color"] { width: 100%; height: 32px; }
         }
     </style>
 </head>
@@ -207,53 +207,50 @@
 
     <!-- MODAL ĐĂNG NHẬP -->
     <div id="loginModal" class="modal">
-        <div class="modal-content" style="max-width: 300px; text-align: center;">
+        <div class="modal-content" style="max-width: 280px; text-align: center;">
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-            <h3 style="margin-top: 0; margin-bottom: 20px;">Xác nhận Quản trị</h3>
-            <input type="password" id="adminPassword" placeholder="Nhập mật khẩu (123)" style="width: 100%; margin-bottom: 15px; text-align: center; min-height: 45px; font-size: 16px;" onkeydown="if(event.key === 'Enter') checkLogin()">
-            <button onclick="checkLogin()" style="width: 100%; min-height: 45px; font-size: 15px;">Đăng Nhập</button>
-            <p id="loginError" style="color: red; font-size: 13px; display: none; margin-top: 15px; font-weight: bold;">Sai mật khẩu!</p>
+            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px;">Nhập Mật Khẩu Admin</h3>
+            <input type="password" id="adminPassword" placeholder="Nhập: 123" style="width: 100%; margin-bottom: 15px; text-align: center; min-height: 40px; font-size: 15px;" onkeydown="if(event.key === 'Enter') checkLogin()">
+            <button onclick="checkLogin()" style="width: 100%; min-height: 40px; font-size: 14px;">Đăng Nhập</button>
+            <p id="loginError" style="color: red; font-size: 12px; display: none; margin-top: 10px; font-weight: bold;">Mật khẩu không đúng!</p>
         </div>
     </div>
 
     <div class="container">
         <div class="header-container">
-            <h2>Bảng Xếp Lịch Trực</h2>
-            <button id="authBtn" class="login-btn" onclick="openLoginModal()">🔓 Sửa Lịch</button>
+            <h2>Bảng Lịch Trực</h2>
+            <button id="authBtn" class="login-btn" onclick="openLoginModal()">🔑 Đăng Nhập</button>
         </div>
 
         <div class="dashboard">
             <!-- PANEL DỮ LIỆU -->
             <div class="panel">
-                <h4>📅 Quản lý Dữ liệu</h4>
+                <h4>⚙️ Quản lý & Lịch</h4>
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
-                    
-                    <!-- Các nút cho Admin -->
-                    <button class="admin-only full-btn" onclick="handleGenerateNewTable()" title="Tạo trắng lại từ đầu">🔄 Tạo Mới Bảng Trắng</button>
-                    <button class="secondary admin-only full-btn" onclick="openHolidayModal()">🏖️ Cài đặt Ngày Lễ</button>
-                    
-                    <button class="secondary admin-only half-btn" onclick="undo()" title="Hoàn tác">↩️ Hoàn tác</button>
-                    <button class="secondary admin-only half-btn" onclick="redo()" title="Làm lại">↪️ Làm lại</button>
+                    <!-- Admin -->
+                    <button class="secondary admin-only third-mobile" onclick="openHolidayModal()">🏖️ Lễ</button>
+                    <button class="secondary admin-only third-mobile" onclick="undo()">↩️ H.Tác</button>
+                    <button class="secondary admin-only third-mobile" onclick="redo()">↪️ L.Lại</button>
                 </div>
                 
-                <div class="input-group" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 12px;">
-                    <!-- Nút Tải hiển thị cho tất cả -->
-                    <button class="load-btn full-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Web</button>
-                    
-                    <!-- Nút Lưu chỉ hiện cho Admin -->
-                    <button class="save-btn admin-only full-btn" onclick="saveToGoogleSheets()">💾 LƯU LÊN MẠNG</button>
+                <div class="input-group" style="margin-top: 8px;">
+                    <button class="load-btn half-mobile" onclick="loadFromGoogleSheets()">⬇️ Tải Data</button>
+                    <!-- Admin -->
+                    <button class="save-btn admin-only half-mobile" onclick="saveToGoogleSheets()">💾 Lưu Data</button>
+                    <button class="admin-only full-mobile" style="background-color: #6c757d; margin-top:4px;" onclick="handleGenerateNewTable()">🔄 Tạo bảng trắng mới</button>
                 </div>
             </div>
 
-            <!-- PANEL CẮT ẢNH -->
+            <!-- PANEL CẮT ẢNH / VIEW CHẾ ĐỘ -->
             <div class="panel">
-                <h4>📸 Công cụ Cắt & Xuất Ảnh</h4>
+                <h4>🔍 Chế độ Xem & Xuất Ảnh</h4>
                 <div class="input-group">
+                    <!-- Sửa nhãn cho dễ hiểu: Chọn cách hiển thị trên màn hình -->
                     <select id="captureMode" onchange="toggleCaptureInputs(); updateCropPreview();">
-                        <option value="all">Hiển thị Toàn bộ Tháng</option>
-                        <option value="week">Cắt theo Tuần</option>
-                        <option value="date">Cắt theo Khoảng Ngày</option>
+                        <option value="all">Xem cả tháng</option>
+                        <option value="week">Xem theo Tuần</option>
+                        <option value="date">Xem theo Ngày</option>
                     </select>
 
                     <span id="weekSelectGroup" style="display: none; width: 100%;">
@@ -263,31 +260,27 @@
                             <option value="5">Tuần 5</option>
                         </select>
                     </span>
-                    <span id="dateSelectGroup" style="display: none; width: 100%; gap: 8px;">
+                    <span id="dateSelectGroup" style="display: none; width: 100%; gap: 6px;">
                         <input type="number" id="startDay" min="1" max="31" style="flex: 1;" value="1" oninput="updateCropPreview()"> 
-                        <span style="line-height: 40px; font-weight: bold;"> - </span>
+                        <span style="line-height: 36px; font-weight: bold;"> - </span>
                         <input type="number" id="endDay" min="1" max="31" style="flex: 1;" value="15" oninput="updateCropPreview()">
                     </span>
-                    
-                    <select id="rowSelectEnd" onchange="updateCropPreview()" style="width: 100%;">
-                        <option value="all">Toàn bộ Hàng</option>
-                    </select>
                 </div>
                 
-                <div class="input-group" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 12px;">
-                    <label style="font-size: 14px; cursor: pointer; color: #333; font-weight: bold; width: 100%; margin-bottom: 5px;">
+                <div class="input-group" style="margin-top: 8px;">
+                    <label style="font-size: 13px; cursor: pointer; color: #333; font-weight: bold; width: 100%; margin-bottom: 2px;">
                         <input type="checkbox" id="showRoleCol" checked onchange="toggleRoleCol()"> Kèm Cột Vị trí
                     </label>
-                    <button class="capture half-btn" onclick="takeScreenshot('share')">📤 Gửi Zalo</button>
-                    <button class="jpg-btn half-btn" onclick="takeScreenshot('download')">⬇️ Lưu Ảnh</button>
+                    <button class="capture half-mobile" onclick="takeScreenshot('share')">📤 Share Zalo</button>
+                    <button class="jpg-btn half-mobile" onclick="takeScreenshot('download')">⬇️ Lưu Ảnh</button>
                 </div>
             </div>
         </div>
 
         <div class="admin-only" style="width: 100%;">
-            <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không xuất hiện trong ảnh chụp)</div>
+            <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Ẩn khi xuất ảnh)</div>
             <div id="notesSection" class="collapsible-content collapsed">
-                <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
+                <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân..."></textarea>
             </div>
         </div>
 
@@ -305,23 +298,20 @@
             <div class="popup-body">
                 <div id="formatTab" class="popup-section active">
                     <div class="popup-item">
-                        <span class="popup-title">Phạm vi áp dụng</span>
+                        <span class="popup-title">Phạm vi</span>
                         <select id="colorScope" style="width:100%; font-weight: bold;" onchange="updateSelectedScope()">
                             <option value="cell">Vùng đang chọn</option>
-                            <option value="row">Toàn bộ Hàng của ô chọn</option>
-                            <option value="col">Toàn bộ Cột của ô chọn</option>
+                            <option value="row">Toàn bộ Hàng</option>
+                            <option value="col">Toàn bộ Cột</option>
                         </select>
                     </div>
                     <div class="popup-item">
-                        <span class="popup-title">Kiểu chữ</span>
-                        <div class="popup-row">
-                            <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold; font-size: 16px;">B</button>
-                            <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif; font-size: 16px;">I</button>
-                            <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline; font-size: 16px;">U</button>
+                        <span class="popup-title">Kiểu & Màu</span>
+                        <div class="popup-row" style="margin-bottom: 5px;">
+                            <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold; font-size: 15px;">B</button>
+                            <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif; font-size: 15px;">I</button>
+                            <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline; font-size: 15px;">U</button>
                         </div>
-                    </div>
-                    <div class="popup-item">
-                        <span class="popup-title">Màu sắc</span>
                         <div class="popup-row">
                             <div class="color-picker-wrapper">
                                 <label>Chữ</label>
@@ -334,8 +324,8 @@
                         </div>
                         <button class="secondary" onclick="clearCellFormat()" style="width: 100%; color:#000; background:#e2e6ea; margin-top: 5px;">Xóa màu nền & Định dạng</button>
                     </div>
-                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                        <span class="popup-title">Dọn dẹp Nội dung (Chữ)</span>
+                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <span class="popup-title">Dọn dẹp Nội dung</span>
                         <div class="popup-row">
                             <select id="clearScopeMode" onchange="toggleClearInputs()" style="flex: 2;">
                                 <option value="cell">Xóa Text vùng chọn</option>
@@ -362,27 +352,24 @@
 
                 <div id="structTab" class="popup-section">
                     <div class="popup-item">
-                        <span class="popup-title">Gộp ô (Merge Cells)</span>
+                        <span class="popup-title">Gộp ô (Merge)</span>
                         <div class="popup-row" id="mergeActionContainer">
-                            <button id="btnMerge" onclick="handleMergeCells()" style="width: 100%; background-color:#6f42c1; min-height: 45px; font-size: 15px;">◧ Kéo chọn nhiều ô để Gộp</button>
+                            <button id="btnMerge" onclick="handleMergeCells()" style="width: 100%; background-color:#6f42c1; min-height: 40px; font-size: 14px;">◧ Kéo chọn nhiều ô để Gộp</button>
                         </div>
                     </div>
-                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                        <span class="popup-title">Thêm Hàng/Cột (Bên cạnh ô đang chọn)</span>
-                        <div class="popup-row">
+                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <span class="popup-title">Thêm/Xóa Khung</span>
+                        <div class="popup-row" style="margin-bottom: 5px;">
                             <button onclick="insertRow('above')">+ Hàng Lên</button>
                             <button onclick="insertRow('below')">+ Hàng Xuống</button>
                         </div>
-                        <div class="popup-row">
+                        <div class="popup-row" style="margin-bottom: 5px;">
                             <button onclick="insertColumn('left')">+ Cột Trái</button>
                             <button onclick="insertColumn('right')">+ Cột Phải</button>
                         </div>
-                    </div>
-                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
-                        <span class="popup-title" style="color: #dc3545;">Phá hủy Cấu trúc Khung</span>
                         <div class="popup-row">
-                            <button class="danger" onclick="deleteSelectedRow()">Xóa nguyên Hàng này</button>
-                            <button class="danger" onclick="deleteSelectedColumn()">Xóa nguyên Cột này</button>
+                            <button class="danger" onclick="deleteSelectedRow()">Xóa Hàng</button>
+                            <button class="danger" onclick="deleteSelectedColumn()">Xóa Cột</button>
                         </div>
                     </div>
                 </div>
@@ -412,15 +399,15 @@
     <div id="holidayModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeHolidayModal()">&times;</span>
-            <h3 style="margin-top: 0; color: var(--primary-color);">🏖️ Quản lý Ngày Lễ</h3>
-            <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Danh sách ngày lễ (Định dạng tự động lặp lại hàng năm MM-DD hoặc ngày cụ thể YYYY-MM-DD):</p>
+            <h3 style="margin-top: 0; color: var(--primary-color); font-size: 16px;">🏖️ Cài Ngày Lễ</h3>
+            <p style="font-size: 12px; color: #555; margin-bottom: 10px;">Lễ sẽ tự tô đỏ (Dùng format tự lặp MM-DD hoặc cụ thể YYYY-MM-DD):</p>
             
             <ul id="holidayList" class="holiday-list"></ul>
             
-            <div class="input-group" style="margin-top: 15px; flex-wrap: nowrap;">
+            <div class="input-group" style="margin-top: 10px; flex-wrap: nowrap;">
                 <input type="date" id="newHolidayDate" style="flex: 1;" title="Chọn ngày">
-                <input type="text" id="newHolidayName" placeholder="Tên ngày lễ..." style="flex: 2;">
-                <button onclick="addHoliday()" style="min-height: 40px; padding: 0 15px;">Thêm</button>
+                <input type="text" id="newHolidayName" placeholder="Tên lễ..." style="flex: 1;">
+                <button onclick="addHoliday()" style="padding: 0 10px;">Thêm</button>
             </div>
         </div>
     </div>
@@ -437,7 +424,7 @@
             if(localStorage.getItem('isScheduleAdmin') === 'true') {
                 isAdmin = true;
                 document.body.classList.add('is-admin');
-                document.getElementById('authBtn').innerText = "🔒 Khóa Sửa";
+                document.getElementById('authBtn').innerHTML = "🔒 Khóa Sửa";
                 document.getElementById('authBtn').style.backgroundColor = "#dc3545";
                 
                 document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', '', 'important'));
@@ -445,7 +432,7 @@
             } else {
                 isAdmin = false;
                 document.body.classList.remove('is-admin');
-                document.getElementById('authBtn').innerText = "🔓 Sửa Lịch";
+                document.getElementById('authBtn').innerHTML = "🔑 Mở Sửa";
                 document.getElementById('authBtn').style.backgroundColor = "#343a40";
                 
                 document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'none', 'important'));
@@ -476,7 +463,7 @@
                 localStorage.setItem('isScheduleAdmin', 'true');
                 closeLoginModal();
                 checkAuthStatus();
-                showMessage('success', 'Mở khóa thành công! Bạn có thể chỉnh sửa bảng.');
+                showMessage('success', 'Mở khóa thành công!');
             } else {
                 document.getElementById('loginError').style.display = "block";
             }
@@ -505,13 +492,11 @@
         }
 
         function undo() {
-            if (currentStep > 0) { currentStep--; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!'); } 
-            else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
+            if (currentStep > 0) { currentStep--; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Hoàn tác!'); } 
         }
 
         function redo() {
-            if (currentStep < historyStack.length - 1) { currentStep++; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã khôi phục thao tác!'); } 
-            else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
+            if (currentStep < historyStack.length - 1) { currentStep++; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Làm lại!'); } 
         }
 
         document.addEventListener('keydown', function(e) {
@@ -563,7 +548,6 @@
                     }
                 }
             }
-
             if(selectedCells.length > 0) { document.getElementById('fabBtn').style.display = 'block'; updatePopupUI(); }
         }
 
@@ -665,7 +649,6 @@
         function toggleFormat(styleProperty, activeValue, inactiveValue) {
             const cells = getCellsToFormat(); if(cells.length === 0) return;
             const targetCell = cells[0]; const comp = window.getComputedStyle(targetCell);
-            
             let isCurrentlyActive = false;
             if(styleProperty === 'fontWeight') isCurrentlyActive = (comp.fontWeight === 'bold' || comp.fontWeight >= 700);
             else if(styleProperty === 'fontStyle') isCurrentlyActive = (comp.fontStyle === 'italic');
@@ -742,13 +725,13 @@
         function deleteSelectedRow() {
             if (selectedCells.length === 0) return; const rowsToDelete = new Set(); selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr')));
             let hasHeader = false; rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; }); if(hasHeader) return alert("Không xóa hàng Tiêu đề!");
-            if (confirm(`Bạn có chắc chắn muốn xóa ${rowsToDelete.size} Hàng này?`)) { rowsToDelete.forEach(row => row.remove()); updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState(); }
+            if (confirm(`Xóa ${rowsToDelete.size} Hàng này?`)) { rowsToDelete.forEach(row => row.remove()); updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState(); }
         }
 
         function deleteSelectedColumn() {
             if (selectedCells.length === 0) return; const colsToDelete = new Set(); selectedCells.forEach(cell => colsToDelete.add(Array.from(cell.closest('tr').children).indexOf(cell)));
             if (colsToDelete.has(0)) return alert("Không xóa Cột Vị trí (cột đầu tiên)!");
-            if (confirm(`Bạn có chắc chắn muốn xóa ${colsToDelete.size} Cột này?`)) {
+            if (confirm(`Xóa ${colsToDelete.size} Cột này?`)) {
                 const table = document.getElementById('scheduleTable'); const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a);
                 table.querySelectorAll('thead tr, tbody tr').forEach(tr => { sortedCols.forEach(colIndex => { if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]); }); });
                 syncScrollbars(true); closePopup(); clearSelection(); saveState();
@@ -789,17 +772,28 @@
             setTimeout(() => syncScrollbars(true), 350);
         }
 
-        // --- CẤU HÌNH BẢNG MẶC ĐỊNH ---
+        // --- CẤU HÌNH BẢNG THEO ẢNH YÊU CẦU ---
         const jobRolesTemplate = [
-            { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" }, { name: " ", headerColor: "#000", dataColor: "#000" }, 
-            { name: "LẦU 12", headerColor: "#000", dataColor: "#000" }, { name: "KHU C", headerColor: "#673ab7", dataColor: "#673ab7" },
-            { name: "TRẦN CC", headerColor: "#673ab7", dataColor: "#673ab7" }, { name: "TRỰC", headerColor: "#28a745", dataColor: "#28a745" }, 
-            { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, { name: "RA TRỰC", headerColor: "#e83e8c", dataColor: "#e83e8c" }, 
-            { name: "PK 121", headerColor: "red", dataColor: "#e83e8c" }, { name: "PK 120s", headerColor: "#000", dataColor: "#000" },
-            { name: "PK 120c", headerColor: "#000", dataColor: "#000" }, { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" },
-            { name: "HỘI CHẨN", headerColor: "#17a2b8", dataColor: "#17a2b8" }, { name: "TRẠI CHIỀU", headerColor: "#673ab7", dataColor: "#000" },
-            { name: "53\n54", headerColor: "#673ab7", dataColor: "#000", separator: true }, { name: "33-34", headerColor: "#000", dataColor: "#000" },
-            { name: "35-36", headerColor: "#000", dataColor: "#000" }, { name: "37-38", headerColor: "#000", dataColor: "#000" }, { name: "46", headerColor: "#000", dataColor: "#000" }
+            { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" }, 
+            { name: "", headerColor: "#000", dataColor: "#000" }, 
+            { name: "Lầu 12", headerColor: "#000", dataColor: "#000" }, 
+            { name: "KHU C", headerColor: "#000", dataColor: "#673ab7" },
+            { name: "TRẦN CC", headerColor: "#000", dataColor: "#673ab7" }, 
+            { name: "TRỰC", headerColor: "#000", dataColor: "#28a745" }, 
+            { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, 
+            { name: "RA TRỰC", headerColor: "#000", dataColor: "#e83e8c" }, 
+            { name: "PK 121", headerColor: "#000", dataColor: "#e83e8c" }, 
+            { name: "PK 120s", headerColor: "#000", dataColor: "#000" },
+            { name: "PK 120c", headerColor: "#000", dataColor: "#000" }, 
+            { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" },
+            { name: "HỘI CHẨN Sáng", headerColor: "#000", dataColor: "#17a2b8" }, 
+            { name: "HỘI CHẨN Chiều", headerColor: "#000", dataColor: "#17a2b8" }, 
+            { name: "TRẠI CHIỀU", headerColor: "#000", dataColor: "#000" },
+            { name: "53\n54", headerColor: "#000", dataColor: "#000", separator: true }, 
+            { name: "33-34", headerColor: "#000", dataColor: "#000" },
+            { name: "35-36", headerColor: "#000", dataColor: "#000" }, 
+            { name: "37-38", headerColor: "#000", dataColor: "#000" }, 
+            { name: "46", headerColor: "#000", dataColor: "#000" }
         ];
 
         let holidays = JSON.parse(localStorage.getItem('holidays')) || [
@@ -931,7 +925,7 @@
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); enableTableEdit(isAdmin); closePopup(); clearSelection(); historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        function handleGenerateNewTable(hideConfirm = false) { if(hideConfirm || confirm("Hành động này sẽ TẠO BẢNG TRẮNG. \nNhững dữ liệu bạn chưa lưu vào GG Sheets sẽ bị mất. Tiếp tục?")) { generateTable(true); } }
+        function handleGenerateNewTable(hideConfirm = false) { if(hideConfirm || confirm("TẠO BẢNG TRẮNG. \nNhững dữ liệu chưa lưu sẽ bị mất. Tiếp tục?")) { generateTable(true); } }
 
         function generateTable(forceReset = false) {
             const pickerValue = document.getElementById('monthYearPicker').value; if (!pickerValue) return; const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
@@ -967,7 +961,7 @@
         function toggleCaptureInputs() {
             const mode = document.getElementById('captureMode').value;
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
-            document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'inline-block' : 'none';
+            document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'flex' : 'none';
         }
 
         function toggleRoleCol() {
@@ -996,22 +990,22 @@
         function showMessage(type, text) { const status = document.getElementById('statusMessage'); status.className = type; status.innerText = text; status.style.display = 'block'; if(type !== 'loading') setTimeout(() => { status.style.display = 'none'; }, 4000); }
 
         function takeScreenshot(actionType) {
-            closePopup(); const backupSelection = [...selectedCells]; clearSelection(); showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
+            closePopup(); const backupSelection = [...selectedCells]; clearSelection(); showMessage('loading', 'Đang tạo ảnh...');
             const table = document.getElementById('scheduleTable'); const [year, month] = document.getElementById('monthYearPicker').value.split('-'); const mode = document.getElementById('captureMode').value;
             let fileNameBase = `Lich_Truc_${month}_${year}`; if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`; else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
 
             html2canvas(table, { scale: 2, backgroundColor: "#ffffff", windowWidth: table.scrollWidth + 50 }).then(canvas => {
                 if (actionType === 'download') {
-                    canvas.toBlob(blob => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Đã tải xuống ảnh JPG thành công!'); }, 'image/jpeg', 0.92);
+                    canvas.toBlob(blob => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Đã tải ảnh JPG!'); }, 'image/jpeg', 0.92);
                 } else if (actionType === 'share') {
                     canvas.toBlob(blob => {
                         if (!blob) throw new Error('Lỗi tạo ảnh'); const file = new File([blob], `${fileNameBase}.png`, { type: 'image/png' });
-                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ title: 'Lịch Trực', files: [file] }).then(() => showMessage('success', 'Đã mở bảng chia sẻ ảnh!')).catch(() => document.getElementById('statusMessage').style.display = 'none'); } 
-                        else { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Thiết bị không hỗ trợ share. Đã tự động tải ảnh!'); }
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ title: 'Lịch Trực', files: [file] }).then(() => showMessage('success', 'Đã mở bảng chia sẻ!')).catch(() => document.getElementById('statusMessage').style.display = 'none'); } 
+                        else { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Đã tải ảnh!'); }
                     }, 'image/png');
                 }
                 if(backupSelection.length > 0) { selectRange(backupSelection[0], backupSelection[backupSelection.length-1]); }
-            }).catch(err => { showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); });
+            }).catch(err => { showMessage('error', 'Lỗi khi chụp ảnh.'); });
         }
 
         // --- LƯU GG SHEET ---
@@ -1037,9 +1031,9 @@
 
             const payload = { sheetName: sheetName, data: payloadData, styles: { bgColors: payloadBgColors, fontColors: payloadFontColors, fontWeights: payloadFontWeights } };
 
-            showMessage('loading', 'Đang cập nhật lên Web...');
+            showMessage('loading', 'Đang lưu lên Web...');
             fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-            .then(response => response.json()).then(result => { if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!'); else showMessage('error', 'Lỗi từ Server: ' + result.message); }).catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
+            .then(response => response.json()).then(result => { if(result.status === 'success') showMessage('success', 'Lưu thành công!'); else showMessage('error', 'Lỗi: ' + result.message); }).catch(() => showMessage('success', 'Đang gửi yêu cầu...'));
         }
 
         const modal = document.getElementById("holidayModal");
