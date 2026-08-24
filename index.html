@@ -39,7 +39,7 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; }
 
-        /* --- DASHBOARD ĐIỀU KHIỂN --- */
+        /* --- DASHBOARD ĐIỀU KHIỂN (CỐ ĐỊNH HIỂN THỊ) --- */
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
 
         .panel {
@@ -56,7 +56,6 @@
         select, input[type="month"], input[type="number"], input[type="color"] {
             padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; height: 28px;
         }
-        input[type="color"] { padding: 0; width: 35px; cursor: pointer; }
 
         button {
             padding: 4px 10px; font-size: 12px; font-weight: 600; color: white;
@@ -72,15 +71,68 @@
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
 
-        /* --- TOOLBAR EXCEL MINI --- */
-        .toolbar {
-            display: flex; gap: 15px; align-items: center; background: #e9ecef;
-            padding: 8px 10px; border-radius: 6px; margin-bottom: 10px; flex-wrap: wrap; border: 1px solid #ced4da;
+        /* --- COLLAPSIBLE SECTIONS (ACCORDION) DÀNH CHO GHI CHÚ --- */
+        .collapsible-header {
+            background-color: #e9ecef; color: #444; cursor: pointer;
+            padding: 8px 12px; width: 100%;
+            border: 1px solid #ced4da; border-radius: 6px;
+            text-align: left; font-size: 13px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background-color 0.2s ease; margin-bottom: 5px;
         }
+
+        .collapsible-header:hover { background-color: #dde2e6; }
+        .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
+        .collapsible-header.active:after { content: '\25B2'; }
+
+        .collapsible-content {
+            padding: 0; max-height: 1000px;
+            overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease;
+            background-color: transparent; margin-bottom: 10px;
+        }
+        .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
+
+        /* Khung Ghi chú */
+        #topNotesArea {
+            width: 100%; min-height: 60px; border: 1px solid #ccc;
+            border-radius: 4px; padding: 8px; font-family: inherit;
+            font-size: 13px; resize: vertical; background-color: #fff8dc; 
+        }
+
+        /* --- FLOATING POPUP MENU (TOOLBAR MỚI) --- */
+        #cellPopupMenu {
+            display: none; position: fixed; z-index: 2000;
+            background-color: #ffffff; border: 1px solid #ced4da;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px;
+            width: 320px; font-size: 13px;
+        }
+
+        .popup-header {
+            background-color: #f1f3f5; padding: 8px 12px; border-bottom: 1px solid #ddd;
+            border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; color: #333; cursor: move; /* Báo hiệu có thể kéo thả nếu sau này thêm tính năng Drag */
+        }
+        .popup-close { cursor: pointer; color: #888; font-size: 16px; font-weight: bold; line-height: 1; }
+        .popup-close:hover { color: #dc3545; }
+
+        .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
+        .popup-tab { flex: 1; text-align: center; padding: 8px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
+        .popup-tab:hover { background: #f0f0f0; }
+        .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
+
+        .popup-body { padding: 12px; max-height: 60vh; overflow-y: auto; }
+        .popup-section { display: none; flex-direction: column; gap: 12px; }
+        .popup-section.active { display: flex; }
+
+        .popup-item { display: flex; flex-direction: column; gap: 5px; }
+        .popup-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 0.5px;}
+        .popup-row { display: flex; gap: 5px; align-items: center; flex-wrap: wrap;}
+        .popup-row button { flex: 1; min-width: 80px; height: 32px; font-size: 11px;}
+        .popup-row select { flex: 1; min-width: 100px;}
+        .popup-row input[type="color"] { width: 35px; height: 32px; padding: 0; cursor: pointer;}
         
-        .toolbar-group { display: flex; align-items: center; gap: 5px; border-right: 1px solid #ccc; padding-right: 15px; }
-        .toolbar-group:last-child { border-right: none; padding-right: 0; }
-        .toolbar-title { font-size: 12px; font-weight: bold; color: #444; margin-right: 5px; }
+        .color-picker-wrapper { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px; border: 1px solid #ddd; border-radius: 4px;}
+        .color-picker-wrapper label { font-size: 11px; color: #555; }
 
         /* --- XỬ LÝ THANH CUỘN KÉP --- */
         .master-wrapper {
@@ -96,7 +148,7 @@
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         
-        .table-container { overflow: auto; flex: 1; width: 100%; }
+        .table-container { overflow: auto; flex: 1; width: 100%; position: relative;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
@@ -113,7 +165,7 @@
 
         /* Ô đang được chọn (Focus) */
         td.selected-cell, th.selected-cell {
-            outline: 2px solid #28a745 !important; outline-offset: -2px; box-shadow: inset 0 0 0 1px #28a745;
+            outline: 2px dashed var(--primary-color) !important; outline-offset: -2px; box-shadow: inset 0 0 0 1px rgba(13,110,253,0.3);
         }
 
         /* Thông báo */
@@ -126,7 +178,7 @@
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
 
         /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
         .close:hover { color: black; }
@@ -134,10 +186,8 @@
         .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; }
 
-        @media (max-width: 1200px) {
-            .toolbar { flex-direction: column; align-items: flex-start; gap: 8px;}
-            .toolbar-group { border-right: none; padding-right: 0; border-bottom: 1px solid #ccc; padding-bottom: 6px; width: 100%; flex-wrap: wrap;}
-            .toolbar-group:last-child { border-bottom: none; }
+        @media (max-width: 768px) {
+            #cellPopupMenu { width: 90vw; left: 5vw !important; } /* Chiếm gần hết ngang trên mobile */
         }
     </style>
 </head>
@@ -146,7 +196,7 @@
     <div class="container">
         <h2>Bảng Xếp Lịch Trực Tùy Chỉnh</h2>
 
-        <!-- DASHBOARD ĐIỀU KHIỂN -->
+        <!-- SECTION: BẢNG ĐIỀU KHIỂN & CẮT ẢNH (LUÔN HIỂN THỊ) -->
         <div class="dashboard">
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
@@ -194,64 +244,94 @@
             </div>
         </div>
 
-        <!-- TOOLBAR: TÔ MÀU, THÊM/XÓA CẤU TRÚC & XÓA NỘI DUNG -->
-        <div class="toolbar">
-            <div class="toolbar-group">
-                <span class="toolbar-title">🎨 TÔ MÀU:</span>
-                <select id="colorScope">
-                    <option value="cell">Chỉ ô hiện tại</option>
-                    <option value="row">Toàn bộ Hàng đang chọn</option>
-                    <option value="col">Toàn bộ Cột đang chọn</option>
-                </select>
-                <label style="font-size: 12px; display:flex; align-items:center; gap:2px;" title="Màu Chữ">
-                    Chữ <input type="color" id="textColorPicker" value="#000000" onchange="applyColorFormat('text')">
-                </label>
-                <label style="font-size: 12px; display:flex; align-items:center; gap:2px;" title="Màu Nền">
-                    Nền <input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')">
-                </label>
-                <button class="secondary" onclick="clearCellFormat()" title="Xóa màu">Xóa Màu</button>
-            </div>
-            
-            <div class="toolbar-group">
-                <span class="toolbar-title">➕ THÊM (HÀNG/CỘT):</span>
-                <button onclick="insertRow('above')">+ Hàng Trên</button>
-                <button onclick="insertRow('below')">+ Hàng Dưới</button>
-                <button onclick="insertColumn('left')" style="margin-left: 5px;">+ Cột Trái</button>
-                <button onclick="insertColumn('right')">+ Cột Phải</button>
-            </div>
-            
-            <div class="toolbar-group">
-                <span class="toolbar-title">➖ XÓA KHUNG:</span>
-                <button class="danger" onclick="deleteSelectedRow()">Xóa Hàng</button>
-                <button class="danger" onclick="deleteSelectedColumn()">Xóa Cột</button>
-            </div>
+        <!-- SECTION: GHI CHÚ CHUNG (Thu gọn được) -->
+        <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
+        <div id="notesSection" class="collapsible-content collapsed">
+            <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây. Nội dung này chỉ dùng để xem, không lưu vào ảnh..."></textarea>
+        </div>
 
-            <!-- NHÓM MỚI: XÓA NỘI DUNG -->
-            <div class="toolbar-group" style="border-right: none;">
-                <span class="toolbar-title">🧹 XÓA NỘI DUNG:</span>
-                <select id="clearScopeMode" onchange="toggleClearInputs()">
-                    <option value="cell">Ô đang chọn</option>
-                    <option value="row">Hàng đang chọn</option>
-                    <option value="col">Cột đang chọn</option>
-                    <option value="week">Theo Tuần</option>
-                    <option value="range">Khoảng Ngày (Cột)</option>
-                    <option value="all" style="color:red; font-weight:bold;">Tất cả Nội Dung</option>
-                </select>
-                
-                <span id="clearWeekGroup" style="display: none;">
-                    <select id="clearWeekSelect">
-                        <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
-                        <option value="3">Tuần 3</option><option value="4">Tuần 4</option>
-                        <option value="5">Tuần 5</option>
-                    </select>
-                </span>
-                
-                <span id="clearDateGroup" style="display: none;">
-                    Từ: <input type="number" id="clearStart" min="1" max="31" style="width: 45px;" value="1"> - 
-                    Đến: <input type="number" id="clearEnd" min="1" max="31" style="width: 45px;" value="7">
-                </span>
+        <!-- FLOATING POPUP MENU CHỈNH SỬA Ô -->
+        <div id="cellPopupMenu">
+            <div class="popup-header">
+                <span id="popupCellName">Tùy chọn Ô</span>
+                <span class="popup-close" onclick="closePopup()">&times;</span>
+            </div>
+            <div class="popup-tabs">
+                <div class="popup-tab active" onclick="switchPopupTab('formatTab')">🎨 Định dạng</div>
+                <div class="popup-tab" onclick="switchPopupTab('structTab')">⚙️ Khung Bảng</div>
+            </div>
+            <div class="popup-body">
+                <!-- Tab: Định dạng & Tô màu -->
+                <div id="formatTab" class="popup-section active">
+                    <div class="popup-item">
+                        <span class="popup-title">Phạm vi áp dụng</span>
+                        <select id="colorScope" style="width:100%;">
+                            <option value="cell">Chỉ ô hiện tại</option>
+                            <option value="row">Toàn bộ Hàng chứa ô này</option>
+                            <option value="col">Toàn bộ Cột chứa ô này</option>
+                        </select>
+                    </div>
+                    <div class="popup-item">
+                        <span class="popup-title">Màu sắc</span>
+                        <div class="popup-row">
+                            <div class="color-picker-wrapper">
+                                <label>Chữ</label>
+                                <input type="color" id="textColorPicker" value="#000000" onchange="applyColorFormat('text')">
+                            </div>
+                            <div class="color-picker-wrapper">
+                                <label>Nền</label>
+                                <input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')">
+                            </div>
+                            <button class="secondary" onclick="clearCellFormat()" style="flex:1;">Xóa Màu</button>
+                        </div>
+                    </div>
+                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <span class="popup-title">Dọn dẹp</span>
+                        <div class="popup-row">
+                            <select id="clearScopeMode" onchange="toggleClearInputs()" style="flex: 2;">
+                                <option value="cell">Xóa Text ô này</option>
+                                <option value="row">Xóa Text cả Hàng</option>
+                                <option value="col">Xóa Text cả Cột</option>
+                                <option value="week">Xóa Text theo Tuần</option>
+                                <option value="range">Xóa Text theo Ngày</option>
+                                <option value="all" style="color:red; font-weight:bold;">Xóa Tất Cả Text</option>
+                            </select>
+                            <button class="warning" onclick="executeClearContent()" style="flex: 1;">🗑️ Xóa</button>
+                        </div>
+                        <div class="popup-row" id="clearWeekGroup" style="display: none; margin-top:5px;">
+                            <select id="clearWeekSelect" style="width:100%;">
+                                <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
+                                <option value="3">Tuần 3</option><option value="4">Tuần 4</option><option value="5">Tuần 5</option>
+                            </select>
+                        </div>
+                        <div class="popup-row" id="clearDateGroup" style="display: none; margin-top:5px;">
+                            <input type="number" id="clearStart" min="1" max="31" placeholder="Từ" style="flex:1;"> 
+                            <input type="number" id="clearEnd" min="1" max="31" placeholder="Đến" style="flex:1;">
+                        </div>
+                    </div>
+                </div>
 
-                <button class="warning" onclick="executeClearContent()">🗑️ Xóa Dữ Liệu</button>
+                <!-- Tab: Thêm Xóa Khung -->
+                <div id="structTab" class="popup-section">
+                    <div class="popup-item">
+                        <span class="popup-title">Thêm Hàng/Cột</span>
+                        <div class="popup-row">
+                            <button onclick="insertRow('above')">Hàng Lên</button>
+                            <button onclick="insertRow('below')">Hàng Xuống</button>
+                        </div>
+                        <div class="popup-row">
+                            <button onclick="insertColumn('left')">Cột Trái</button>
+                            <button onclick="insertColumn('right')">Cột Phải</button>
+                        </div>
+                    </div>
+                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                        <span class="popup-title">Xóa Khung (Xóa hẳn dòng/cột)</span>
+                        <div class="popup-row">
+                            <button class="danger" onclick="deleteSelectedRow()">Xóa Hàng</button>
+                            <button class="danger" onclick="deleteSelectedColumn()">Xóa Cột</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -260,10 +340,11 @@
         <!-- BẢNG NỘI DUNG VỚI THANH CUỘN KÉP -->
         <div class="master-wrapper">
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
-            <div class="right-content">
+            <div class="right-content"> 
                 <div class="top-scrollbar" id="topScroll"><div id="topScrollContent" style="height: 1px;"></div></div>
                 <div class="table-container" id="bottomScroll">
-                    <table id="scheduleTable" onclick="selectCell(event)">
+                    <!-- id table để xuất ảnh -->
+                    <table id="scheduleTable" onclick="openCellPopup(event)">
                         <thead>
                             <tr id="dateHeaderRow1"></tr>
                             <tr id="dateHeaderRow2"></tr>
@@ -326,28 +407,100 @@
             syncScrollbars();
         });
 
-        // --- HÀM CHỌN VÀ TÔ MÀU Ô/HÀNG/CỘT ---
-        function selectCell(event) {
-            let target = event.target;
-            if (target.tagName === 'TD' || target.tagName === 'TH') {
-                if (selectedCell) selectedCell.classList.remove('selected-cell');
-                selectedCell = target;
-                selectedCell.classList.add('selected-cell'); 
+        // Ẩn Popup khi click ra ngoài bảng
+        document.addEventListener('click', function(event) {
+            const popup = document.getElementById('cellPopupMenu');
+            const table = document.getElementById('scheduleTable');
+            if (!popup.contains(event.target) && !table.contains(event.target)) {
+                closePopup();
+            }
+        });
 
-                const computedStyle = window.getComputedStyle(selectedCell);
-                document.getElementById('textColorPicker').value = rgbToHex(computedStyle.color);
-                
-                let bgColor = computedStyle.backgroundColor;
-                if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
-                    document.getElementById('bgColorPicker').value = '#ffffff';
-                } else {
-                    document.getElementById('bgColorPicker').value = rgbToHex(bgColor);
-                }
+        // --- HÀM ẨN/HIỆN ACCORDION ---
+        function toggleSection(sectionId, headerElement) {
+            const content = document.getElementById(sectionId);
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                headerElement.classList.add('active');
+            } else {
+                content.classList.add('collapsed');
+                headerElement.classList.remove('active');
+            }
+            setTimeout(() => syncScrollbars(true), 350);
+        }
+
+        // --- HÀM QUẢN LÝ POPUP MENU ---
+        function openCellPopup(event) {
+            let target = event.target;
+            if (target.tagName !== 'TD' && target.tagName !== 'TH') return;
+
+            // Xử lý Focus
+            if (selectedCell) selectedCell.classList.remove('selected-cell');
+            selectedCell = target;
+            selectedCell.classList.add('selected-cell'); 
+
+            // Đọc màu hiển thị lên input
+            const computedStyle = window.getComputedStyle(selectedCell);
+            document.getElementById('textColorPicker').value = rgbToHex(computedStyle.color);
+            let bgColor = computedStyle.backgroundColor;
+            document.getElementById('bgColorPicker').value = (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') ? '#ffffff' : rgbToHex(bgColor);
+
+            // Xác định tên/vị trí ô để hiển thị trên Header Popup
+            const row = selectedCell.closest('tr');
+            const colIndex = Array.from(row.children).indexOf(selectedCell);
+            let cellName = "";
+            if (row.parentElement.tagName === 'THEAD') {
+                cellName = "Ô Tiêu Đề";
+            } else {
+                const headerText = document.getElementById('dateHeaderRow2').children[colIndex] ? document.getElementById('dateHeaderRow2').children[colIndex].innerText : '';
+                const rowText = row.children[0] ? row.children[0].innerText.replace('\n',' ') : '';
+                cellName = (colIndex === 0) ? `Cột Vị trí: ${rowText}` : `Hàng ${rowText} - Ngày ${headerText}`;
+            }
+            document.getElementById('popupCellName').innerText = cellName;
+
+            // Hiển thị và định vị Popup
+            const popup = document.getElementById('cellPopupMenu');
+            popup.style.display = 'block';
+
+            // Tính toán vị trí: Đặt dưới ô click, nếu tràn dưới thì đặt lên trên
+            const rect = selectedCell.getBoundingClientRect();
+            let topPos = rect.bottom + window.scrollY + 5;
+            let leftPos = rect.left + window.scrollX;
+
+            // Căn lề trái phải nếu tràn màn hình
+            if (leftPos + 320 > window.innerWidth) {
+                leftPos = window.innerWidth - 330;
+            }
+            if (leftPos < 10) leftPos = 10;
+            
+            // Căn lề dưới nếu tràn (ước tính height popup ~ 300px)
+            if (topPos - window.scrollY + 300 > window.innerHeight) {
+                topPos = rect.top + window.scrollY - 300 - 5; 
+                if (topPos < window.scrollY) topPos = window.scrollY + 10; // Tránh văng khỏi cạnh trên
+            }
+
+            popup.style.top = `${topPos}px`;
+            popup.style.left = `${leftPos}px`;
+        }
+
+        function closePopup() {
+            document.getElementById('cellPopupMenu').style.display = 'none';
+            if (selectedCell) {
+                selectedCell.classList.remove('selected-cell');
+                selectedCell = null;
             }
         }
 
+        function switchPopupTab(tabId) {
+            document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // --- HÀM XỬ LÝ TÔ MÀU ---
         function applyColorFormat(type) {
-            if (!selectedCell) return alert("Vui lòng nhấp chuột chọn 1 ô trong bảng làm mốc!");
+            if (!selectedCell) return;
             const scope = document.getElementById('colorScope').value;
             const color = type === 'text' ? document.getElementById('textColorPicker').value : document.getElementById('bgColorPicker').value;
 
@@ -356,14 +509,10 @@
                 else el.style.setProperty('background-color', color, 'important');
             };
 
-            if (scope === 'cell') {
-                applyStyle(selectedCell);
-            } else if (scope === 'row') {
-                const tr = selectedCell.closest('tr');
-                Array.from(tr.children).forEach(applyStyle);
-            } else if (scope === 'col') {
-                const tr = selectedCell.closest('tr');
-                const colIndex = Array.from(tr.children).indexOf(selectedCell);
+            if (scope === 'cell') { applyStyle(selectedCell); } 
+            else if (scope === 'row') { Array.from(selectedCell.closest('tr').children).forEach(applyStyle); } 
+            else if (scope === 'col') {
+                const colIndex = Array.from(selectedCell.closest('tr').children).indexOf(selectedCell);
                 document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
                     if(row.children[colIndex]) applyStyle(row.children[colIndex]);
                 });
@@ -371,21 +520,14 @@
         }
 
         function clearCellFormat() {
-            if (!selectedCell) return alert("Vui lòng nhấp chuột chọn 1 ô trong bảng làm mốc!");
+            if (!selectedCell) return;
             const scope = document.getElementById('colorScope').value;
-            const clearStyle = (el) => {
-                el.style.color = '';
-                el.style.removeProperty('background-color'); 
-            };
+            const clearStyle = (el) => { el.style.color = ''; el.style.removeProperty('background-color'); };
 
-            if (scope === 'cell') {
-                clearStyle(selectedCell);
-            } else if (scope === 'row') {
-                const tr = selectedCell.closest('tr');
-                Array.from(tr.children).forEach(clearStyle);
-            } else if (scope === 'col') {
-                const tr = selectedCell.closest('tr');
-                const colIndex = Array.from(tr.children).indexOf(selectedCell);
+            if (scope === 'cell') { clearStyle(selectedCell); } 
+            else if (scope === 'row') { Array.from(selectedCell.closest('tr').children).forEach(clearStyle); } 
+            else if (scope === 'col') {
+                const colIndex = Array.from(selectedCell.closest('tr').children).indexOf(selectedCell);
                 document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
                     if(row.children[colIndex]) clearStyle(row.children[colIndex]);
                 });
@@ -395,26 +537,20 @@
         function rgbToHex(rgb) {
             if (rgb.startsWith('#')) return rgb;
             let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
-            if(m) {
-                return "#" + ("0" + parseInt(m[1],10).toString(16)).slice(-2) +
-                             ("0" + parseInt(m[2],10).toString(16)).slice(-2) +
-                             ("0" + parseInt(m[3],10).toString(16)).slice(-2);
-            }
+            if(m) return "#" + ("0" + parseInt(m[1],10).toString(16)).slice(-2) + ("0" + parseInt(m[2],10).toString(16)).slice(-2) + ("0" + parseInt(m[3],10).toString(16)).slice(-2);
             return "#000000";
         }
 
-        // --- HÀM CHÈN/XÓA HÀNG CỘT (CẤU TRÚC) ---
+        // --- HÀM CHÈN/XÓA CẤU TRÚC BẢNG ---
         function insertRow(position) {
-            if (!selectedCell) return alert("Vui lòng nhấp chọn 1 ô để làm mốc chèn Hàng!");
+            if (!selectedCell) return;
             const currentRow = selectedCell.closest('tr');
-            if (currentRow.parentElement.tagName === 'THEAD') return alert("Không thể chèn Hàng vào vùng Tiêu đề!");
+            if (currentRow.parentElement.tagName === 'THEAD') return alert("Không chèn vào vùng Tiêu đề!");
 
             const colCount = document.getElementById('dateHeaderRow1').children.length;
             const newRow = document.createElement('tr');
-            
             for (let i = 0; i < colCount; i++) {
-                const td = document.createElement('td');
-                td.contentEditable = "true";
+                const td = document.createElement('td'); td.contentEditable = "true";
                 if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; }
                 newRow.appendChild(td);
             }
@@ -422,66 +558,61 @@
             if (position === 'above') currentRow.parentNode.insertBefore(newRow, currentRow);
             else currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
             
-            updateRowSelectDropdown(); syncScrollbars(true);
+            updateRowSelectDropdown(); syncScrollbars(true); closePopup();
         }
 
         function insertColumn(position) {
-            if (!selectedCell) return alert("Vui lòng nhấp chọn 1 ô để làm mốc chèn Cột!");
+            if (!selectedCell) return;
             const tr = selectedCell.closest('tr');
             const colIndex = Array.from(tr.children).indexOf(selectedCell);
-            if (colIndex === 0 && position === 'left') return alert("Không thể chèn cột vào trước Cột Vị trí!");
+            if (colIndex === 0 && position === 'left') return alert("Không chèn trước Cột Vị trí!");
 
             const targetIndex = position === 'left' ? colIndex : colIndex + 1;
 
             const thead1 = document.getElementById('dateHeaderRow1');
-            const th1 = document.createElement('th');
-            th1.contentEditable = "true"; th1.innerText = "MỚI";
+            const th1 = document.createElement('th'); th1.contentEditable = "true"; th1.innerText = "MỚI";
             thead1.insertBefore(th1, thead1.children[targetIndex] || null);
 
             const thead2 = document.getElementById('dateHeaderRow2');
-            const th2 = document.createElement('th');
-            th2.contentEditable = "true"; th2.innerText = "00";
+            const th2 = document.createElement('th'); th2.contentEditable = "true"; th2.innerText = "00";
             thead2.insertBefore(th2, thead2.children[targetIndex] || null);
 
             document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => {
-                const td = document.createElement('td');
-                td.contentEditable = "true";
+                const td = document.createElement('td'); td.contentEditable = "true";
                 row.insertBefore(td, row.children[targetIndex] || null);
             });
-            syncScrollbars(true);
+            syncScrollbars(true); closePopup();
         }
 
         function deleteSelectedRow() {
-            if (!selectedCell) return alert("Vui lòng nhấp chuột chọn 1 ô thuộc Hàng cần xóa!");
+            if (!selectedCell) return;
             const row = selectedCell.closest('tr');
-            if (row.parentElement.tagName === 'THEAD') return alert("Không thể xóa hàng Tiêu đề!");
-            
+            if (row.parentElement.tagName === 'THEAD') return alert("Không xóa hàng Tiêu đề!");
             if (confirm("Xóa Hàng sẽ xóa luôn cấu trúc của Hàng này. Tiếp tục?")) {
-                row.remove(); selectedCell = null;
-                updateRowSelectDropdown(); syncScrollbars(true);
+                row.remove(); updateRowSelectDropdown(); syncScrollbars(true); closePopup();
             }
         }
 
         function deleteSelectedColumn() {
-            if (!selectedCell) return alert("Vui lòng nhấp chuột chọn 1 ô thuộc Cột cần xóa!");
+            if (!selectedCell) return;
             const row = selectedCell.closest('tr');
             const colIndex = Array.from(row.children).indexOf(selectedCell);
-            if (colIndex === 0) return alert("Không thể xóa Cột Vị trí (cột đầu tiên)!");
+            if (colIndex === 0) return alert("Không xóa Cột Vị trí (cột đầu tiên)!");
 
             if (confirm("Xóa Cột sẽ xóa luôn cấu trúc của Cột này. Tiếp tục?")) {
                 const table = document.getElementById('scheduleTable');
                 table.querySelectorAll('thead tr, tbody tr').forEach(tr => {
                     if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]);
                 });
-                selectedCell = null; syncScrollbars(true);
+                syncScrollbars(true); closePopup();
             }
         }
 
-        // --- CHỨC NĂNG MỚI: XÓA NỘI DUNG ---
+        // --- HÀM XÓA NỘI DUNG ---
         function toggleClearInputs() {
             const mode = document.getElementById('clearScopeMode').value;
-            document.getElementById('clearWeekGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
-            document.getElementById('clearDateGroup').style.display = mode === 'range' ? 'inline-block' : 'none';
+            document.getElementById('clearWeekGroup').style.display = mode === 'week' ? 'flex' : 'none';
+            document.getElementById('clearDateGroup').style.display = mode === 'range' ? 'flex' : 'none';
         }
 
         function executeClearContent() {
@@ -489,59 +620,44 @@
             const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
             
             if (mode === 'cell') {
-                if (!selectedCell || selectedCell.tagName !== 'TD') return alert("Vui lòng chọn 1 ô nội dung (TD) để xóa!");
+                if (!selectedCell || selectedCell.tagName !== 'TD') return alert("Chọn 1 ô nội dung (TD) để xóa!");
                 selectedCell.innerText = '';
-            } 
-            else if (mode === 'row') {
-                if (!selectedCell) return alert("Vui lòng chọn 1 ô để xác định Hàng cần xóa nội dung!");
+            } else if (mode === 'row') {
+                if (!selectedCell) return;
                 const tr = selectedCell.closest('tr');
-                if (tr.parentElement.tagName === 'THEAD') return alert("Không thể xóa nội dung Tiêu đề!");
-                Array.from(tr.children).forEach((td, i) => {
-                    if (i > 0 && td.tagName === 'TD') td.innerText = '';
-                });
-            } 
-            else if (mode === 'col') {
-                if (!selectedCell) return alert("Vui lòng chọn 1 ô để xác định Cột cần xóa nội dung!");
+                if (tr.parentElement.tagName === 'THEAD') return alert("Không xóa nội dung Tiêu đề!");
+                Array.from(tr.children).forEach((td, i) => { if (i > 0 && td.tagName === 'TD') td.innerText = ''; });
+            } else if (mode === 'col') {
+                if (!selectedCell) return;
                 const colIndex = Array.from(selectedCell.closest('tr').children).indexOf(selectedCell);
-                if (colIndex === 0) return alert("Không thể xóa nội dung Cột Vị trí!");
-                tbodyRows.forEach(row => {
-                    if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') {
-                        row.children[colIndex].innerText = '';
-                    }
-                });
-            } 
-            else {
-                // Xử lý xóa theo mảng cột: Tuần, Khoảng, Tất cả
+                if (colIndex === 0) return alert("Không xóa nội dung Cột Vị trí!");
+                tbodyRows.forEach(row => { if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') row.children[colIndex].innerText = ''; });
+            } else {
                 let start = 1, end = 999;
                 const [year, month] = document.getElementById('monthYearPicker').value.split('-');
                 const daysInMonth = new Date(year, parseInt(month), 0).getDate();
 
                 if (mode === 'week') {
                     const w = parseInt(document.getElementById('clearWeekSelect').value);
-                    start = (w - 1) * 7 + 1;
-                    end = Math.min(w * 7, daysInMonth);
-                } 
-                else if (mode === 'range') {
+                    start = (w - 1) * 7 + 1; end = Math.min(w * 7, daysInMonth);
+                } else if (mode === 'range') {
                     start = parseInt(document.getElementById('clearStart').value) || 1;
                     end = parseInt(document.getElementById('clearEnd').value) || daysInMonth;
-                } 
-                else if (mode === 'all') {
-                    if(!confirm("CẢNH BÁO: Bạn chuẩn bị xóa TOÀN BỘ dữ liệu người trực trong bảng này. Vẫn tiếp tục?")) return;
+                } else if (mode === 'all') {
+                    if(!confirm("CẢNH BÁO: Xóa TOÀN BỘ dữ liệu. Vẫn tiếp tục?")) return;
                     start = 1; end = 999; 
                 }
 
                 tbodyRows.forEach(row => {
                     const cells = row.children;
-                    for (let i = 1; i < cells.length; i++) { // Bắt đầu từ 1 để bỏ qua cột Vị trí
-                        if (mode === 'all' || (i >= start && i <= end)) {
-                            if (cells[i].tagName === 'TD') cells[i].innerText = '';
-                        }
+                    for (let i = 1; i < cells.length; i++) { 
+                        if (mode === 'all' || (i >= start && i <= end)) { if (cells[i].tagName === 'TD') cells[i].innerText = ''; }
                     }
                 });
             }
-            showMessage('success', 'Đã xóa nội dung thành công!');
+            showMessage('success', 'Đã xóa nội dung!');
+            closePopup();
         }
-
 
         // --- ĐỒNG BỘ THANH CUỘN KÉP ---
         function syncScrollbars(forceUpdate = false) {
@@ -565,12 +681,10 @@
 
             document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
             bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; });
-
             leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
             bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
         }
 
-        // --- TẠO DROPDOWN CẮT HÀNG ---
         function updateRowSelectDropdown() {
             const select = document.getElementById('rowSelectEnd');
             select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
@@ -584,7 +698,6 @@
             select.value = "all";
         }
 
-        // --- TẠO BẢNG ĐỘNG ---
         function generateTable() {
             const pickerValue = document.getElementById('monthYearPicker').value;
             if (!pickerValue) return;
@@ -592,7 +705,6 @@
             const [year, month] = pickerValue.split('-');
             const yearNum = parseInt(year);
             const monthNum = parseInt(month) - 1; 
-
             const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
             const dateHeaderRow1 = document.getElementById('dateHeaderRow1');
             const dateHeaderRow2 = document.getElementById('dateHeaderRow2');
@@ -607,11 +719,8 @@
                 const currentDate = new Date(yearNum, monthNum, day);
                 const dayOfWeekIndex = currentDate.getDay();
                 
-                const thName = document.createElement('th');
-                thName.innerText = daysOfWeek[dayOfWeekIndex];
-                
-                const thNum = document.createElement('th');
-                thNum.innerText = day;
+                const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex];
+                const thNum = document.createElement('th'); thNum.innerText = day;
                 
                 const annualDateString = `${String(monthNum + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 if (holidays.find(h => h.date === annualDateString)) {
@@ -620,8 +729,7 @@
                     thName.classList.add('weekend'); thNum.classList.add('weekend');
                 }
 
-                dateHeaderRow1.appendChild(thName);
-                dateHeaderRow2.appendChild(thNum);
+                dateHeaderRow1.appendChild(thName); dateHeaderRow2.appendChild(thNum);
             }
 
             scheduleBody.innerHTML = ''; 
@@ -631,8 +739,7 @@
                 
                 const tdRole = document.createElement('td');
                 tdRole.classList.add('header-col');
-                tdRole.innerText = role.name;
-                tdRole.style.color = role.headerColor;
+                tdRole.innerText = role.name; tdRole.style.color = role.headerColor;
                 if (role.bold) tdRole.style.fontWeight = "bold";
                 tr.appendChild(tdRole);
 
@@ -644,27 +751,20 @@
                     const td = document.createElement('td');
                     td.contentEditable = "true";
 
-                    if (holidays.find(h => h.date === annualDateString)) {
-                        td.classList.add('holiday');
-                    } else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) {
-                        td.classList.add('weekend');
-                    }
+                    if (holidays.find(h => h.date === annualDateString)) td.classList.add('holiday');
+                    else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
                     
-                    td.style.color = role.dataColor;
-                    td.style.fontWeight = "bold";
+                    td.style.color = role.dataColor; td.style.fontWeight = "bold";
                     if(role.name.trim() === "") td.style.backgroundColor = "#fff";
-
                     tr.appendChild(td);
                 }
                 scheduleBody.appendChild(tr);
             });
 
-            updateRowSelectDropdown();
-            updateCropPreview();
-            toggleRoleCol();
-            selectedCell = null; 
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); 
         }
 
+        // --- XỬ LÝ CẮT ẢNH ---
         function toggleCaptureInputs() {
             const mode = document.getElementById('captureMode').value;
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
@@ -676,7 +776,7 @@
             document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
                 if (row.children.length > 0) row.children[0].style.display = isChecked ? '' : 'none';
             });
-            syncScrollbars(true);
+            syncScrollbars(true); closePopup();
         }
 
         function updateCropPreview() {
@@ -692,8 +792,7 @@
             
             if (mode === 'week') {
                 const w = parseInt(document.getElementById('weekSelect').value);
-                startDay = (w - 1) * 7 + 1;
-                endDay = Math.min(w * 7, daysInMonth);
+                startDay = (w - 1) * 7 + 1; endDay = Math.min(w * 7, daysInMonth);
             } else if (mode === 'date') {
                 startDay = parseInt(document.getElementById('startDay').value) || 1;
                 endDay = parseInt(document.getElementById('endDay').value) || daysInMonth;
@@ -723,27 +822,23 @@
                     else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; }
                 }
             });
-            syncScrollbars(true);
+            syncScrollbars(true); closePopup();
         }
 
         function showMessage(type, text) {
             const status = document.getElementById('statusMessage');
-            status.className = type;
-            status.innerText = text;
-            status.style.display = 'block';
+            status.className = type; status.innerText = text; status.style.display = 'block';
             if(type !== 'loading') setTimeout(() => { status.style.display = 'none'; }, 4000);
         }
 
-        // --- XUẤT ẢNH ---
         function takeScreenshot(actionType) {
-            if(selectedCell) selectedCell.classList.remove('selected-cell');
-
+            closePopup(); // Ẩn popup trước khi chụp
             showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
             const table = document.getElementById('scheduleTable');
+
             const [year, month] = document.getElementById('monthYearPicker').value.split('-');
             const mode = document.getElementById('captureMode').value;
             let fileNameBase = `Lich_Truc_${month}_${year}`;
-            
             if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`;
             else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
 
@@ -769,16 +864,16 @@
                         }
                     }, 'image/png');
                 }
-                if(selectedCell) selectedCell.classList.add('selected-cell');
-            }).catch(err => showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'));
+            }).catch(err => {
+                showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.');
+            });
         }
 
         // --- LƯU GG SHEET ---
         function saveToGoogleSheets() {
-            document.getElementById('captureMode').value = 'all';
-            document.getElementById('rowSelectEnd').value = 'all';
-            document.getElementById('showRoleCol').checked = true;
-            toggleRoleCol(); updateCropPreview();
+            closePopup();
+            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
+            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
             
             const table = document.getElementById('scheduleTable');
             const [year, month] = document.getElementById('monthYearPicker').value.split('-');
@@ -800,8 +895,7 @@
         const modal = document.getElementById("holidayModal");
         function openHolidayModal() { modal.style.display = "block"; renderHolidayList(); }
         function closeHolidayModal() { modal.style.display = "none"; generateTable(); }
-        window.onclick = function(event) { if (event.target == modal) closeHolidayModal(); }
-
+        
         function renderHolidayList() {
             const list = document.getElementById('holidayList'); list.innerHTML = '';
             holidays.sort((a, b) => a.date.localeCompare(b.date));
