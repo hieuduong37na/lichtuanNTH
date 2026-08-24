@@ -20,7 +20,7 @@
             --weekend-bg: #fff2cc; 
             --holiday-bg: #f8d7da;
             --header-bg: #d9ead3; 
-            --select-bg: rgba(13, 110, 253, 0.15); /* Màu nền khi quét chọn nhiều ô */
+            --select-bg: rgba(13, 110, 253, 0.15);
         }
 
         * { box-sizing: border-box; }
@@ -29,7 +29,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0; padding: 10px;
             background-color: var(--bg-color); color: var(--text-color);
-            user-select: none; /* Chống bôi đen text thừa khi kéo chuột */
+            user-select: none;
         }
 
         .container {
@@ -40,7 +40,6 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; }
 
-        /* --- DASHBOARD ĐIỀU KHIỂN --- */
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
 
         .panel {
@@ -73,11 +72,9 @@
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
         
-        /* Định dạng style cho các nút chữ */
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
-        /* --- GHI CHÚ --- */
         .collapsible-header {
             background-color: #e9ecef; color: #444; cursor: pointer;
             padding: 8px 12px; width: 100%;
@@ -104,7 +101,6 @@
             font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text;
         }
 
-        /* --- XỬ LÝ THANH CUỘN KÉP --- */
         .master-wrapper {
             display: flex; border: 2px solid #555; background-color: white;
             flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px;
@@ -125,13 +121,19 @@
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: fixed;}
 
         th, td {
-            border: 1px solid var(--border-color); padding: 5px; text-align: center;
-            min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell;
+            border: 1px solid var(--border-color); 
+            padding: 5px; 
+            text-align: center;
+            min-width: 45px; 
+            font-size: 13px; 
+            white-space: pre-wrap; 
+            word-wrap: break-word; /* Tự động ngắt dòng nếu từ quá dài */
+            overflow-wrap: anywhere; /* Ép chữ ngắt dòng để khớp với chiều rộng ô */
+            cursor: cell;
         }
 
-        /* Hiệu ứng focus khi đang nhập chữ */
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
-            user-select: text; /* Cho phép bôi đen chữ khi đang sửa */
+            user-select: text;
             cursor: text;
             background-color: rgba(255, 255, 255, 0.9) !important;
             outline: 2px solid var(--primary-color) !important;
@@ -143,11 +145,7 @@
         .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
         thead th.header-col { z-index: 12; font-size: 15px; }
 
-        /* MULTI-SELECT STYLES */
-        .selected-cell {
-            background-color: var(--select-bg) !important;
-        }
-        /* Tạo đường viền xanh bao quanh vùng chọn (giả lập excel) */
+        .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
         .selection-bottom { border-bottom: 2px solid var(--primary-color) !important; }
         .selection-left { border-left: 2px solid var(--primary-color) !important; }
@@ -159,7 +157,6 @@
         .holiday { background-color: var(--holiday-bg) !important; font-weight: bold; color: #721c24 !important; }
         .red-separator { border-bottom: 3px solid red !important; }
 
-        /* --- NÚT FLOATING ACTION BUTTON (FAB) --- */
         #fabBtn {
             display: none; position: fixed; bottom: 20px; right: 20px;
             width: 50px; height: 50px; background-color: var(--primary-color);
@@ -169,7 +166,6 @@
         }
         #fabBtn:hover { background-color: #0b5ed7; transform: scale(1.05); }
 
-        /* --- POPUP (BOTTOM SHEET) CHỈNH SỬA Ô --- */
         #cellPopupMenu {
             display: none; position: fixed; z-index: 2001; bottom: -400px; 
             left: 50%; transform: translateX(-50%);
@@ -207,7 +203,6 @@
         .color-picker-wrapper { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; justify-content: center;}
         .color-picker-wrapper label { font-size: 11px; color: #555; }
 
-        /* Thông báo */
         #statusMessage {
             position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; 
             padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
@@ -217,7 +212,6 @@
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
         .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
-        /* MODAL NGÀY LỄ */
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
         .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
@@ -239,7 +233,6 @@
     <div class="container">
         <h2>Bảng Xếp Lịch Trực Tùy Chỉnh</h2>
 
-        <!-- SECTION: BẢNG ĐIỀU KHIỂN & CẮT ẢNH -->
         <div class="dashboard">
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
@@ -293,16 +286,13 @@
             </div>
         </div>
 
-        <!-- SECTION: GHI CHÚ CHUNG -->
         <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
         <div id="notesSection" class="collapsible-content collapsed">
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
         </div>
 
-        <!-- FAB BUTTON -->
         <div id="fabBtn" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
 
-        <!-- FLOATING POPUP MENU CHỈNH SỬA Ô -->
         <div id="cellPopupMenu">
             <div class="popup-header">
                 <span id="popupCellName">Tùy chọn Ô</span>
@@ -322,14 +312,18 @@
                             <option value="col">Toàn bộ Cột của ô chọn</option>
                         </select>
                     </div>
+                    
                     <div class="popup-item">
-                        <span class="popup-title">Kiểu chữ</span>
+                        <span class="popup-title">Cỡ chữ & Kiểu chữ</span>
                         <div class="popup-row">
+                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; height: 34px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
                             <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold;">B</button>
                             <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif;">I</button>
                             <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline;">U</button>
+                            <button class="secondary" onclick="forceLineBreak()" style="flex:1; height: 34px;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
                         </div>
                     </div>
+                    
                     <div class="popup-item">
                         <span class="popup-title">Màu sắc</span>
                         <div class="popup-row">
@@ -401,7 +395,6 @@
 
         <div id="statusMessage"></div>
 
-        <!-- BẢNG NỘI DUNG -->
         <div class="master-wrapper">
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
             <div class="right-content" id="captureArea"> 
@@ -419,7 +412,6 @@
         </div>
     </div>
 
-    <!-- MODAL QUẢN LÝ NGÀY LỄ -->
     <div id="holidayModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeHolidayModal()">&times;</span>
@@ -439,7 +431,6 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlaF3gVNhm_s-kAilknWyeUM5eaIHERNPazL7mklG6FHQYnpuC10wp3SO26MFnGzyZRw/exec'; 
         
-        // --- HỆ THỐNG LƯU TRỮ LỊCH SỬ (UNDO / REDO) ---
         let historyStack = [];
         let currentStep = -1;
 
@@ -483,10 +474,9 @@
             });
         });
 
-        // --- HỆ THỐNG CHỌN NHIỀU Ô (MULTI-SELECT) ---
         let isMouseDown = false;
         let startCell = null;
-        let selectedCells = []; // Mảng chứa các ô đang được chọn
+        let selectedCells = []; 
 
         const table = document.getElementById('scheduleTable');
 
@@ -526,7 +516,6 @@
             for (let r = rMin; r <= rMax; r++) {
                 for (let c = cMin; c <= cMax; c++) {
                     let cell = getCellAt(r, c);
-                    // Bỏ qua nếu ô bị ẩn (do gộp ô)
                     if (cell && cell.style.display !== 'none') {
                         cell.classList.add('selected-cell');
                         if (r === rMin) cell.classList.add('selection-top');
@@ -538,19 +527,16 @@
                 }
             }
 
-            // Hiển thị nút FAB khi có ô được chọn
             if(selectedCells.length > 0) {
                 document.getElementById('fabBtn').style.display = 'block';
                 updatePopupUI();
             }
         }
 
-        // Sự kiện Kéo chuột
         table.addEventListener('mousedown', (e) => {
             let cell = e.target.closest('td, th');
             if (!cell) return;
             
-            // Đóng popup nếu đang mở
             closePopup();
 
             if (e.shiftKey && startCell) {
@@ -574,7 +560,6 @@
             isMouseDown = false;
         });
 
-        // Click ra ngoài để bỏ chọn
         document.addEventListener('mousedown', function(event) {
             const popup = document.getElementById('cellPopupMenu');
             const fab = document.getElementById('fabBtn');
@@ -588,25 +573,22 @@
             if (event.target == modalElement) { closeHolidayModal(); }
         });
 
-
-        // --- CẬP NHẬT GIAO DIỆN POPUP DỰA TRÊN VÙNG CHỌN ---
         function updatePopupUI() {
             if (selectedCells.length === 0) return;
             
-            // Lấy ô đầu tiên làm chuẩn cho màu sắc
             const targetCell = selectedCells[0];
             const comp = window.getComputedStyle(targetCell);
             
             document.getElementById('textColorPicker').value = rgbToHex(comp.color);
             let bg = comp.backgroundColor;
             document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
+            
+            document.getElementById('fontSizePicker').value = parseInt(comp.fontSize) || 13;
 
-            // Cập nhật trạng thái các nút Style (B, I, U)
             document.getElementById('btnBold').classList.toggle('active', comp.fontWeight === 'bold' || comp.fontWeight >= 700);
             document.getElementById('btnItalic').classList.toggle('active', comp.fontStyle === 'italic');
             document.getElementById('btnUnderline').classList.toggle('active', comp.textDecorationLine === 'underline');
 
-            // Cập nhật nút Gộp ô
             const mergeBtn = document.getElementById('btnMerge');
             if (selectedCells.length > 1) {
                 mergeBtn.innerText = "◧ Gộp các ô đã chọn";
@@ -615,7 +597,6 @@
                 mergeBtn.disabled = false;
                 mergeBtn.style.opacity = "1";
             } else {
-                // Kiểm tra xem 1 ô duy nhất này có phải là ô đã gộp không
                 if (targetCell.colSpan > 1 || targetCell.rowSpan > 1) {
                     mergeBtn.innerText = "◨ Hủy gộp ô này";
                     mergeBtn.style.backgroundColor = "#dc3545";
@@ -631,7 +612,6 @@
                 }
             }
             
-            // Tên ô trên popup
             let cellName = selectedCells.length > 1 ? `Đã chọn ${selectedCells.length} ô` : "Tùy chọn Ô";
             document.getElementById('popupCellName').innerText = cellName;
         }
@@ -659,8 +639,6 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        // --- CÁC HÀM XỬ LÝ ĐỊNH DẠNG ---
-        // Hàm Lấy danh sách ô dựa theo Scope (Ô, Hàng, Cột)
         function getCellsToFormat() {
             const scope = document.getElementById('colorScope').value;
             let cellsToFormat = [];
@@ -668,7 +646,6 @@
             if (scope === 'cell') {
                 cellsToFormat = [...selectedCells];
             } else if (scope === 'row') {
-                // Lấy tất cả các ô trên các hàng chứa ô đang chọn
                 const rows = new Set();
                 selectedCells.forEach(cell => rows.add(cell.closest('tr')));
                 rows.forEach(row => {
@@ -687,15 +664,12 @@
         }
 
         function updateSelectedScope() {
-            // Hiển thị lại vùng chọn giả lập khi đổi scope để người dùng dễ hình dung
             if(selectedCells.length === 0) return;
             const cells = getCellsToFormat();
             
-            // Xóa hiệu ứng vùng chọn cũ (Không xóa selectedCells thật)
             document.querySelectorAll('.selected-cell-preview').forEach(c => c.classList.remove('selected-cell-preview'));
             
             cells.forEach(cell => {
-                // Thêm hiệu ứng nhấp nháy tạm thời
                 cell.style.transition = "background-color 0.2s";
                 const oldBg = cell.style.backgroundColor;
                 cell.style.backgroundColor = "rgba(13, 110, 253, 0.2)";
@@ -714,12 +688,38 @@
             saveState(); 
         }
 
-        // Hàm Đa Năng Toggle B/I/U
+        function applyFontSize() {
+            const size = document.getElementById('fontSizePicker').value;
+            const cells = getCellsToFormat();
+            
+            cells.forEach(el => {
+                el.style.fontSize = size + 'px';
+            });
+            saveState(); 
+        }
+
+        function forceLineBreak() {
+            const cells = getCellsToFormat();
+            cells.forEach(el => {
+                el.innerText += "\n"; 
+                
+                if(el === cells[0]) {
+                    el.focus();
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(el);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
+            saveState();
+        }
+
         function toggleFormat(styleProperty, activeValue, inactiveValue) {
             const cells = getCellsToFormat();
             if(cells.length === 0) return;
 
-            // Kiểm tra trạng thái của ô đầu tiên để làm chuẩn
             const targetCell = cells[0];
             const comp = window.getComputedStyle(targetCell);
             
@@ -743,16 +743,15 @@
                 el.style.fontWeight = 'normal';
                 el.style.fontStyle = 'normal';
                 el.style.textDecoration = 'none';
+                el.style.fontSize = ''; 
             });
             updatePopupUI();
             saveState();
         }
 
-        // --- GỘP Ô (MERGE) VÀ HỦY GỘP (UNMERGE) ---
         function mergeCells() {
             if (selectedCells.length < 2) return;
             
-            // Xác định hình chữ nhật bao quanh các ô được chọn
             let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
             
             selectedCells.forEach(cell => {
@@ -766,10 +765,8 @@
             const rowSpan = maxR - minR + 1;
             const colSpan = maxC - minC + 1;
 
-            // Ô giữ lại là ô trên cùng bên trái
             const top_left_cell = getCellAt(minR, minC);
             
-            // Thu thập text của các ô khác (nếu có) để gom vào ô đầu
             let mergedText = "";
             for (let r = minR; r <= maxR; r++) {
                 for (let c = minC; c <= maxC; c++) {
@@ -779,9 +776,8 @@
                         if(text !== "") {
                             mergedText += (mergedText === "" ? "" : "\n") + text;
                         }
-                        // Xóa các ô bị gộp đi thay vì ẩn (để HTML sạch, export Google Sheet dễ)
                         if (r !== minR || c !== minC) {
-                            cell.style.display = 'none'; // Tạm ẩn để không phá vỡ colIndex
+                            cell.style.display = 'none'; 
                             cell.innerHTML = "";
                             cell.classList.add('merged-hidden');
                         }
@@ -793,7 +789,6 @@
             top_left_cell.colSpan = colSpan;
             top_left_cell.innerText = mergedText;
             
-            // Xóa vùng chọn cũ, chọn lại ô mới gộp
             selectRange(top_left_cell, top_left_cell);
             saveState();
         }
@@ -805,14 +800,13 @@
             const rSpan = cell.rowSpan;
             const cSpan = cell.colSpan;
 
-            if (rSpan <= 1 && cSpan <= 1) return; // Không có gì để hủy gộp
+            if (rSpan <= 1 && cSpan <= 1) return; 
 
             const pos = getCellCoords(cell);
 
-            // Phục hồi lại các ô bị ẩn
             for (let r = pos.r; r < pos.r + rSpan; r++) {
                 for (let c = pos.c; c < pos.c + cSpan; c++) {
-                    if (r === pos.r && c === pos.c) continue; // Bỏ qua ô gốc
+                    if (r === pos.r && c === pos.c) continue; 
                     let hiddenCell = getCellAt(r, c);
                     if (hiddenCell && hiddenCell.classList.contains('merged-hidden')) {
                         hiddenCell.style.display = '';
@@ -828,10 +822,8 @@
             saveState();
         }
 
-        // --- THÊM/XÓA CẤU TRÚC (Sửa lại cho chọn nhiều ô) ---
         function insertRow(position) {
             if (selectedCells.length === 0) return;
-            // Lấy ô mốc (ô cuối cùng trong danh sách chọn)
             const currentRow = selectedCells[selectedCells.length-1].closest('tr');
             if (currentRow.parentElement.tagName === 'THEAD') return alert("Không chèn vào vùng Tiêu đề!");
 
@@ -875,11 +867,9 @@
         function deleteSelectedRow() {
             if (selectedCells.length === 0) return;
             
-            // Xóa tất cả các hàng chứa các ô được chọn
             const rowsToDelete = new Set();
             selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr')));
             
-            // Kiem tra thead
             let hasHeader = false;
             rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; });
             if(hasHeader) return alert("Không xóa hàng Tiêu đề!");
@@ -900,7 +890,6 @@
 
             if (confirm(`Bạn có chắc chắn muốn xóa ${colsToDelete.size} Cột này?`)) {
                 const table = document.getElementById('scheduleTable');
-                // Sắp xếp giảm dần để xóa không bị sai index
                 const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a);
                 
                 table.querySelectorAll('thead tr, tbody tr').forEach(tr => {
@@ -984,7 +973,6 @@
             setTimeout(() => syncScrollbars(true), 350);
         }
 
-        // --- CẤU HÌNH BẢNG MẶC ĐỊNH ---
         const jobRolesTemplate = [
             { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" },
             { name: " ", headerColor: "#000", dataColor: "#000" }, 
@@ -1079,7 +1067,6 @@
             });
         }
 
-        // --- GIAO TIẾP VỚI GOOGLE SHEETS VÀ TẠO BẢNG ---
         function loadFromGoogleSheets() {
             const pickerValue = document.getElementById('monthYearPicker').value;
             if (!pickerValue) return;
@@ -1351,7 +1338,6 @@
             historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        // --- CÁC HÀM XUẤT ẢNH ---
         function toggleCaptureInputs() {
             const mode = document.getElementById('captureMode').value;
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
@@ -1418,7 +1404,6 @@
 
         function takeScreenshot(actionType) {
             closePopup(); 
-            // Lưu lại danh sách ô đang chọn để phục hồi sau khi chụp
             const backupSelection = [...selectedCells];
             clearSelection();
             
@@ -1455,14 +1440,12 @@
                     }, 'image/png');
                 }
                 
-                // Phục hồi lại vùng chọn
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
                 }
             }).catch(err => { showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); });
         }
 
-        // --- LƯU GG SHEET ---
         function saveToGoogleSheets() {
             closePopup(); clearSelection();
             document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
@@ -1484,7 +1467,6 @@
                 const rowWeight = [];
 
                 row.querySelectorAll('th, td').forEach(cell => {
-                    // Nếu ô bị ẩn do gộp, chèn ô rỗng vào mảng để GG sheet tự hiểu
                     if(cell.style.display === 'none') {
                         rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal");
                     } else {
@@ -1535,7 +1517,6 @@
         function closeHolidayModal() { 
             modal.style.display = "none"; 
             
-            // Re-render lại mảng hiện tại để cập nhật lễ
             let currentPayload = { text: [], bgColors: [], fontColors: [], fontWeights: [] };
             
             const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
