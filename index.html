@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -30,6 +30,7 @@
             margin: 0; padding: 10px;
             background-color: var(--bg-color); color: var(--text-color);
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
@@ -38,58 +39,80 @@
             height: calc(100vh - 20px);
         }
 
-        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
+        /* --- Header & Auth --- */
+        .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
         h2 { color: var(--primary-color); margin: 0; font-size: 22px; user-select: text; text-align: center; flex: 1;}
         
-        .login-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
-        .login-btn:hover { background-color: #23272b; }
+        .login-btn { 
+            background-color: #343a40; color: white; border: none; padding: 8px 16px; 
+            border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-        .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
+        /* --- DASHBOARD ĐIỀU KHIỂN --- */
+        .dashboard { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; user-select: text;}
 
-        .panel { flex: 1; min-width: 300px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .panel h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .panel { 
+            flex: 1; min-width: 300px; background: white; padding: 12px; 
+            border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .panel h4 { margin: 0 0 10px 0; color: #444; font-size: 15px; border-bottom: 2px solid #f1f1f1; padding-bottom: 6px; }
+        
+        .input-group { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin-bottom: 10px; }
         .input-group:last-child { margin-bottom: 0; }
 
         select, input[type="month"], input[type="number"], input[type="color"], input[type="password"] {
-            padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; height: 28px;
+            padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; min-height: 36px;
         }
 
-        button { padding: 4px 10px; font-size: 12px; font-weight: 600; color: white; background-color: var(--primary-color); border: none; border-radius: 4px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; height: 28px;}
-        button:hover { opacity: 0.85; }
+        button { 
+            padding: 8px 12px; font-size: 13px; font-weight: 600; color: white; 
+            background-color: var(--primary-color); border: none; border-radius: 4px; 
+            cursor: pointer; transition: opacity 0.2s; min-height: 36px;
+            display: flex; align-items: center; justify-content: center; line-height: 1.2;
+            word-break: break-word; white-space: normal;
+        }
+
+        button:active { opacity: 0.7; transform: scale(0.98); }
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
         button.jpg-btn { background-color: var(--jpg-color); }
-        button.save-btn { background-color: var(--save-color); color: #000; flex: 1;}
-        button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
+        button.save-btn { background-color: var(--save-color); color: #000;}
+        button.load-btn { background-color: #17a2b8; color: white;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
-        button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
+        
+        button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 40px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
         /* CLASS ĐIỀU KHIỂN QUYỀN */
         .admin-only { display: none !important; } 
 
-        .collapsible-header { background-color: #e9ecef; color: #444; cursor: pointer; padding: 8px 12px; width: 100%; border: 1px solid #ced4da; border-radius: 6px; text-align: left; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;}
-        .collapsible-header:hover { background-color: #dde2e6; }
+        /* --- GHI CHÚ --- */
+        .collapsible-header { 
+            background-color: #e9ecef; color: #444; cursor: pointer; padding: 10px 12px; 
+            width: 100%; border: 1px solid #ced4da; border-radius: 6px; text-align: left; 
+            font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 5px; user-select: text;
+        }
         .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
         .collapsible-header.active:after { content: '\25B2'; }
 
         .collapsible-content { padding: 0; max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease; background-color: transparent; margin-bottom: 10px; }
         .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
+        #topNotesArea { width: 100%; min-height: 80px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-family: inherit; font-size: 14px; resize: vertical; background-color: #fff8dc; user-select: text; }
 
-        #topNotesArea { width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text; }
-
-        .master-wrapper { display: flex; border: 2px solid #555; background-color: white; flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px; }
-        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
+        /* --- XỬ LÝ THANH CUỘN BẢNG --- */
+        .master-wrapper { display: flex; border: 2px solid #555; background-color: white; flex: 1; overflow: hidden; border-radius: 6px; min-height: 250px; }
+        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 16px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
+        .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 16px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         .table-container { overflow: auto; flex: 1; width: 100%; position: relative;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: fixed;}
-        th, td { border: 1px solid var(--border-color); padding: 5px; text-align: center; min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell; }
+        th, td { border: 1px solid var(--border-color); padding: 6px 4px; text-align: center; min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell; word-wrap: break-word;}
 
         body:not(.is-admin) td, body:not(.is-admin) th { pointer-events: none; }
         
@@ -110,53 +133,73 @@
         .holiday { background-color: var(--holiday-bg) !important; font-weight: bold; color: #721c24 !important; }
         .red-separator { border-bottom: 3px solid red !important; }
 
-        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 50px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 2000; transition: transform 0.2s, background-color 0.2s; }
-        #fabBtn:hover { background-color: #0b5ed7; transform: scale(1.05); }
+        /* --- NÚT FAB MỞ POPUP --- */
+        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 55px; font-size: 26px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 2000; transition: transform 0.2s; }
+        #fabBtn:active { transform: scale(0.9); }
 
-        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -400px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); border-radius: 12px 12px 0 0; width: 100%; max-width: 500px; font-size: 13px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
+        /* --- POPUP CHỈNH SỬA Ô --- */
+        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -500px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); border-radius: 16px 16px 0 0; width: 100%; max-width: 600px; font-size: 14px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
         #cellPopupMenu.show { bottom: 0; }
-        .popup-header { background-color: #f1f3f5; padding: 10px 15px; border-bottom: 1px solid #ddd; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; }
-        .popup-close { cursor: pointer; color: #888; font-size: 20px; font-weight: bold; line-height: 1; }
-        .popup-close:hover { color: #dc3545; }
+        .popup-header { background-color: #f8f9fa; padding: 12px 18px; border-bottom: 1px solid #ddd; border-radius: 16px 16px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; font-size: 15px;}
+        .popup-close { cursor: pointer; color: #888; font-size: 24px; font-weight: bold; line-height: 1; padding: 0 5px;}
         .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
-        .popup-tab { flex: 1; text-align: center; padding: 10px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
-        .popup-tab:hover { background: #f0f0f0; }
+        .popup-tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-weight: bold; color: #666; border-bottom: 3px solid transparent;}
         .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
-        .popup-body { padding: 15px; max-height: 60vh; overflow-y: auto; }
-        .popup-section { display: none; flex-direction: column; gap: 12px; }
+        
+        .popup-body { padding: 18px; max-height: 65vh; overflow-y: auto; }
+        .popup-section { display: none; flex-direction: column; gap: 16px; }
         .popup-section.active { display: flex; }
-        .popup-item { display: flex; flex-direction: column; gap: 5px; }
-        .popup-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 0.5px;}
-        .popup-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
-        .popup-row button { flex: 1; min-width: 80px; height: 34px; font-size: 12px;}
-        .popup-row select { flex: 1; min-width: 100px; height: 34px;}
-        .popup-row input[type="color"] { width: 40px; height: 34px; padding: 0; cursor: pointer;}
-        .color-picker-wrapper { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; justify-content: center;}
-        .color-picker-wrapper label { font-size: 11px; color: #555; }
+        .popup-item { display: flex; flex-direction: column; gap: 6px; }
+        .popup-title { font-size: 12px; text-transform: uppercase; color: #666; font-weight: bold; letter-spacing: 0.5px;}
+        .popup-row { display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap;}
+        .popup-row button { flex: 1; min-width: 80px; }
+        .popup-row select { flex: 1; min-width: 100px; }
+        
+        .color-picker-wrapper { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; justify-content: center;}
+        .color-picker-wrapper label { font-size: 13px; color: #555; font-weight: 600;}
+        input[type="color"] { width: 45px; height: 38px; padding: 0; cursor: pointer; border-radius: 4px; border: 1px solid #aaa;}
 
-        #statusMessage { position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
-        .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
-        .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
+        #statusMessage { position: fixed; top: 15px; right: 15px; z-index: 9999; font-weight: bold; padding: 14px 24px; border-radius: 8px; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-size: 14px;}
 
         /* MODAL */
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
-        .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
-        .close-modal:hover { color: black; }
-        .holiday-list { list-style-type: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;}
-        .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
-        .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
-        .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px);}
+        .modal-content { background-color: #fefefe; margin: 15% auto; padding: 24px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); user-select: text;}
+        .close-modal { color: #aaa; float: right; font-size: 30px; font-weight: bold; cursor: pointer; line-height: 20px;}
+        .holiday-list { list-style-type: none; padding: 0; max-height: 250px; overflow-y: auto; border: 1px solid #eee; border-radius: 6px;}
+        .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 14px;}
+        .holiday-list button { padding: 6px 10px; background-color: #dc3545; font-size: 12px; min-height: 30px;}
 
-        #loginModal .modal-content { max-width: 300px; text-align: center; }
-
+        /* ========================================================
+           TỐI ƯU HÓA HOÀN TOÀN CHO ĐIỆN THOẠI (MOBILE RESPONSIVE)
+           ======================================================== */
         @media (max-width: 768px) {
-            #cellPopupMenu { max-width: 100%; } 
-            .popup-row button { font-size: 11px; }
-            .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
-            h2 {font-size: 18px;}
+            body { padding: 6px; }
+            h2 { font-size: 18px; }
+            .login-btn { padding: 8px; flex: 0.4; text-align: center; }
+
+            .dashboard { flex-direction: column; gap: 8px;}
+            .panel { width: 100%; min-width: 100%; padding: 10px; }
+            
+            /* Sắp xếp các nút Full Width và Half Width trên Mobile */
+            .input-group { justify-content: space-between; gap: 8px;}
+            
+            /* Các input/select mặc định tràn viền */
+            .input-group > select, .input-group > input { flex: 1 1 100%; width: 100%; min-height: 40px;}
+            
+            .full-btn { flex: 1 1 100% !important; width: 100%; min-height: 40px; margin-bottom: 0;}
+            .half-btn { flex: 1 1 48% !important; width: 48%; min-height: 40px;}
+
+            /* Tối ưu chữ trong Bảng để không chồng lấp */
+            table { table-layout: fixed; }
+            th, td { font-size: 12px; min-width: 40px; padding: 5px 2px; line-height: 1.3;}
+            .header-col { min-width: 65px; font-size: 12px !important; }
+            thead th.header-col { font-size: 13px !important; }
+
+            /* Tối ưu Popup Menu tràn viền dưới */
+            #cellPopupMenu { max-width: 100%; width: 100%; border-radius: 20px 20px 0 0; }
+            .popup-row button, .popup-row select { min-height: 42px; font-size: 13px; }
+            .color-picker-wrapper { padding: 8px; }
+            input[type="color"] { width: 100%; height: 38px; }
         }
     </style>
 </head>
@@ -164,19 +207,19 @@
 
     <!-- MODAL ĐĂNG NHẬP -->
     <div id="loginModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 300px; text-align: center;">
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
-            <h3 style="margin-top: 0;">Đăng Nhập Quản Trị</h3>
-            <input type="password" id="adminPassword" placeholder="Nhập mật khẩu..." style="width: 100%; margin-bottom: 10px; text-align: center;" onkeydown="if(event.key === 'Enter') checkLogin()">
-            <button onclick="checkLogin()" style="width: 100%; height: 35px; font-size: 14px;">Đăng Nhập</button>
-            <p id="loginError" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Sai mật khẩu!</p>
+            <h3 style="margin-top: 0; margin-bottom: 20px;">Xác nhận Quản trị</h3>
+            <input type="password" id="adminPassword" placeholder="Nhập mật khẩu (123)" style="width: 100%; margin-bottom: 15px; text-align: center; min-height: 45px; font-size: 16px;" onkeydown="if(event.key === 'Enter') checkLogin()">
+            <button onclick="checkLogin()" style="width: 100%; min-height: 45px; font-size: 15px;">Đăng Nhập</button>
+            <p id="loginError" style="color: red; font-size: 13px; display: none; margin-top: 15px; font-weight: bold;">Sai mật khẩu!</p>
         </div>
     </div>
 
     <div class="container">
         <div class="header-container">
             <h2>Bảng Xếp Lịch Trực</h2>
-            <button id="authBtn" class="login-btn" onclick="openLoginModal()">Đăng nhập Edit</button>
+            <button id="authBtn" class="login-btn" onclick="openLoginModal()">🔓 Sửa Lịch</button>
         </div>
 
         <div class="dashboard">
@@ -186,19 +229,20 @@
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
                     
-                    <!-- Các công cụ ẩn/hiện theo quyền -->
-                    <button class="admin-only" onclick="handleGenerateNewTable()" title="Tạo trắng lại từ đầu">🔄 Tạo Mới</button>
-                    <button class="secondary admin-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
-                    <button class="secondary admin-only" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
-                    <button class="secondary admin-only" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
+                    <!-- Các nút cho Admin -->
+                    <button class="admin-only full-btn" onclick="handleGenerateNewTable()" title="Tạo trắng lại từ đầu">🔄 Tạo Mới Bảng Trắng</button>
+                    <button class="secondary admin-only full-btn" onclick="openHolidayModal()">🏖️ Cài đặt Ngày Lễ</button>
+                    
+                    <button class="secondary admin-only half-btn" onclick="undo()" title="Hoàn tác">↩️ Hoàn tác</button>
+                    <button class="secondary admin-only half-btn" onclick="redo()" title="Làm lại">↪️ Làm lại</button>
                 </div>
                 
-                <div class="input-group" style="margin-top: 10px;">
+                <div class="input-group" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 12px;">
                     <!-- Nút Tải hiển thị cho tất cả -->
-                    <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu về bảng</button>
+                    <button class="load-btn full-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Web</button>
                     
                     <!-- Nút Lưu chỉ hiện cho Admin -->
-                    <button class="save-btn admin-only" onclick="saveToGoogleSheets()" style="margin-left: 5px;">💾 Lưu lên Google Sheets</button>
+                    <button class="save-btn admin-only full-btn" onclick="saveToGoogleSheets()">💾 LƯU LÊN MẠNG</button>
                 </div>
             </div>
 
@@ -207,40 +251,41 @@
                 <h4>📸 Công cụ Cắt & Xuất Ảnh</h4>
                 <div class="input-group">
                     <select id="captureMode" onchange="toggleCaptureInputs(); updateCropPreview();">
-                        <option value="all">Toàn bộ Cột</option>
+                        <option value="all">Hiển thị Toàn bộ Tháng</option>
                         <option value="week">Cắt theo Tuần</option>
-                        <option value="date">Khoảng Ngày</option>
+                        <option value="date">Cắt theo Khoảng Ngày</option>
                     </select>
 
-                    <span id="weekSelectGroup" style="display: none;">
-                        <select id="weekSelect" onchange="updateCropPreview()">
+                    <span id="weekSelectGroup" style="display: none; width: 100%;">
+                        <select id="weekSelect" style="width: 100%;" onchange="updateCropPreview()">
                             <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
                             <option value="3">Tuần 3</option><option value="4">Tuần 4</option>
                             <option value="5">Tuần 5</option>
                         </select>
                     </span>
-                    <span id="dateSelectGroup" style="display: none;">
-                        <input type="number" id="startDay" min="1" max="31" style="width: 45px;" value="1" oninput="updateCropPreview()"> - 
-                        <input type="number" id="endDay" min="1" max="31" style="width: 45px;" value="15" oninput="updateCropPreview()">
+                    <span id="dateSelectGroup" style="display: none; width: 100%; gap: 8px;">
+                        <input type="number" id="startDay" min="1" max="31" style="flex: 1;" value="1" oninput="updateCropPreview()"> 
+                        <span style="line-height: 40px; font-weight: bold;"> - </span>
+                        <input type="number" id="endDay" min="1" max="31" style="flex: 1;" value="15" oninput="updateCropPreview()">
                     </span>
                     
-                    <select id="rowSelectEnd" onchange="updateCropPreview()" style="margin-left: 5px;">
+                    <select id="rowSelectEnd" onchange="updateCropPreview()" style="width: 100%;">
                         <option value="all">Toàn bộ Hàng</option>
                     </select>
                 </div>
                 
-                <div class="input-group" style="margin-top: 10px;">
-                    <label style="font-size: 12px; cursor: pointer; color: #555;">
-                        <input type="checkbox" id="showRoleCol" checked onchange="toggleRoleCol()"> Hiện Cột Vị trí
+                <div class="input-group" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 12px;">
+                    <label style="font-size: 14px; cursor: pointer; color: #333; font-weight: bold; width: 100%; margin-bottom: 5px;">
+                        <input type="checkbox" id="showRoleCol" checked onchange="toggleRoleCol()"> Kèm Cột Vị trí
                     </label>
-                    <button class="capture" style="margin-left: auto;" onclick="takeScreenshot('share')">📤 Chụp & Share</button>
-                    <button class="jpg-btn" onclick="takeScreenshot('download')">⬇️ Lưu JPG</button>
+                    <button class="capture half-btn" onclick="takeScreenshot('share')">📤 Gửi Zalo</button>
+                    <button class="jpg-btn half-btn" onclick="takeScreenshot('download')">⬇️ Lưu Ảnh</button>
                 </div>
             </div>
         </div>
 
         <div class="admin-only" style="width: 100%;">
-            <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
+            <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không xuất hiện trong ảnh chụp)</div>
             <div id="notesSection" class="collapsible-content collapsed">
                 <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
             </div>
@@ -261,7 +306,7 @@
                 <div id="formatTab" class="popup-section active">
                     <div class="popup-item">
                         <span class="popup-title">Phạm vi áp dụng</span>
-                        <select id="colorScope" style="width:100%;" onchange="updateSelectedScope()">
+                        <select id="colorScope" style="width:100%; font-weight: bold;" onchange="updateSelectedScope()">
                             <option value="cell">Vùng đang chọn</option>
                             <option value="row">Toàn bộ Hàng của ô chọn</option>
                             <option value="col">Toàn bộ Cột của ô chọn</option>
@@ -270,9 +315,9 @@
                     <div class="popup-item">
                         <span class="popup-title">Kiểu chữ</span>
                         <div class="popup-row">
-                            <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold;">B</button>
-                            <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif;">I</button>
-                            <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline;">U</button>
+                            <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold; font-size: 16px;">B</button>
+                            <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif; font-size: 16px;">I</button>
+                            <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline; font-size: 16px;">U</button>
                         </div>
                     </div>
                     <div class="popup-item">
@@ -286,11 +331,11 @@
                                 <label>Nền</label>
                                 <input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')">
                             </div>
-                            <button class="secondary" onclick="clearCellFormat()" style="flex:0.8; color:#000; background:#e2e6ea;">Xóa Màu</button>
                         </div>
+                        <button class="secondary" onclick="clearCellFormat()" style="width: 100%; color:#000; background:#e2e6ea; margin-top: 5px;">Xóa màu nền & Định dạng</button>
                     </div>
-                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        <span class="popup-title">Dọn dẹp Nội dung</span>
+                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <span class="popup-title">Dọn dẹp Nội dung (Chữ)</span>
                         <div class="popup-row">
                             <select id="clearScopeMode" onchange="toggleClearInputs()" style="flex: 2;">
                                 <option value="cell">Xóa Text vùng chọn</option>
@@ -319,11 +364,11 @@
                     <div class="popup-item">
                         <span class="popup-title">Gộp ô (Merge Cells)</span>
                         <div class="popup-row" id="mergeActionContainer">
-                            <button id="btnMerge" onclick="handleMergeCells()" style="width: 100%; background-color:#6f42c1;">◧ Gộp các ô đã chọn</button>
+                            <button id="btnMerge" onclick="handleMergeCells()" style="width: 100%; background-color:#6f42c1; min-height: 45px; font-size: 15px;">◧ Kéo chọn nhiều ô để Gộp</button>
                         </div>
                     </div>
-                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        <span class="popup-title">Thêm Hàng/Cột (Cạnh ô chọn)</span>
+                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <span class="popup-title">Thêm Hàng/Cột (Bên cạnh ô đang chọn)</span>
                         <div class="popup-row">
                             <button onclick="insertRow('above')">+ Hàng Lên</button>
                             <button onclick="insertRow('below')">+ Hàng Xuống</button>
@@ -333,11 +378,11 @@
                             <button onclick="insertColumn('right')">+ Cột Phải</button>
                         </div>
                     </div>
-                    <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
-                        <span class="popup-title">Phá hủy Cấu trúc Khung</span>
+                    <div class="popup-item" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                        <span class="popup-title" style="color: #dc3545;">Phá hủy Cấu trúc Khung</span>
                         <div class="popup-row">
-                            <button class="danger" onclick="deleteSelectedRow()">Xóa Hàng Này</button>
-                            <button class="danger" onclick="deleteSelectedColumn()">Xóa Cột Này</button>
+                            <button class="danger" onclick="deleteSelectedRow()">Xóa nguyên Hàng này</button>
+                            <button class="danger" onclick="deleteSelectedColumn()">Xóa nguyên Cột này</button>
                         </div>
                     </div>
                 </div>
@@ -375,7 +420,7 @@
             <div class="input-group" style="margin-top: 15px; flex-wrap: nowrap;">
                 <input type="date" id="newHolidayDate" style="flex: 1;" title="Chọn ngày">
                 <input type="text" id="newHolidayName" placeholder="Tên ngày lễ..." style="flex: 2;">
-                <button onclick="addHoliday()" style="height: 28px;">Thêm</button>
+                <button onclick="addHoliday()" style="min-height: 40px; padding: 0 15px;">Thêm</button>
             </div>
         </div>
     </div>
@@ -384,7 +429,7 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFGDOJ4xblxTg-lnL0klZTZCnZUmec7YkkBtEZVZnMqwwyVDNDizKYsiPXY4LljuJQ6Q/exec'; 
         
         // --- CHỨC NĂNG AUTH ---
-        // THAY ĐỔI MẬT KHẨU TẠI ĐÂY (NẾU CẦN)
+        // THAY ĐỔI MẬT KHẨU TẠI ĐÂY
         const ADMIN_PASSWORD = "123"; 
         let isAdmin = false;
 
@@ -392,7 +437,7 @@
             if(localStorage.getItem('isScheduleAdmin') === 'true') {
                 isAdmin = true;
                 document.body.classList.add('is-admin');
-                document.getElementById('authBtn').innerText = "Đăng xuất";
+                document.getElementById('authBtn').innerText = "🔒 Khóa Sửa";
                 document.getElementById('authBtn').style.backgroundColor = "#dc3545";
                 
                 document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', '', 'important'));
@@ -400,7 +445,7 @@
             } else {
                 isAdmin = false;
                 document.body.classList.remove('is-admin');
-                document.getElementById('authBtn').innerText = "Đăng nhập Edit";
+                document.getElementById('authBtn').innerText = "🔓 Sửa Lịch";
                 document.getElementById('authBtn').style.backgroundColor = "#343a40";
                 
                 document.querySelectorAll('.admin-only').forEach(el => el.style.setProperty('display', 'none', 'important'));
@@ -412,7 +457,7 @@
 
         function openLoginModal() {
             if(isAdmin) {
-                localStorage.removeItem('isScheduleAdmin'); checkAuthStatus(); showMessage('success', 'Đã đăng xuất!');
+                localStorage.removeItem('isScheduleAdmin'); checkAuthStatus(); showMessage('success', 'Đã khóa chức năng chỉnh sửa!');
             } else {
                 document.getElementById('loginModal').style.display = "block";
                 setTimeout(() => document.getElementById('adminPassword').focus(), 100);
@@ -431,7 +476,7 @@
                 localStorage.setItem('isScheduleAdmin', 'true');
                 closeLoginModal();
                 checkAuthStatus();
-                showMessage('success', 'Đăng nhập thành công! Đã mở khóa tính năng.');
+                showMessage('success', 'Mở khóa thành công! Bạn có thể chỉnh sửa bảng.');
             } else {
                 document.getElementById('loginError').style.display = "block";
             }
@@ -568,7 +613,7 @@
                 if (targetCell.colSpan > 1 || targetCell.rowSpan > 1) {
                     mergeBtn.innerText = "◨ Hủy gộp ô này"; mergeBtn.style.backgroundColor = "#dc3545"; mergeBtn.onclick = unmergeCell; mergeBtn.disabled = false; mergeBtn.style.opacity = "1";
                 } else {
-                    mergeBtn.innerText = "◧ Cần chọn nhiều ô để gộp"; mergeBtn.style.backgroundColor = "#6c757d"; mergeBtn.onclick = null; mergeBtn.disabled = true; mergeBtn.style.opacity = "0.6";
+                    mergeBtn.innerText = "◧ Quét chọn nhiều ô để Gộp"; mergeBtn.style.backgroundColor = "#6c757d"; mergeBtn.onclick = null; mergeBtn.disabled = true; mergeBtn.style.opacity = "0.6";
                 }
             }
             
@@ -791,7 +836,7 @@
         function loadFromGoogleSheets() {
             const pickerValue = document.getElementById('monthYearPicker').value; if (!pickerValue) return;
             const [year, month] = pickerValue.split('-'); const sheetName = `Thang_${month}_${year}`;
-            showMessage('loading', 'Đang tải dữ liệu từ Google Sheets...'); clearSelection();
+            showMessage('loading', 'Đang tải dữ liệu từ Web...'); clearSelection();
 
             fetch(`${SCRIPT_URL}?sheetName=${sheetName}`)
             .then(response => response.json())
@@ -992,7 +1037,7 @@
 
             const payload = { sheetName: sheetName, data: payloadData, styles: { bgColors: payloadBgColors, fontColors: payloadFontColors, fontWeights: payloadFontWeights } };
 
-            showMessage('loading', 'Đang cập nhật Sheet...');
+            showMessage('loading', 'Đang cập nhật lên Web...');
             fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
             .then(response => response.json()).then(result => { if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!'); else showMessage('error', 'Lỗi từ Server: ' + result.message); }).catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
         }
