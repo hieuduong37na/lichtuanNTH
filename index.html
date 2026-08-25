@@ -254,7 +254,6 @@
             .dashboard { display: none; }
             .dashboard.show-dashboard { display: flex; }
 
-            /* Mở rộng vùng chạm an toàn */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
                 height: 44px !important; font-size: 14px !important;
             }
@@ -267,7 +266,6 @@
             .input-group button.load-btn { flex: auto; width: 100%; }
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
 
-            /* Ẩn các thanh cuộn ảo chiếm diện tích thừa */
             .left-scrollbar, .top-scrollbar { display: none !important; }
             .master-wrapper { border: 1px solid #ccc; border-radius: 6px; }
             
@@ -275,7 +273,6 @@
             .quick-save-btn { margin-left: 0 !important; width: 100%; margin-top: 4px; }
             #cellPopupMenu { max-width: 100%; }
 
-            /* CSS dành riêng cơ sở thiết kế Mobile */
             th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
@@ -508,8 +505,12 @@
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
             <h3 style="margin-top: 0; color: #343a40;">🔐 Đăng nhập Quản trị</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
-                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
+                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)" style="padding: 8px;">
+                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)" style="padding: 8px;">
+                <!-- THÊM Ô CHECKBOX NHỚ TÀI KHOẢN -->
+                <label style="font-size: 13px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
+                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản trên máy này
+                </label>
                 <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
             </div>
         </div>
@@ -521,9 +522,9 @@
             <span class="close-modal" onclick="closeChangePassModal()">&times;</span>
             <h3 style="margin-top: 0; color: #17a2b8;">🔄 Đổi Mật Khẩu</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại">
-                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới">
-                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới">
+                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại" style="padding: 8px;">
+                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới" style="padding: 8px;">
+                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" style="padding: 8px;">
                 <button onclick="handleChangePassword()" style="margin-top: 5px; background-color: #17a2b8;">Xác nhận đổi</button>
             </div>
         </div>
@@ -553,20 +554,32 @@
                 document.body.classList.add('view-only-mode');
                 clearSelection();
                 lockTableEditing();
+                
+                // XÓA NHỚ TÀI KHOẢN KHI ĐĂNG XUẤT
+                localStorage.removeItem('savedUser');
+                localStorage.removeItem('savedToken');
+                
                 showMessage('success', 'Đã đăng xuất, chuyển về chế độ Xem.');
             } else {
                 document.getElementById('loginModal').style.display = 'block';
             }
         }
+        
         function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
 
-        async function handleLogin() {
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-            if(!user || !pass) return alert("Nhập đủ tài khoản và mật khẩu!");
+        async function handleLogin(isAutoLogin = false, savedUser = null, savedToken = null) {
+            if (typeof isAutoLogin !== 'boolean') isAutoLogin = false;
 
-            showMessage('loading', 'Đang xác thực...');
-            const hashedPass = await hashPassword(pass);
+            let user = savedUser;
+            let hashedPass = savedToken;
+
+            if (!isAutoLogin) {
+                user = document.getElementById('loginUser').value.trim();
+                const pass = document.getElementById('loginPass').value.trim();
+                if(!user || !pass) return alert("Nhập đủ tài khoản và mật khẩu!");
+                showMessage('loading', 'Đang xác thực...');
+                hashedPass = await hashPassword(pass);
+            }
 
             fetch(SCRIPT_URL, { 
                 method: 'POST', 
@@ -581,12 +594,25 @@
                     document.body.classList.remove('view-only-mode');
                     closeLoginModal();
                     unlockTableEditing();
-                    showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
+                    
+                    // NẾU CHỌN NHỚ TÀI KHOẢN (LƯU VÀO LOCALSTORAGE)
+                    if (!isAutoLogin && document.getElementById('rememberMe').checked) {
+                        localStorage.setItem('savedUser', user);
+                        localStorage.setItem('savedToken', hashedPass);
+                    }
+                    
+                    if (!isAutoLogin) showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
                 } else {
-                    showMessage('error', result.message);
+                    if (!isAutoLogin) showMessage('error', result.message);
+                    else {
+                        localStorage.removeItem('savedUser');
+                        localStorage.removeItem('savedToken');
+                    }
                 }
             })
-            .catch(() => showMessage('error', 'Lỗi mạng khi đăng nhập.'));
+            .catch(() => {
+                if (!isAutoLogin) showMessage('error', 'Lỗi mạng khi đăng nhập.');
+            });
         }
 
         function openChangePassModal() {
@@ -623,6 +649,9 @@
             .then(result => {
                 if (result.status === 'success') {
                     authToken = hashedNewPass; 
+                    if(localStorage.getItem('savedUser')) {
+                        localStorage.setItem('savedToken', hashedNewPass);
+                    }
                     closeChangePassModal();
                     showMessage('success', 'Đổi mật khẩu thành công!');
                 } else {
@@ -786,6 +815,13 @@
             renderHolidayList();
             syncScrollbars();
             
+            // TỰ ĐỘNG ĐĂNG NHẬP NẾU CÓ TÀI KHOẢN TRONG LOCALSTORAGE
+            const savedUser = localStorage.getItem('savedUser');
+            const savedToken = localStorage.getItem('savedToken');
+            if (savedUser && savedToken) {
+                handleLogin(true, savedUser, savedToken);
+            }
+            
             document.getElementById('scheduleTable').addEventListener('focusout', function(e) {
                 if(e.target.isContentEditable) saveState();
             });
@@ -872,20 +908,19 @@
         // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) TRÊN MOBILE BẰNG LONG-PRESS
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
-            if (e.touches.length > 1) return; // Bỏ qua nếu đang dùng 2 ngón zoom
+            if (e.touches.length > 1) return; 
             
             let cell = e.target.closest('td, th');
             if (!cell) return;
             
             isScrolling = false;
             
-            // Bắt đầu đếm thời gian chạm (300ms) để kích hoạt quét bôi đen
             longPressTimer = setTimeout(() => {
                 isSelecting = true;
                 startCell = cell;
                 closePopup();
                 selectRange(cell, cell);
-                if (navigator.vibrate) navigator.vibrate(50); // Rung báo hiệu đã bôi đen
+                if (navigator.vibrate) navigator.vibrate(50); 
             }, 300);
         }, { passive: true });
 
@@ -893,12 +928,11 @@
             if (e.touches.length > 1) { clearTimeout(longPressTimer); return; }
             
             if (!isSelecting) {
-                isScrolling = true; // Người dùng đang vuốt để cuộn
+                isScrolling = true; 
                 clearTimeout(longPressTimer);
                 return;
             }
             
-            // Nếu đang trong chế độ Bôi đen (Đã nhấn giữ đủ 300ms)
             e.preventDefault(); 
             let touch = e.touches[0];
             let elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -915,7 +949,6 @@
             if (isSelecting) {
                 isSelecting = false;
             } else if (!isScrolling) {
-                // Nhấp nhả nhanh (Tap) -> Chỉ chọn 1 ô
                 let cell = e.target.closest('td, th');
                 if (cell) {
                     closePopup();
@@ -925,7 +958,6 @@
             }
         });
 
-        // Giữ lại logic kéo chuột trên máy tính
         table.addEventListener('mousedown', (e) => {
             if (!isEditMode) return; 
             let cell = e.target.closest('td, th');
