@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Xếp Lịch Trực Khoa Nội Tổng Hợp</title>
+    <title>Lịch Trực Khoa Nội Tổng Hợp</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -38,12 +38,22 @@
             height: calc(100vh - 20px);
         }
 
-        h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; }
+        h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
+
+        /* CSS CHO ĐĂNG NHẬP VÀ PHÂN QUYỀN */
+        .auth-container { position: absolute; right: 10px; top: 0px; }
+        .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
+        .auth-btn:hover { background-color: #23272b; }
+        
+        /* Ẩn các công cụ dành riêng cho admin khi chưa đăng nhập */
+        .view-only-mode .edit-only { display: none !important; }
+        .view-only-mode td, .view-only-mode th { cursor: default; }
 
         /* Nút ẩn/hiện Dashboard trên Mobile */
         #mobileMenuToggle {
             display: none; width: 100%; margin-bottom: 10px; 
             height: 36px; font-size: 14px; background-color: var(--secondary-color);
+            color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
         }
 
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
@@ -110,7 +120,7 @@
         .master-wrapper {
             display: flex; border: 2px solid #555; background-color: white;
             flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px;
-            position: relative; /* Cho phép chứa nút Fullscreen */
+            position: relative;
         }
 
         /* Nút Fullscreen */
@@ -121,8 +131,6 @@
             cursor: pointer; backdrop-filter: blur(2px); transition: background 0.2s;
         }
         #fullscreenBtn:hover { background: rgba(0, 0, 0, 0.7); }
-
-        /* Ẩn nút toàn màn hình khi đang ở chế độ toàn màn hình mặc định của trình duyệt để tránh trùng lặp */
         :fullscreen #fullscreenBtn { background: rgba(220, 53, 69, 0.7); content: "✖"; }
         
         .left-scrollbar {
@@ -236,23 +244,31 @@
         @media (max-width: 768px) {
             #mobileMenuToggle { display: block; }
             .dashboard { display: none; }
-            .dashboard.show-dashboard { display: flex; } /* Class để toggle hiển thị */
+            .dashboard.show-dashboard { display: flex; }
 
             #cellPopupMenu { max-width: 100%; } 
             .popup-row button { font-size: 11px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
 
-            /* CSS vừa khít 1 Tuần (Cột vị trí 75px, Cột ngày 40px) */
+            /* CSS vừa khít 1 Tuần */
             th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
+            
+            .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Bảng Xếp Lịch Trực Khoa Nội Tổng Hợp</h2>
+        <h2>
+            Lịch Trực Khoa Nội Tổng Hợp
+            <div class="auth-container">
+                <button id="changePassBtn" class="auth-btn edit-only" onclick="openChangePassModal()" style="background-color: #17a2b8; margin-right: 5px;">Đổi MK</button>
+                <button id="authBtn" class="auth-btn" onclick="openLoginModal()">Đăng nhập</button>
+            </div>
+        </h2>
 
         <!-- NÚT TOGGLE MOBILE -->
         <button id="mobileMenuToggle" onclick="toggleMobileDashboard()">⚙️ Bảng Điều Khiển</button>
@@ -262,15 +278,16 @@
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
-                    <button onclick="handleGenerateNewTable()">🔄 Tạo Mới</button>
-                    <button class="secondary" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
+                    <!-- Gán class edit-only vào các nút chỉ admin mới được xài -->
+                    <button class="edit-only" onclick="handleGenerateNewTable()">🔄 Tạo Mới</button>
+                    <button class="secondary edit-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
                     
-                    <button class="secondary" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
-                    <button class="secondary" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
+                    <button class="secondary edit-only" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
+                    <button class="secondary edit-only" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
                     <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Sheet</button>
-                    <button class="save-btn" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
+                    <button class="save-btn edit-only" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
                 </div>
             </div>
 
@@ -310,12 +327,12 @@
             </div>
         </div>
 
-        <div class="collapsible-header" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
-        <div id="notesSection" class="collapsible-content collapsed">
+        <div class="collapsible-header edit-only" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
+        <div id="notesSection" class="collapsible-content collapsed edit-only">
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
         </div>
 
-        <div id="fabBtn" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
+        <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
 
         <div id="cellPopupMenu">
             <div class="popup-header">
@@ -439,6 +456,7 @@
         </div>
     </div>
 
+    <!-- MODAL QUẢN LÝ NGÀY LỄ -->
     <div id="holidayModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeHolidayModal()">&times;</span>
@@ -455,11 +473,147 @@
         </div>
     </div>
 
+    <!-- MODAL ĐĂNG NHẬP -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <span class="close-modal" onclick="closeLoginModal()">&times;</span>
+            <h3 style="margin-top: 0; color: #343a40;">🔐 Đăng nhập Quản trị</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)" style="padding: 8px;">
+                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)" style="padding: 8px;">
+                <button onclick="handleLogin()" style="height: 35px; margin-top: 5px;">Đăng nhập</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐỔI MẬT KHẨU -->
+    <div id="changePassModal" class="modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <span class="close-modal" onclick="closeChangePassModal()">&times;</span>
+            <h3 style="margin-top: 0; color: #17a2b8;">🔄 Đổi Mật Khẩu</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại" style="padding: 8px;">
+                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới" style="padding: 8px;">
+                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" style="padding: 8px;">
+                <button onclick="handleChangePassword()" style="height: 35px; margin-top: 5px; background-color: #17a2b8;">Xác nhận đổi</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlaF3gVNhm_s-kAilknWyeUM5eaIHERNPazL7mklG6FHQYnpuC10wp3SO26MFnGzyZRw/exec'; 
         
         let historyStack = [];
         let currentStep = -1;
+
+        // --- TRẠNG THÁI ĐĂNG NHẬP ---
+        let isEditMode = false;
+        let authUsername = "";
+        let authToken = "";
+
+        async function hashPassword(password) {
+            const msgUint8 = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // --- LOGIC ĐĂNG NHẬP ---
+        function openLoginModal() {
+            if (isEditMode) {
+                isEditMode = false; authUsername = ""; authToken = "";
+                document.getElementById('authBtn').innerText = "Đăng nhập";
+                document.body.classList.add('view-only-mode');
+                clearSelection();
+                lockTableEditing();
+                showMessage('success', 'Đã đăng xuất, chuyển về chế độ Xem.');
+            } else {
+                document.getElementById('loginModal').style.display = 'block';
+            }
+        }
+        function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
+
+        async function handleLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value.trim();
+            if(!user || !pass) return alert("Nhập đủ tài khoản và mật khẩu!");
+
+            showMessage('loading', 'Đang xác thực...');
+            const hashedPass = await hashPassword(pass);
+
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: "login", username: user, token: hashedPass }) 
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    isEditMode = true; authUsername = user; authToken = hashedPass;
+                    document.getElementById('authBtn').innerText = "Đăng xuất (" + user + ")";
+                    document.body.classList.remove('view-only-mode');
+                    closeLoginModal();
+                    unlockTableEditing();
+                    showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
+                } else {
+                    showMessage('error', result.message);
+                }
+            })
+            .catch(() => showMessage('error', 'Lỗi mạng khi đăng nhập.'));
+        }
+
+        // --- LOGIC ĐỔI MẬT KHẨU ---
+        function openChangePassModal() {
+            document.getElementById('cpOldPass').value = '';
+            document.getElementById('cpNewPass').value = '';
+            document.getElementById('cpConfirmPass').value = '';
+            document.getElementById('changePassModal').style.display = 'block';
+        }
+        function closeChangePassModal() { document.getElementById('changePassModal').style.display = 'none'; }
+
+        async function handleChangePassword() {
+            const oldPass = document.getElementById('cpOldPass').value;
+            const newPass = document.getElementById('cpNewPass').value;
+            const confirmPass = document.getElementById('cpConfirmPass').value;
+
+            if(!oldPass || !newPass || !confirmPass) return alert("Vui lòng nhập đầy đủ thông tin!");
+            if(newPass !== confirmPass) return alert("Mật khẩu mới không khớp!");
+
+            showMessage('loading', 'Đang xử lý...');
+            const hashedOldPass = await hashPassword(oldPass);
+            const hashedNewPass = await hashPassword(newPass);
+
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ 
+                    action: "changePassword", 
+                    username: authUsername, 
+                    oldToken: hashedOldPass,
+                    newToken: hashedNewPass
+                }) 
+            })
+            .then(res => res.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    authToken = hashedNewPass; // Cập nhật token mới vào session hiện tại
+                    closeChangePassModal();
+                    showMessage('success', 'Đổi mật khẩu thành công!');
+                } else {
+                    showMessage('error', result.message);
+                }
+            })
+            .catch(() => showMessage('error', 'Lỗi mạng khi đổi mật khẩu.'));
+        }
+
+        // --- BẬT/TẮT CHẾ ĐỘ SỬA TRÊN BẢNG LỊCH ---
+        function lockTableEditing() {
+            document.querySelectorAll('th[contenteditable], td[contenteditable]').forEach(el => { el.setAttribute('contenteditable', 'false'); });
+        }
+        function unlockTableEditing() {
+            if(!isEditMode) return;
+            document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
+        }
 
         /* HÀM ẨN/HIỆN DASHBOARD TRÊN MOBILE */
         function toggleMobileDashboard() {
@@ -513,6 +667,15 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Mặc định luôn bật Chế độ Chỉ xem khi vào web
+            document.body.classList.add('view-only-mode'); 
+            isEditMode = false;
+            
+            // Gọi các lệnh hiển thị lịch cơ bản
+            loadFromGoogleSheets();
+            renderHolidayList();
+            syncScrollbars();
+            
             document.getElementById('scheduleTable').addEventListener('focusout', function(e) {
                 if(e.target.isContentEditable) saveState();
             });
@@ -578,6 +741,7 @@
         }
 
         table.addEventListener('mousedown', (e) => {
+            if (!isEditMode) return; // CHẶN CHỌN Ô NẾU CHƯA ĐĂNG NHẬP
             let cell = e.target.closest('td, th');
             if (!cell) return;
             
@@ -593,7 +757,7 @@
         });
 
         table.addEventListener('mouseover', (e) => {
-            if (!isMouseDown) return;
+            if (!isMouseDown || !isEditMode) return;
             let cell = e.target.closest('td, th');
             if (cell && startCell) {
                 selectRange(startCell, cell);
@@ -608,6 +772,8 @@
             const popup = document.getElementById('cellPopupMenu');
             const fab = document.getElementById('fabBtn');
             const modalElement = document.getElementById('holidayModal');
+            const loginModal = document.getElementById('loginModal');
+            const changePassModal = document.getElementById('changePassModal');
             const isClickInsideTable = table.contains(event.target);
             
             if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable) {
@@ -615,6 +781,8 @@
                 clearSelection();
             }
             if (event.target == modalElement) { closeHolidayModal(); }
+            if (event.target == loginModal) { closeLoginModal(); }
+            if (event.target == changePassModal) { closeChangePassModal(); }
         });
 
         function updatePopupUI() {
@@ -874,7 +1042,7 @@
             const colCount = document.getElementById('dateHeaderRow1').children.length;
             const newRow = document.createElement('tr');
             for (let i = 0; i < colCount; i++) {
-                const td = document.createElement('td'); td.contentEditable = "true";
+                const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
                 if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; }
                 newRow.appendChild(td);
             }
@@ -894,15 +1062,15 @@
             const targetIndex = position === 'left' ? colIndex : colIndex + 1;
 
             const thead1 = document.getElementById('dateHeaderRow1');
-            const th1 = document.createElement('th'); th1.contentEditable = "true"; th1.innerText = "MỚI";
+            const th1 = document.createElement('th'); th1.contentEditable = isEditMode ? "true" : "false"; th1.innerText = "MỚI";
             thead1.insertBefore(th1, thead1.children[targetIndex] || null);
 
             const thead2 = document.getElementById('dateHeaderRow2');
-            const th2 = document.createElement('th'); th2.contentEditable = "true"; th2.innerText = "00";
+            const th2 = document.createElement('th'); th2.contentEditable = isEditMode ? "true" : "false"; th2.innerText = "00";
             thead2.insertBefore(th2, thead2.children[targetIndex] || null);
 
             document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => {
-                const td = document.createElement('td'); td.contentEditable = "true";
+                const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
                 row.insertBefore(td, row.children[targetIndex] || null);
             });
             syncScrollbars(true); closePopup(); clearSelection(); saveState();
@@ -1044,12 +1212,6 @@
             { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" }
         ];
 
-        document.addEventListener('DOMContentLoaded', () => {
-            loadFromGoogleSheets();
-            renderHolidayList();
-            syncScrollbars();
-        });
-
         function rgbToHex(rgb) {
             if (rgb.startsWith('#')) return rgb;
             let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
@@ -1180,7 +1342,7 @@
             if (!dataText || dataText.length < 2) return; 
 
             dataText[0].forEach((cellText, index) => {
-                const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
+                const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
                 else {
                     const dayNum = parseInt(dataText[1][index]);
@@ -1194,7 +1356,7 @@
             });
 
             dataText[1].forEach((cellText, index) => {
-                const th = document.createElement('th'); th.contentEditable = "true"; th.innerText = cellText;
+                const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText;
                 if(index === 0) th.classList.add('header-col');
                 else {
                     const dayNum = parseInt(cellText);
@@ -1215,7 +1377,7 @@
                 if (roleTemplate && roleTemplate.separator) tr.classList.add('red-separator');
 
                 rowData.forEach((cellText, index) => {
-                    const td = document.createElement('td'); td.contentEditable = "true"; td.innerText = cellText;
+                    const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; td.innerText = cellText;
                     
                     if (index === 0) {
                         td.classList.add('header-col');
@@ -1253,8 +1415,8 @@
             const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; 
             const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
             
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`;
-            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`;
+            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
 
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
@@ -1277,7 +1439,7 @@
                 if (template && template.separator) tr.classList.add('red-separator');
                 
                 const tdRole = document.createElement('td');
-                tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; 
+                tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; 
                 tdRole.innerText = roleObj.text; 
                 if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color;
                 if(roleObj.bold) tdRole.style.fontWeight = "bold";
@@ -1288,7 +1450,7 @@
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                    const td = document.createElement('td'); td.contentEditable = "true";
+                    const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
 
                     if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
                     else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
@@ -1331,8 +1493,8 @@
                 savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator }));
             }
 
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="true">${yearNum}</th>`;
-            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="true">${monthNum + 1}</th>`;
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`;
+            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
 
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
             for (let day = 1; day <= daysInMonth; day++) {
@@ -1355,7 +1517,7 @@
                 else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
                 
                 const tdRole = document.createElement('td');
-                tdRole.classList.add('header-col'); tdRole.contentEditable = "true"; 
+                tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; 
                 tdRole.innerText = role.name; tdRole.style.color = role.headerColor;
                 if (role.isBold) tdRole.style.fontWeight = "bold";
                 tr.appendChild(tdRole);
@@ -1366,7 +1528,7 @@
 
                 for (let day = 1; day <= daysInMonth; day++) {
                     const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
-                    const td = document.createElement('td'); td.contentEditable = "true";
+                    const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
 
                     if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
                     else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
@@ -1537,6 +1699,9 @@
             });
 
             const payload = { 
+                action: "save",
+                username: authUsername,
+                token: authToken,
                 sheetName: sheetName, 
                 data: payloadData, 
                 styles: {
