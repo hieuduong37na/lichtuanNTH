@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lịch Trực Khoa Nội Tổng Hợp</title>
+    <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -97,7 +97,7 @@
         }
         .quick-save-btn {
             background-color: var(--save-color) !important; color: #000 !important; font-weight: bold;
-            margin-left: auto; /* Đẩy nút lưu sang góc phải thanh công cụ */
+            margin-left: auto; 
         }
         
         .collapsible-header {
@@ -150,14 +150,16 @@
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
+        
+        /* CƠ CHẾ ZOOM GPU MỚI MƯỢT MÀ HƠN */
+        #scheduleTable {
+            zoom: var(--zoom-level);
+            transform-origin: top left;
+        }
 
         th, td {
-            border: 1px solid var(--border-color); 
-            padding: calc(5px * var(--zoom-level)); 
-            text-align: center;
-            min-width: calc(45px * var(--zoom-level)); 
-            font-size: calc(13px * var(--zoom-level)); 
-            white-space: pre-wrap; cursor: cell;
+            border: 1px solid var(--border-color); padding: 5px; text-align: center;
+            min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell;
         }
 
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
@@ -168,12 +170,8 @@
         }
 
         thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; }
-        .header-col { 
-            background-color: var(--header-bg) !important; font-weight: bold; 
-            position: sticky; left: 0; z-index: 11; 
-            min-width: calc(90px * var(--zoom-level)) !important; 
-        }
-        thead th.header-col { z-index: 12; font-size: calc(15px * var(--zoom-level)); }
+        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
+        thead th.header-col { z-index: 12; font-size: 15px; }
 
         .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
@@ -250,25 +248,37 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
-        /* ĐIỀU CHỈNH CHUẨN UX CHO MOBILE */
+        /* ĐIỀU CHỈNH CHUẨN UX CHO MOBILE 44px TOUCH TARGETS */
         @media (max-width: 768px) {
-            #mobileMenuToggle { display: block; height: 40px; }
+            #mobileMenuToggle { display: block; height: 44px; }
             .dashboard { display: none; }
             .dashboard.show-dashboard { display: flex; }
 
+            /* Mở rộng vùng chạm an toàn */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
-                height: 38px !important; font-size: 13px !important;
+                height: 44px !important; font-size: 14px !important;
             }
-            .popup-row button { font-size: 12px; }
+            .popup-row button { font-size: 13px; }
+            .popup-header { padding: 15px 20px; }
+            .popup-close { font-size: 30px; padding: 5px 15px; }
+            .popup-row { gap: 12px; }
+            .popup-item { gap: 10px; }
+            
             .input-group button.load-btn { flex: auto; width: 100%; }
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
 
+            /* Ẩn các thanh cuộn ảo chiếm diện tích thừa */
             .left-scrollbar, .top-scrollbar { display: none !important; }
             .master-wrapper { border: 1px solid #ccc; border-radius: 6px; }
             
             .view-controls { justify-content: flex-start; gap: 6px; }
             .quick-save-btn { margin-left: 0 !important; width: 100%; margin-top: 4px; }
             #cellPopupMenu { max-width: 100%; }
+
+            /* CSS dành riêng cơ sở thiết kế Mobile */
+            th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
+            .header-col { min-width: 75px !important; font-size: 12px !important; }
+            thead th.header-col { font-size: 12px !important; }
         }
     </style>
 </head>
@@ -276,7 +286,7 @@
 
     <div class="container">
         <h2>
-            Lịch Trực Khoa Nội Tổng Hợp
+            Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
                 <button id="changePassBtn" class="auth-btn edit-only" onclick="openChangePassModal()" style="background-color: #17a2b8; margin-right: 5px;">Đổi MK</button>
                 <button id="authBtn" class="auth-btn" onclick="openLoginModal()">Đăng nhập</button>
@@ -347,10 +357,9 @@
         <div class="view-controls">
             <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
-            <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;"></span>
+            <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Giữ 1 ô để bôi đen - Vuốt 2 ngón để thu phóng)</span>
             
-            <!-- NÚT LƯU HIỂN THỊ CẠNH BẢNG (CHỈ HIỆN KHI ĐĂNG NHẬP) -->
-            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
+            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ</button>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
@@ -458,7 +467,6 @@
         <div id="statusMessage"></div>
 
         <div class="master-wrapper" id="masterWrapper">
-            <!-- Nút Fullscreen -->
             <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Bật/Tắt Toàn Màn Hình">⛶</button>
 
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
@@ -527,7 +535,6 @@
         let historyStack = [];
         let currentStep = -1;
 
-        // --- TRẠNG THÁI ĐĂNG NHẬP ---
         let isEditMode = false;
         let authUsername = "";
         let authToken = "";
@@ -633,7 +640,7 @@
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
         }
 
-        // --- HỆ THỐNG THU PHÓNG CẢM ỨNG (PINCH TO ZOOM) ---
+        /* HỆ THỐNG THU PHÓNG CẢM ỨNG (PINCH TO ZOOM) */
         let initialPinchDistance = null;
         let initialPinchZoom = 1;
         const tableContainer = document.getElementById('bottomScroll');
@@ -670,7 +677,7 @@
             }
         });
 
-        // --- HÀM XEM NHANH 1 TUẦN / 1 THÁNG ---
+        /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
         function setQuickViewMode(mode) {
             document.getElementById('captureMode').value = 'all';
             toggleCaptureInputs();
@@ -784,9 +791,28 @@
             });
         });
 
+        // ẨN POPUP VÀ BÀN PHÍM ẢO CHE KHUẤT
+        document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
+            if (e.target.isContentEditable) {
+                const popup = document.getElementById('cellPopupMenu');
+                popup.classList.remove('show');
+                setTimeout(() => { popup.style.display = 'none'; }, 300);
+                document.getElementById('fabBtn').style.display = 'none';
+            }
+        });
+
+        document.getElementById('scheduleTable').addEventListener('focusout', (e) => {
+            if (selectedCells.length > 0 && isEditMode) {
+                document.getElementById('fabBtn').style.display = 'block';
+            }
+        });
+
         let isMouseDown = false;
         let startCell = null;
         let selectedCells = []; 
+        let isSelecting = false;
+        let longPressTimer = null;
+        let isScrolling = false;
 
         const table = document.getElementById('scheduleTable');
 
@@ -843,37 +869,63 @@
             }
         }
 
+        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) TRÊN MOBILE BẰNG LONG-PRESS
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
-            if (e.touches.length > 1) return; 
+            if (e.touches.length > 1) return; // Bỏ qua nếu đang dùng 2 ngón zoom
             
             let cell = e.target.closest('td, th');
             if (!cell) return;
             
-            closePopup();
-            isMouseDown = true;
-            startCell = cell;
-            selectRange(cell, cell);
+            isScrolling = false;
+            
+            // Bắt đầu đếm thời gian chạm (300ms) để kích hoạt quét bôi đen
+            longPressTimer = setTimeout(() => {
+                isSelecting = true;
+                startCell = cell;
+                closePopup();
+                selectRange(cell, cell);
+                if (navigator.vibrate) navigator.vibrate(50); // Rung báo hiệu đã bôi đen
+            }, 300);
         }, { passive: true });
 
         table.addEventListener('touchmove', (e) => {
-            if (!isMouseDown || !isEditMode || e.touches.length > 1) return;
+            if (e.touches.length > 1) { clearTimeout(longPressTimer); return; }
             
+            if (!isSelecting) {
+                isScrolling = true; // Người dùng đang vuốt để cuộn
+                clearTimeout(longPressTimer);
+                return;
+            }
+            
+            // Nếu đang trong chế độ Bôi đen (Đã nhấn giữ đủ 300ms)
+            e.preventDefault(); 
             let touch = e.touches[0];
             let elem = document.elementFromPoint(touch.clientX, touch.clientY);
             if (!elem) return;
             
             let cell = elem.closest('td, th');
             if (cell && startCell && cell !== startCell) {
-                e.preventDefault(); 
                 selectRange(startCell, cell);
             }
         }, { passive: false });
 
-        table.addEventListener('touchend', () => {
-            isMouseDown = false;
+        table.addEventListener('touchend', (e) => {
+            clearTimeout(longPressTimer);
+            if (isSelecting) {
+                isSelecting = false;
+            } else if (!isScrolling) {
+                // Nhấp nhả nhanh (Tap) -> Chỉ chọn 1 ô
+                let cell = e.target.closest('td, th');
+                if (cell) {
+                    closePopup();
+                    startCell = cell;
+                    selectRange(cell, cell);
+                }
+            }
         });
 
+        // Giữ lại logic kéo chuột trên máy tính
         table.addEventListener('mousedown', (e) => {
             if (!isEditMode) return; 
             let cell = e.target.closest('td, th');
@@ -1747,6 +1799,10 @@
             const backupSelection = [...selectedCells];
             clearSelection();
             
+            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
+            const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
+            document.documentElement.style.setProperty('--zoom-level', 1);
+            
             showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
             
             const table = document.getElementById('scheduleTable');
@@ -1780,10 +1836,15 @@
                     }, 'image/png');
                 }
                 
+                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
+                document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
                 }
-            }).catch(err => { showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); });
+            }).catch(err => { 
+                document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
+                showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); 
+            });
         }
 
         function saveToGoogleSheets() {
