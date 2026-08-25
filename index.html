@@ -41,7 +41,6 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
 
-        /* CSS CHO ĐĂNG NHẬP VÀ PHÂN QUYỀN */
         .auth-container { position: absolute; right: 10px; top: 0px; }
         .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
         .auth-btn:hover { background-color: #23272b; }
@@ -89,7 +88,6 @@
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
-        /* THANH CÔNG CỤ XEM NHANH */
         .view-controls {
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
             background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
@@ -141,14 +139,12 @@
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         
-        /* Chặn trình duyệt xử lý pinch-zoom mặc định trên bảng để script tùy chỉnh hoạt động */
         .table-container { overflow: auto; flex: 1; width: 100%; position: relative; touch-action: pan-x pan-y;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
 
-        /* ÁP DỤNG BIẾN ZOOM VÀO BẢNG */
         th, td {
             border: 1px solid var(--border-color); 
             padding: calc(5px * var(--zoom-level)); 
@@ -204,15 +200,15 @@
         #cellPopupMenu.show { bottom: 0; }
 
         .popup-header {
-            background-color: #f1f3f5; padding: 10px 15px; border-bottom: 1px solid #ddd;
+            background-color: #f1f3f5; padding: 12px 15px; border-bottom: 1px solid #ddd;
             border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;
             font-weight: bold; color: #333;
         }
-        .popup-close { cursor: pointer; color: #888; font-size: 20px; font-weight: bold; line-height: 1; }
+        .popup-close { cursor: pointer; color: #888; font-size: 24px; font-weight: bold; line-height: 1; padding: 0 10px; }
         .popup-close:hover { color: #dc3545; }
 
         .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
-        .popup-tab { flex: 1; text-align: center; padding: 10px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
+        .popup-tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
         .popup-tab:hover { background: #f0f0f0; }
         .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
 
@@ -248,32 +244,26 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
-        /* ĐIỀU CHỈNH CSS CHO MOBILE */
+        /* --- ĐIỀU CHỈNH CHUẨN UX CHO MOBILE --- */
         @media (max-width: 768px) {
-            #mobileMenuToggle { display: block; }
+            #mobileMenuToggle { display: block; height: 44px; }
             .dashboard { display: none; }
             .dashboard.show-dashboard { display: flex; }
 
-            #cellPopupMenu { max-width: 100%; } 
-            .popup-row button { font-size: 11px; }
+            /* Mở rộng vùng chạm chuẩn 40px - 44px cho ngón tay */
+            button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
+                height: 40px !important; font-size: 13px !important;
+            }
+            .popup-row button { font-size: 12px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
-
-            /* CSS áp dụng Zoom cho cả điện thoại */
-            th, td { 
-                min-width: calc(40px * var(--zoom-level)); 
-                padding: calc(3px * var(--zoom-level)); 
-                font-size: calc(11px * var(--zoom-level)); 
-                word-break: break-word; 
-            }
-            .header-col { 
-                min-width: calc(75px * var(--zoom-level)) !important; 
-                font-size: calc(12px * var(--zoom-level)) !important; 
-            }
-            thead th.header-col { font-size: calc(12px * var(--zoom-level)) !important; }
-            
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
+
+            /* Ẩn các thanh cuộn ảo chiếm diện tích thừa */
+            .left-scrollbar, .top-scrollbar { display: none !important; }
+            .master-wrapper { border: 1px solid #ccc; border-radius: 6px; }
             
             .view-controls { justify-content: center; }
+            #cellPopupMenu { max-width: 100%; }
         }
     </style>
 </head>
@@ -289,7 +279,7 @@
         </h2>
 
         <!-- NÚT TOGGLE MOBILE -->
-        <button id="mobileMenuToggle" onclick="toggleMobileDashboard()">⚙️ Bảng Điều Khiển</button>
+        <button id="mobileMenuToggle" onclick="toggleMobileDashboard()">⚙️ Bảng Điều Khiển Quản Lý</button>
 
         <div class="dashboard" id="mainDashboard">
             <div class="panel">
@@ -353,7 +343,7 @@
         <div class="view-controls">
             <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần (Kéo ngang)</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
-            <span style="margin-left: 10px; font-size: 12px; color: #666; font-style: italic;">(💡 Dùng 2 ngón tay vuốt trên bảng để thu phóng)</span>
+            <span style="margin-left: 10px; font-size: 12px; color: #666; font-style: italic;">(💡 Vuốt 2 ngón tay trên bảng để thu/phóng)</span>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
@@ -381,11 +371,11 @@
                     <div class="popup-item">
                         <span class="popup-title">Cỡ chữ & Kiểu chữ</span>
                         <div class="popup-row">
-                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; height: 34px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
+                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
                             <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold;">B</button>
                             <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif;">I</button>
                             <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline;">U</button>
-                            <button class="secondary" onclick="forceLineBreak()" style="flex:1; height: 34px;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
+                            <button class="secondary" onclick="forceLineBreak()" style="flex:1;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
                         </div>
                     </div>
                     
@@ -492,7 +482,7 @@
             <div class="input-group" style="margin-top: 15px; flex-wrap: nowrap;">
                 <input type="date" id="newHolidayDate" style="flex: 1;" title="Chọn ngày">
                 <input type="text" id="newHolidayName" placeholder="Tên ngày lễ..." style="flex: 2;">
-                <button onclick="addHoliday()" style="height: 28px;">Thêm</button>
+                <button onclick="addHoliday()">Thêm</button>
             </div>
         </div>
     </div>
@@ -503,9 +493,9 @@
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
             <h3 style="margin-top: 0; color: #343a40;">🔐 Đăng nhập Quản trị</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)" style="padding: 8px;">
-                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)" style="padding: 8px;">
-                <button onclick="handleLogin()" style="height: 35px; margin-top: 5px;">Đăng nhập</button>
+                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
+                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
+                <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
             </div>
         </div>
     </div>
@@ -516,10 +506,10 @@
             <span class="close-modal" onclick="closeChangePassModal()">&times;</span>
             <h3 style="margin-top: 0; color: #17a2b8;">🔄 Đổi Mật Khẩu</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại" style="padding: 8px;">
-                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới" style="padding: 8px;">
-                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" style="padding: 8px;">
-                <button onclick="handleChangePassword()" style="height: 35px; margin-top: 5px; background-color: #17a2b8;">Xác nhận đổi</button>
+                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại">
+                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới">
+                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới">
+                <button onclick="handleChangePassword()" style="margin-top: 5px; background-color: #17a2b8;">Xác nhận đổi</button>
             </div>
         </div>
     </div>
@@ -661,7 +651,7 @@
                 );
                 
                 let newZoom = initialPinchZoom * (currentDistance / initialPinchDistance);
-                newZoom = Math.max(0.25, Math.min(3.0, newZoom)); // Cho phép thu nhỏ tới 25% để xem cả tháng
+                newZoom = Math.max(0.25, Math.min(3.0, newZoom)); 
                 
                 document.documentElement.style.setProperty('--zoom-level', newZoom);
                 syncScrollbars(true);
@@ -725,7 +715,7 @@
                         const headerWidth = headerRow.cells[0].offsetWidth;
                         container.scrollLeft = cellLeft - headerWidth;
                     }
-                }, 50); // Chờ xíu để CSS nhận biến Zoom mới cuộn
+                }, 50); 
             }
         }
 
@@ -850,6 +840,40 @@
             }
         }
 
+        // --- NÂNG CẤP CHỌN O TRÊN CẢM ỨNG (TOUCH MULTI-SELECT) ---
+        table.addEventListener('touchstart', (e) => {
+            if (!isEditMode) return; 
+            if (e.touches.length > 1) return; // Chừa chỗ cho zoom 2 ngón
+            
+            let cell = e.target.closest('td, th');
+            if (!cell) return;
+            
+            closePopup();
+            isMouseDown = true;
+            startCell = cell;
+            selectRange(cell, cell);
+        }, { passive: true });
+
+        table.addEventListener('touchmove', (e) => {
+            if (!isMouseDown || !isEditMode || e.touches.length > 1) return;
+            
+            let touch = e.touches[0];
+            let elem = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!elem) return;
+            
+            let cell = elem.closest('td, th');
+            // Nếu ngón tay đang di chuyển quét qua ô khác ô ban đầu -> Bôi đen
+            if (cell && startCell && cell !== startCell) {
+                e.preventDefault(); // CHỐNG CUỘN TRANG KHI ĐANG QUÉT CHỌN
+                selectRange(startCell, cell);
+            }
+        }, { passive: false });
+
+        table.addEventListener('touchend', () => {
+            isMouseDown = false;
+        });
+
+        // Vẫn giữ mousedown/mousemove cho máy tính
         table.addEventListener('mousedown', (e) => {
             if (!isEditMode) return; 
             let cell = e.target.closest('td, th');
