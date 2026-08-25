@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lịch Trực Khoa Nội Tổng Hợp</title>
+    <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -49,12 +49,6 @@
         .view-only-mode .edit-only { display: none !important; }
         .view-only-mode td, .view-only-mode th { cursor: default; }
 
-        #mobileMenuToggle {
-            display: none; width: 100%; margin-bottom: 10px; 
-            height: 36px; font-size: 14px; background-color: var(--secondary-color);
-            color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
-        }
-
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
 
         .panel {
@@ -89,7 +83,7 @@
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
-        /* THANH CÔNG CỤ XEM NHANH & LƯU NHANH */
+        /* THANH CÔNG CỤ XEM NHANH & LƯU NHANH (Desktop) */
         .view-controls {
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
             background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
@@ -151,7 +145,6 @@
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
-        /* CƠ CHẾ ZOOM GPU MỚI MƯỢT MÀ HƠN */
         #scheduleTable {
             zoom: var(--zoom-level);
             transform-origin: top left;
@@ -248,12 +241,55 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
-        /* ĐIỀU CHỈNH CHUẨN UX CHO MOBILE 44px TOUCH TARGETS */
-        @media (max-width: 768px) {
-            #mobileMenuToggle { display: block; height: 44px; }
-            .dashboard { display: none; }
-            .dashboard.show-dashboard { display: flex; }
+        /* CSS MỚI CHO BOTTOM NAVIGATION (MOBILE CHUẨN APP) */
+        .bottom-nav, .bottom-nav-overlay, .action-sheet { display: none; }
 
+        @media (max-width: 768px) {
+            /* Ẩn các công cụ điều khiển Desktop */
+            .dashboard, h2, .auth-container, .view-controls, .collapsible-header { display: none !important; }
+            
+            /* Cấu trúc Full màn hình cho Mobile */
+            .container { padding: 0; padding-bottom: 60px; height: 100vh; background-color: #fff;}
+            .master-wrapper { border: none; border-radius: 0; border-top: 1px solid #ccc; height: 100%;}
+            .left-scrollbar, .top-scrollbar { display: none !important; }
+
+            /* Nút Bottom Navigation */
+            .bottom-nav { 
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
+                border-top: 1px solid #ddd; z-index: 3000; height: 60px; justify-content: space-around; 
+                align-items: center; padding-bottom: env(safe-area-inset-bottom);
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            }
+            .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: #6c757d; cursor: pointer; height: 100%;}
+            .nav-item.active { color: var(--primary-color); }
+            .nav-icon { font-size: 20px; margin-bottom: 2px;}
+            .nav-text { font-size: 11px; font-weight: bold;}
+
+            /* Action Sheets (Khay trượt từ dưới lên) */
+            .action-sheet { 
+                display: block; position: fixed; bottom: -500px; left: 0; width: 100%; background: #fff; 
+                border-top-left-radius: 16px; border-top-right-radius: 16px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
+                z-index: 2999; padding: 20px; padding-bottom: 80px; transition: bottom 0.3s ease; visibility: hidden;
+            }
+            .action-sheet.show { bottom: 0; visibility: visible; }
+            .bottom-nav-overlay { 
+                display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                background: rgba(0,0,0,0.5); z-index: 2998; 
+            }
+            .bottom-nav-overlay.show { display: block; }
+            
+            .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+            .sheet-header h4 { margin: 0; font-size: 16px; color: var(--primary-color);}
+            .sheet-close { font-size: 28px; color: #888; cursor: pointer; line-height: 1;}
+            .list-btn { width: 100%; height: 44px; margin-bottom: 8px; font-size: 14px; text-align: left; padding-left: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f8f9fa; color: #333;}
+            .list-btn.primary { background-color: var(--primary-color); color: #fff; border: none;}
+            
+            /* Tối ưu Popup Menu Edit trên Mobile */
+            #cellPopupMenu { bottom: -500px; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
+            #cellPopupMenu.show { bottom: 0; }
+            #fabBtn { bottom: 80px; z-index: 2990;}
+
+            /* Mở rộng Touch Targets */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
                 height: 44px !important; font-size: 14px !important;
             }
@@ -262,20 +298,12 @@
             .popup-close { font-size: 30px; padding: 5px 15px; }
             .popup-row { gap: 12px; }
             .popup-item { gap: 10px; }
-            
-            .input-group button.load-btn { flex: auto; width: 100%; }
-            .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
 
-            .left-scrollbar, .top-scrollbar { display: none !important; }
-            .master-wrapper { border: 1px solid #ccc; border-radius: 6px; }
-            
-            .view-controls { justify-content: flex-start; gap: 6px; }
-            .quick-save-btn { margin-left: 0 !important; width: 100%; margin-top: 4px; }
-            #cellPopupMenu { max-width: 100%; }
-
+            /* Size bảng Mobile mặc định */
             th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
+            #fullscreenBtn { top: 10px; right: 10px; }
         }
     </style>
 </head>
@@ -283,24 +311,20 @@
 
     <div class="container">
         <h2>
-            Lịch Trực Khoa Nội Tổng Hợp
+            Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
                 <button id="changePassBtn" class="auth-btn edit-only" onclick="openChangePassModal()" style="background-color: #17a2b8; margin-right: 5px;">Đổi MK</button>
                 <button id="authBtn" class="auth-btn" onclick="openLoginModal()">Đăng nhập</button>
             </div>
         </h2>
 
-        <!-- NÚT TOGGLE MOBILE -->
-        <button id="mobileMenuToggle" onclick="toggleMobileDashboard()">⚙️ Bảng Điều Khiển Quản Lý</button>
-
         <div class="dashboard" id="mainDashboard">
             <div class="panel">
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
-                    <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
+                    <input type="month" id="monthYearPicker" value="2026-08" onchange="syncMonthToMobile(this.value)">
                     <button class="edit-only" onclick="handleGenerateNewTable()">🔄 Tạo Mới</button>
                     <button class="secondary edit-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
-                    
                     <button class="secondary edit-only" onclick="undo()" style="margin-left:auto;" title="Hoàn tác (Ctrl+Z)">↩️</button>
                     <button class="secondary edit-only" onclick="redo()" title="Làm lại (Ctrl+Y)">↪️</button>
                 </div>
@@ -350,12 +374,10 @@
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
         </div>
 
-        <!-- THANH ĐIỀU KHIỂN XEM NHANH VÀ NÚT LƯU NHANH -->
         <div class="view-controls">
             <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
             <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Giữ 1 ô để bôi đen - Vuốt 2 ngón để thu phóng)</span>
-            
             <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ</button>
         </div>
 
@@ -465,7 +487,6 @@
 
         <div class="master-wrapper" id="masterWrapper">
             <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Bật/Tắt Toàn Màn Hình">⛶</button>
-
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
             <div class="right-content" id="captureArea"> 
                 <div class="top-scrollbar" id="topScroll"><div id="topScrollContent" style="height: 1px;"></div></div>
@@ -479,6 +500,64 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- HỆ THỐNG GIAO DIỆN MOBILE CHUẨN APP (BOTTOM NAV & SHEETS) -->
+    <div class="bottom-nav-overlay" id="bottomNavOverlay" onclick="closeAllActionSheets()"></div>
+    
+    <!-- Màn hình Dữ liệu (Bảng) -->
+    <div id="sheetBang" class="action-sheet">
+        <div class="sheet-header">
+            <h4>📊 Quản lý Dữ liệu</h4>
+            <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+        </div>
+        <div class="sheet-body">
+            <input type="month" id="mobileMonthPicker" style="width: 100%; margin-bottom: 10px;" onchange="syncMonthToDesktop(this.value)">
+            <button class="list-btn primary" onclick="loadFromGoogleSheets(); closeAllActionSheets();">⬇️ Tải Dữ liệu Lịch về</button>
+            <button class="list-btn edit-only" style="background-color: var(--save-color); color: #000; font-weight: bold; border: none;" onclick="saveToGoogleSheets(); closeAllActionSheets();">💾 Lưu Lên Máy Chủ GG Sheets</button>
+            <button class="list-btn edit-only" onclick="handleGenerateNewTable(); closeAllActionSheets();">🔄 Tạo Bảng Trắng Mới</button>
+            
+            <div style="display: flex; gap: 10px; margin-top: 10px;" class="edit-only">
+                <button class="list-btn" onclick="undo(); closeAllActionSheets();" style="flex:1; justify-content: center; margin-bottom: 0;">↩️ Hoàn tác</button>
+                <button class="list-btn" onclick="redo(); closeAllActionSheets();" style="flex:1; justify-content: center; margin-bottom: 0;">↪️ Làm lại</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Màn hình Khác (Settings) -->
+    <div id="sheetKhac" class="action-sheet">
+        <div class="sheet-header">
+            <h4>⚙️ Tùy chọn khác</h4>
+            <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+        </div>
+        <div class="sheet-body">
+            <button class="list-btn" onclick="setQuickViewMode('month'); closeAllActionSheets();">🗓️ Căn vừa lịch Cả Tháng</button>
+            <button class="list-btn" onclick="setQuickViewMode('week'); closeAllActionSheets();">📅 Căn vừa lịch 1 Tuần</button>
+            <button class="list-btn edit-only" onclick="openHolidayModal(); closeAllActionSheets();">🏖️ Quản lý Ngày Lễ</button>
+            <button class="list-btn" onclick="takeScreenshot('download'); closeAllActionSheets();" style="color: var(--jpg-color);">⬇️ Xuất Lưu thành Ảnh JPG</button>
+            <button class="list-btn" onclick="takeScreenshot('share'); closeAllActionSheets();" style="color: var(--capture-color);">📤 Chụp Ảnh & Chia sẻ</button>
+            
+            <hr style="border-top:1px solid #ddd; width: 100%; margin: 15px 0;">
+            
+            <button id="mobileAuthBtn" class="list-btn" onclick="mobileHandleAuth()" style="background-color: #343a40; color: white; border: none;">Đăng nhập Quản trị</button>
+            <button class="list-btn edit-only" onclick="openChangePassModal(); closeAllActionSheets();" style="background-color: #17a2b8; color: white; border: none;">Đổi Mật Khẩu</button>
+        </div>
+    </div>
+
+    <!-- Thanh Điều Hướng Dưới Cùng -->
+    <div class="bottom-nav">
+        <div class="nav-item active" id="navLich" onclick="activateNav('lich')">
+            <div class="nav-icon">📅</div><div class="nav-text">Lịch</div>
+        </div>
+        <div class="nav-item" id="navSua" onclick="activateNav('sua')">
+            <div class="nav-icon">✏️</div><div class="nav-text">Sửa</div>
+        </div>
+        <div class="nav-item" id="navBang" onclick="activateNav('bang')">
+            <div class="nav-icon">📊</div><div class="nav-text">Bảng</div>
+        </div>
+        <div class="nav-item" id="navKhac" onclick="activateNav('khac')">
+            <div class="nav-icon">⚙️</div><div class="nav-text">Khác</div>
         </div>
     </div>
 
@@ -505,10 +584,9 @@
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
             <h3 style="margin-top: 0; color: #343a40;">🔐 Đăng nhập Quản trị</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)" style="padding: 8px;">
-                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)" style="padding: 8px;">
-                <!-- THÊM Ô CHECKBOX NHỚ TÀI KHOẢN -->
-                <label style="font-size: 13px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
+                <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
+                <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
+                <label style="font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
                     <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản trên máy này
                 </label>
                 <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
@@ -522,9 +600,9 @@
             <span class="close-modal" onclick="closeChangePassModal()">&times;</span>
             <h3 style="margin-top: 0; color: #17a2b8;">🔄 Đổi Mật Khẩu</h3>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại" style="padding: 8px;">
-                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới" style="padding: 8px;">
-                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới" style="padding: 8px;">
+                <input type="password" id="cpOldPass" placeholder="Mật khẩu hiện tại">
+                <input type="password" id="cpNewPass" placeholder="Mật khẩu mới">
+                <input type="password" id="cpConfirmPass" placeholder="Nhập lại mật khẩu mới">
                 <button onclick="handleChangePassword()" style="margin-top: 5px; background-color: #17a2b8;">Xác nhận đổi</button>
             </div>
         </div>
@@ -540,6 +618,75 @@
         let authUsername = "";
         let authToken = "";
 
+        // Đồng bộ ô tháng năm giữa Desktop và Mobile
+        function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
+        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; }
+
+        /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) */
+        function activateNav(tab) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+
+            if (tab === 'lich') {
+                closeAllActionSheets();
+                isEditMode = false;
+                document.body.classList.add('view-only-mode');
+                lockTableEditing();
+                clearSelection();
+            } 
+            else if (tab === 'sua') {
+                closeAllActionSheets();
+                if (!authToken) {
+                    openLoginModal();
+                    activateNav('lich'); // Chặn lại nếu chưa đăng nhập
+                } else {
+                    isEditMode = true;
+                    document.body.classList.remove('view-only-mode');
+                    unlockTableEditing();
+                }
+            }
+            else if (tab === 'bang') {
+                openActionSheet('sheetBang');
+            }
+            else if (tab === 'khac') {
+                openActionSheet('sheetKhac');
+            }
+        }
+
+        function openActionSheet(id) {
+            closeAllActionSheets();
+            document.getElementById('bottomNavOverlay').classList.add('show');
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeAllActionSheets() {
+            document.getElementById('bottomNavOverlay').classList.remove('show');
+            document.querySelectorAll('.action-sheet').forEach(el => el.classList.remove('show'));
+            // Phục hồi lại màu của tab Lịch hoặc Sửa đang chọn dở
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(isEditMode) document.getElementById('navSua').classList.add('active');
+            else document.getElementById('navLich').classList.add('active');
+        }
+
+        function mobileHandleAuth() {
+            closeAllActionSheets();
+            if (authToken) {
+                // Logout Logic
+                isEditMode = false; authUsername = ""; authToken = "";
+                localStorage.removeItem('savedUser');
+                localStorage.removeItem('savedToken');
+                document.getElementById('authBtn').innerText = "Đăng nhập";
+                document.getElementById('mobileAuthBtn').innerText = "Đăng nhập Quản trị";
+                document.body.classList.add('view-only-mode');
+                clearSelection();
+                lockTableEditing();
+                activateNav('lich');
+                showMessage('success', 'Đã đăng xuất.');
+            } else {
+                openLoginModal();
+            }
+        }
+
         async function hashPassword(password) {
             const msgUint8 = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -548,18 +695,8 @@
         }
 
         function openLoginModal() {
-            if (isEditMode) {
-                isEditMode = false; authUsername = ""; authToken = "";
-                document.getElementById('authBtn').innerText = "Đăng nhập";
-                document.body.classList.add('view-only-mode');
-                clearSelection();
-                lockTableEditing();
-                
-                // XÓA NHỚ TÀI KHOẢN KHI ĐĂNG XUẤT
-                localStorage.removeItem('savedUser');
-                localStorage.removeItem('savedToken');
-                
-                showMessage('success', 'Đã đăng xuất, chuyển về chế độ Xem.');
+            if (isEditMode) { // Logic trên Desktop
+                mobileHandleAuth(); 
             } else {
                 document.getElementById('loginModal').style.display = 'block';
             }
@@ -591,17 +728,20 @@
                 if (result.status === 'success') {
                     isEditMode = true; authUsername = user; authToken = hashedPass;
                     document.getElementById('authBtn').innerText = "Đăng xuất (" + user + ")";
+                    document.getElementById('mobileAuthBtn').innerText = "Đăng xuất (" + user + ")";
                     document.body.classList.remove('view-only-mode');
                     closeLoginModal();
                     unlockTableEditing();
                     
-                    // NẾU CHỌN NHỚ TÀI KHOẢN (LƯU VÀO LOCALSTORAGE)
                     if (!isAutoLogin && document.getElementById('rememberMe').checked) {
                         localStorage.setItem('savedUser', user);
                         localStorage.setItem('savedToken', hashedPass);
                     }
                     
-                    if (!isAutoLogin) showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
+                    if (!isAutoLogin) {
+                        showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
+                        if(window.innerWidth <= 768) activateNav('sua');
+                    }
                 } else {
                     if (!isAutoLogin) showMessage('error', result.message);
                     else {
@@ -669,7 +809,7 @@
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
         }
 
-        /* HỆ THỐNG THU PHÓNG CẢM ỨNG (PINCH TO ZOOM) */
+        /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (MƯỢT MÀ 60FPS) */
         let initialPinchDistance = null;
         let initialPinchZoom = 1;
         const tableContainer = document.getElementById('bottomScroll');
@@ -758,10 +898,6 @@
             }
         }
 
-        function toggleMobileDashboard() {
-            document.getElementById('mainDashboard').classList.toggle('show-dashboard');
-        }
-
         function toggleFullscreen() {
             let elem = document.getElementById("masterWrapper");
             if (!document.fullscreenElement) {
@@ -811,11 +947,11 @@
             document.body.classList.add('view-only-mode'); 
             isEditMode = false;
             
+            syncMonthToMobile(document.getElementById('monthYearPicker').value);
             loadFromGoogleSheets();
             renderHolidayList();
             syncScrollbars();
             
-            // TỰ ĐỘNG ĐĂNG NHẬP NẾU CÓ TÀI KHOẢN TRONG LOCALSTORAGE
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
             if (savedUser && savedToken) {
@@ -827,7 +963,7 @@
             });
         });
 
-        // ẨN POPUP VÀ BÀN PHÍM ẢO CHE KHUẤT
+        // ẨN POPUP MENU KHI BÀN PHÍM ẢO BẬT LÊN
         document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
             if (e.target.isContentEditable) {
                 const popup = document.getElementById('cellPopupMenu');
@@ -905,7 +1041,7 @@
             }
         }
 
-        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) TRÊN MOBILE BẰNG LONG-PRESS
+        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS 300MS
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
             if (e.touches.length > 1) return; 
