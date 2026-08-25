@@ -41,6 +41,7 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
 
+        /* CSS CHO ĐĂNG NHẬP VÀ PHÂN QUYỀN */
         .auth-container { position: absolute; right: 10px; top: 0px; }
         .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
         .auth-btn:hover { background-color: #23272b; }
@@ -81,17 +82,22 @@
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
         button.jpg-btn { background-color: var(--jpg-color); }
-        button.save-btn { background-color: var(--save-color); color: #000; flex: 1;}
+        button.save-btn { background-color: var(--save-color); color: #000; }
         button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
+        /* THANH CÔNG CỤ XEM NHANH & LƯU NHANH */
         .view-controls {
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
             background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .quick-save-btn {
+            background-color: var(--save-color) !important; color: #000 !important; font-weight: bold;
+            margin-left: auto; /* Đẩy nút lưu sang góc phải thanh công cụ */
         }
         
         .collapsible-header {
@@ -244,25 +250,24 @@
         .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
         .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
-        /* --- ĐIỀU CHỈNH CHUẨN UX CHO MOBILE --- */
+        /* ĐIỀU CHỈNH CHUẨN UX CHO MOBILE */
         @media (max-width: 768px) {
-            #mobileMenuToggle { display: block; height: 44px; }
+            #mobileMenuToggle { display: block; height: 40px; }
             .dashboard { display: none; }
             .dashboard.show-dashboard { display: flex; }
 
-            /* Mở rộng vùng chạm chuẩn 40px - 44px cho ngón tay */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
-                height: 40px !important; font-size: 13px !important;
+                height: 38px !important; font-size: 13px !important;
             }
             .popup-row button { font-size: 12px; }
-            .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
+            .input-group button.load-btn { flex: auto; width: 100%; }
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
 
-            /* Ẩn các thanh cuộn ảo chiếm diện tích thừa */
             .left-scrollbar, .top-scrollbar { display: none !important; }
             .master-wrapper { border: 1px solid #ccc; border-radius: 6px; }
             
-            .view-controls { justify-content: center; }
+            .view-controls { justify-content: flex-start; gap: 6px; }
+            .quick-save-btn { margin-left: 0 !important; width: 100%; margin-top: 4px; }
             #cellPopupMenu { max-width: 100%; }
         }
     </style>
@@ -294,7 +299,6 @@
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
                     <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Sheet</button>
-                    <button class="save-btn edit-only" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
                 </div>
             </div>
 
@@ -339,11 +343,14 @@
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
         </div>
 
-        <!-- THANH ĐIỀU KHIỂN XEM NHANH -->
+        <!-- THANH ĐIỀU KHIỂN XEM NHANH VÀ NÚT LƯU NHANH -->
         <div class="view-controls">
-            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần (Kéo ngang)</button>
+            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
-            <span style="margin-left: 10px; font-size: 12px; color: #666; font-style: italic;">(💡 Vuốt 2 ngón tay trên bảng để thu/phóng)</span>
+            <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Vuốt 2 ngón tay thu phóng)</span>
+            
+            <!-- NÚT LƯU HIỂN THỊ CẠNH BẢNG (CHỈ HIỆN KHI ĐĂNG NHẬP) -->
+            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu lên Google Sheets</button>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
@@ -532,7 +539,6 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // --- LOGIC ĐĂNG NHẬP ---
         function openLoginModal() {
             if (isEditMode) {
                 isEditMode = false; authUsername = ""; authToken = "";
@@ -664,9 +670,8 @@
             }
         });
 
-        // --- HÀM XEM NHANH 1 TUẦN / 1 THÁNG TỐI ƯU CẢM ỨNG ---
+        // --- HÀM XEM NHANH 1 TUẦN / 1 THÁNG ---
         function setQuickViewMode(mode) {
-            // Mở hiển thị tất cả các cột để có thể cuộn ngang
             document.getElementById('captureMode').value = 'all';
             toggleCaptureInputs();
             updateCropPreview();
@@ -678,7 +683,6 @@
             const headerRow = table.rows[1]; 
             if (!headerRow || headerRow.cells.length < 2) return;
 
-            // Tính toán kích thước zoom 
             const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             const containerWidth = container.clientWidth;
             const hw = headerRow.cells[0].offsetWidth / currentZoom;
@@ -697,7 +701,6 @@
                 document.documentElement.style.setProperty('--zoom-level', targetZoom);
                 syncScrollbars(true);
 
-                // Cuộn đến ngày hiện tại
                 const today = new Date();
                 const pickerVal = document.getElementById('monthYearPicker').value;
                 let targetDay = 1;
@@ -840,10 +843,9 @@
             }
         }
 
-        // --- NÂNG CẤP CHỌN O TRÊN CẢM ỨNG (TOUCH MULTI-SELECT) ---
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
-            if (e.touches.length > 1) return; // Chừa chỗ cho zoom 2 ngón
+            if (e.touches.length > 1) return; 
             
             let cell = e.target.closest('td, th');
             if (!cell) return;
@@ -862,9 +864,8 @@
             if (!elem) return;
             
             let cell = elem.closest('td, th');
-            // Nếu ngón tay đang di chuyển quét qua ô khác ô ban đầu -> Bôi đen
             if (cell && startCell && cell !== startCell) {
-                e.preventDefault(); // CHỐNG CUỘN TRANG KHI ĐANG QUÉT CHỌN
+                e.preventDefault(); 
                 selectRange(startCell, cell);
             }
         }, { passive: false });
@@ -873,7 +874,6 @@
             isMouseDown = false;
         });
 
-        // Vẫn giữ mousedown/mousemove cho máy tính
         table.addEventListener('mousedown', (e) => {
             if (!isEditMode) return; 
             let cell = e.target.closest('td, th');
@@ -927,7 +927,7 @@
             
             document.getElementById('textColorPicker').value = rgbToHex(comp.color);
             let bg = comp.backgroundColor;
-            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
+            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(comp.color);
             
             document.getElementById('fontSizePicker').value = parseInt(comp.fontSize) || 13;
 
