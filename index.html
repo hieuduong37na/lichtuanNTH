@@ -41,13 +41,22 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
 
-        /* CSS CHO ĐĂNG NHẬP VÀ PHÂN QUYỀN */
         .auth-container { position: absolute; right: 10px; top: 0px; }
         .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
         .auth-btn:hover { background-color: #23272b; }
         
         .view-only-mode .edit-only { display: none !important; }
         .view-only-mode td, .view-only-mode th { cursor: default; }
+
+        /* HUY HIỆU AUTO-SAVE TRẠNG THÁI (GÓC TRÊN MÀN HÌNH) */
+        #syncBadge {
+            position: fixed; top: 10px; right: 50px; z-index: 3001;
+            background: rgba(255, 255, 255, 0.95); padding: 5px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 1px solid #ddd;
+            display: none; align-items: center; justify-content: center;
+            pointer-events: none; transition: opacity 0.3s;
+        }
 
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
 
@@ -82,43 +91,6 @@
         button.warning { background-color: var(--warning-color); color: #000; }
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
-
-        /* THANH CÔNG CỤ XEM NHANH & LƯU NHANH (Desktop) */
-        .view-controls {
-            display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
-            background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .quick-save-btn {
-            background-color: var(--save-color) !important; color: #000 !important; font-weight: bold;
-            margin-left: auto; 
-        }
-        
-        .collapsible-header {
-            background-color: #e9ecef; color: #444; cursor: pointer;
-            padding: 8px 12px; width: 100%;
-            border: 1px solid #ced4da; border-radius: 6px;
-            text-align: left; font-size: 13px; font-weight: bold;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;
-        }
-
-        .collapsible-header:hover { background-color: #dde2e6; }
-        .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
-        .collapsible-header.active:after { content: '\25B2'; }
-
-        .collapsible-content {
-            padding: 0; max-height: 1000px;
-            overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease;
-            background-color: transparent; margin-bottom: 10px;
-        }
-        .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
-
-        #topNotesArea {
-            width: 100%; min-height: 60px; border: 1px solid #ccc;
-            border-radius: 4px; padding: 8px; font-family: inherit;
-            font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text;
-        }
 
         .master-wrapper {
             display: flex; border: 2px solid #555; background-color: white;
@@ -297,10 +269,16 @@
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
             #fullscreenBtn { top: 10px; right: 10px; }
+
+            /* Điều chỉnh Auto-save Badge cho Mobile (Ở chính giữa) */
+            #syncBadge { top: 10px; left: 50%; transform: translateX(-50%); right: auto; padding: 6px 16px;}
         }
     </style>
 </head>
 <body>
+
+    <!-- HUY HIỆU AUTO-SAVE TRẠNG THÁI -->
+    <div id="syncBadge" class="edit-only">🟢 Đã đồng bộ</div>
 
     <div class="container">
         <h2>
@@ -323,6 +301,7 @@
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
                     <button class="load-btn" onclick="loadFromGoogleSheets()">⬇️ Tải Dữ liệu từ Sheet</button>
+                    <button class="save-btn edit-only" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ GG Sheets</button>
                 </div>
             </div>
 
@@ -365,13 +344,6 @@
         <div class="collapsible-header edit-only" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
         <div id="notesSection" class="collapsible-content collapsed edit-only">
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
-        </div>
-
-        <div class="view-controls">
-            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
-            <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
-            <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Giữ 1 ô để bôi đen - Vuốt 2 ngón để thu phóng)</span>
-            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ</button>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
@@ -580,7 +552,7 @@
                 <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
                 <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
                 <label style="font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
-                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản
+                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản trên máy này
                 </label>
                 <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
             </div>
@@ -610,14 +582,16 @@
         let isEditMode = false;
         let authUsername = "";
         let authToken = "";
-        
+
         let isScrollbarsInitialized = false;
+        let resizeObserver = null;
+        let autoSaveTimeout = null;
 
         // Đồng bộ ô tháng năm giữa Desktop và Mobile
         function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
         function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; loadFromGoogleSheets(); }
 
-        /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) */
+        /* --- HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) --- */
         function activateNav(tab) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
@@ -628,6 +602,7 @@
                 document.body.classList.add('view-only-mode');
                 lockTableEditing();
                 clearSelection();
+                updateSyncStatus('none');
             } 
             else if (tab === 'sua') {
                 closeAllActionSheets();
@@ -675,6 +650,7 @@
                 document.body.classList.add('view-only-mode');
                 clearSelection();
                 lockTableEditing();
+                updateSyncStatus('none');
                 activateNav('lich');
                 showMessage('success', 'Đã đăng xuất.');
             } else {
@@ -682,6 +658,7 @@
             }
         }
 
+        /* --- XÁC THỰC VÀ BẢO MẬT --- */
         async function hashPassword(password) {
             const msgUint8 = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -804,7 +781,136 @@
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
         }
 
-        /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU TỐI ƯU HIỆU NĂNG */
+        /* --- HỆ THỐNG AUTO-SAVE DEBOUNCE 2.5s --- */
+        function triggerAutoSave() {
+            if (!isEditMode || !authToken) return;
+            
+            updateSyncStatus('waiting');
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            
+            autoSaveTimeout = setTimeout(() => { performAutoSave(); }, 2500);
+        }
+
+        function updateSyncStatus(status) {
+            const badge = document.getElementById('syncBadge');
+            if (!isEditMode || status === 'none') {
+                badge.style.display = 'none'; return;
+            }
+            badge.style.display = 'flex';
+            
+            if (status === 'waiting') {
+                badge.innerHTML = '🟡 Chờ lưu...'; badge.style.color = '#856404';
+            } else if (status === 'saving') {
+                badge.innerHTML = '🔄 Đang lưu...'; badge.style.color = '#004085';
+            } else if (status === 'success') {
+                badge.innerHTML = '🟢 Đã đồng bộ'; badge.style.color = '#155724';
+                setTimeout(() => { if (badge.innerHTML.includes('Đã đồng bộ')) badge.style.display = 'none'; }, 3000);
+            } else if (status === 'error') {
+                badge.innerHTML = '🔴 Lỗi lưu'; badge.style.color = '#721c24';
+            }
+        }
+
+        function buildSavePayload() {
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            const mobilePickerValue = document.getElementById('mobileMonthPicker').value;
+            const [year, month] = (pickerValue || mobilePickerValue).split('-');
+            const sheetName = `Thang_${month}_${year}`;
+            
+            const payloadData = [];
+            const payloadBgColors = [];
+            const payloadFontColors = [];
+            const payloadFontWeights = [];
+
+            const table = document.getElementById('scheduleTable');
+            table.querySelectorAll('tr').forEach(row => {
+                const rowData = []; const rowBg = []; const rowFont = []; const rowWeight = [];
+                row.querySelectorAll('th, td').forEach(cell => {
+                    if(cell.style.display === 'none') {
+                        rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal");
+                    } else {
+                        rowData.push(cell.innerText.trim());
+                        let computedStyle = window.getComputedStyle(cell);
+                        let bg = computedStyle.backgroundColor;
+                        rowBg.push((bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? "#ffffff" : rgbToHex(bg));
+                        let color = computedStyle.color;
+                        rowFont.push(color ? rgbToHex(color) : "#000000");
+                        let fw = computedStyle.fontWeight;
+                        rowWeight.push((fw === 'bold' || fw >= 700) ? "bold" : "normal");
+                    }
+                });
+                payloadData.push(rowData); payloadBgColors.push(rowBg); payloadFontColors.push(rowFont); payloadFontWeights.push(rowWeight);
+            });
+
+            return { 
+                action: "save", username: authUsername, token: authToken, sheetName: sheetName, 
+                data: payloadData, styles: { bgColors: payloadBgColors, fontColors: payloadFontColors, fontWeights: payloadFontWeights }
+            };
+        }
+
+        function performAutoSave() {
+            if (!isEditMode || !authToken) return;
+            updateSyncStatus('saving');
+            fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(buildSavePayload()) })
+            .then(res => res.json())
+            .then(result => { updateSyncStatus(result.status === 'success' ? 'success' : 'error'); })
+            .catch(() => updateSyncStatus('error'));
+        }
+
+        function saveToGoogleSheets() {
+            closePopup(); clearSelection();
+            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
+            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
+            
+            showMessage('loading', 'Đang cập nhật Sheet...');
+            updateSyncStatus('saving');
+            fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(buildSavePayload()) })
+            .then(res => res.json())
+            .then(result => {
+                if(result.status === 'success') { showMessage('success', 'Đã lưu xong!'); updateSyncStatus('success'); } 
+                else { showMessage('error', 'Lỗi: ' + result.message); updateSyncStatus('error'); }
+            })
+            .catch(() => { showMessage('error', 'Lỗi lưu dữ liệu.'); updateSyncStatus('error'); });
+        }
+
+
+        /* --- HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (TỐI ƯU HIỆU NĂNG OBSERVER) --- */
+        function initScrollbars() {
+            if (isScrollbarsInitialized) return;
+            const table = document.getElementById('scheduleTable');
+            const bottomScroll = document.getElementById('bottomScroll');
+            const topScroll = document.getElementById('topScroll');
+            const leftScroll = document.getElementById('leftScroll');
+
+            updateScrollDimensions();
+            resizeObserver = new ResizeObserver(updateScrollDimensions);
+            resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
+
+            topScroll.addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
+            bottomScroll.addEventListener('scroll', (e) => { topScroll.scrollLeft = e.target.scrollLeft; });
+            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
+            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
+            isScrollbarsInitialized = true;
+        }
+
+        function updateScrollDimensions() {
+            const table = document.getElementById('scheduleTable');
+            const bottomScroll = document.getElementById('bottomScroll'); 
+            const topScrollContent = document.getElementById('topScrollContent');
+            const leftScroll = document.getElementById('leftScroll');
+            const leftScrollContent = document.getElementById('leftScrollContent');
+
+            if(table && bottomScroll && topScrollContent && leftScrollContent) {
+                topScrollContent.style.width = table.offsetWidth + 'px';
+                leftScrollContent.style.height = table.offsetHeight + 'px';
+                leftScroll.style.height = bottomScroll.clientHeight + 'px';
+            }
+        }
+
+        function syncScrollbars(forceUpdate = false) {
+            if (!isScrollbarsInitialized) initScrollbars();
+            else if (forceUpdate) updateScrollDimensions();
+        }
+
         let initialPinchDistance = null;
         let initialPinchZoom = 1;
         const tableContainer = document.getElementById('bottomScroll');
@@ -841,7 +947,7 @@
             }
         });
 
-        /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
+        /* --- XEM NHANH 1 TUẦN / 1 THÁNG --- */
         function setQuickViewMode(mode) {
             document.getElementById('captureMode').value = 'all';
             toggleCaptureInputs();
@@ -893,17 +999,6 @@
             }
         }
 
-        function toggleFullscreen() {
-            let elem = document.getElementById("masterWrapper");
-            if (!document.fullscreenElement) {
-                elem.requestFullscreen().catch((err) => {
-                    showMessage('error', `Lỗi khi mở toàn màn hình: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
         function saveState() {
             const table = document.getElementById('scheduleTable');
             const htmlState = table.innerHTML;
@@ -915,6 +1010,9 @@
             currentStep++;
 
             if (historyStack.length > 50) { historyStack.shift(); currentStep--; }
+            
+            // Kích hoạt auto-save mỗi khi state thay đổi
+            triggerAutoSave();
         }
 
         function undo() {
@@ -922,6 +1020,7 @@
                 currentStep--;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!');
+                triggerAutoSave();
             } else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
         }
 
@@ -930,6 +1029,7 @@
                 currentStep++;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã khôi phục thao tác!');
+                triggerAutoSave();
             } else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
         }
 
@@ -954,6 +1054,11 @@
             
             document.getElementById('scheduleTable').addEventListener('focusout', function(e) {
                 if(e.target.isContentEditable) saveState();
+            });
+
+            // Lắng nghe thao tác gõ chữ để auto-save
+            document.getElementById('scheduleTable').addEventListener('input', function(e) {
+                triggerAutoSave();
             });
         });
 
@@ -1567,51 +1672,6 @@
             return "#000000";
         }
 
-        // TỐI ƯU HÓA HIỆU NĂNG CHO OBSERVER
-        function updateScrollDimensions() {
-            const table = document.getElementById('scheduleTable');
-            const bottomScroll = document.getElementById('bottomScroll'); 
-            const topScrollContent = document.getElementById('topScrollContent');
-            const leftScroll = document.getElementById('leftScroll');
-            const leftScrollContent = document.getElementById('leftScrollContent');
-
-            if(table && bottomScroll && topScrollContent && leftScrollContent) {
-                topScrollContent.style.width = table.offsetWidth + 'px';
-                leftScrollContent.style.height = table.offsetHeight + 'px';
-                leftScroll.style.height = bottomScroll.clientHeight + 'px';
-            }
-        }
-
-        function initScrollbars() {
-            if (isScrollbarsInitialized) return;
-
-            const table = document.getElementById('scheduleTable');
-            const bottomScroll = document.getElementById('bottomScroll');
-            const topScroll = document.getElementById('topScroll');
-            const leftScroll = document.getElementById('leftScroll');
-
-            updateScrollDimensions();
-
-            const resizeObserver = new ResizeObserver(updateScrollDimensions);
-            resizeObserver.observe(table); 
-            resizeObserver.observe(bottomScroll);
-
-            topScroll.addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
-            bottomScroll.addEventListener('scroll', (e) => { topScroll.scrollLeft = e.target.scrollLeft; });
-            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
-            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
-
-            isScrollbarsInitialized = true;
-        }
-
-        function syncScrollbars(forceUpdate = false) {
-            if (!isScrollbarsInitialized) {
-                initScrollbars();
-            } else if (forceUpdate) {
-                updateScrollDimensions();
-            }
-        }
-
         function updateRowSelectDropdown() {
             const select = document.getElementById('rowSelectEnd');
             select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
@@ -1982,7 +2042,6 @@
             const backupSelection = [...selectedCells];
             clearSelection();
             
-            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
             const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
             document.documentElement.style.setProperty('--zoom-level', 1);
             
@@ -2019,7 +2078,6 @@
                     }, 'image/png');
                 }
                 
-                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
@@ -2028,75 +2086,6 @@
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); 
             });
-        }
-
-        function saveToGoogleSheets() {
-            closePopup(); clearSelection();
-            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
-            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
-            
-            const table = document.getElementById('scheduleTable');
-            const [year, month] = document.getElementById('monthYearPicker').value.split('-');
-            const sheetName = `Thang_${month}_${year}`;
-            
-            const payloadData = [];
-            const payloadBgColors = [];
-            const payloadFontColors = [];
-            const payloadFontWeights = [];
-
-            table.querySelectorAll('tr').forEach(row => {
-                const rowData = [];
-                const rowBg = [];
-                const rowFont = [];
-                const rowWeight = [];
-
-                row.querySelectorAll('th, td').forEach(cell => {
-                    if(cell.style.display === 'none') {
-                        rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal");
-                    } else {
-                        rowData.push(cell.innerText.trim());
-                        
-                        let computedStyle = window.getComputedStyle(cell);
-                        let bg = computedStyle.backgroundColor;
-                        let hexBg = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? "#ffffff" : rgbToHex(bg);
-                        rowBg.push(hexBg);
-
-                        let color = computedStyle.color;
-                        let hexColor = color ? rgbToHex(color) : "#000000";
-                        rowFont.push(hexColor);
-                        
-                        let fw = computedStyle.fontWeight;
-                        rowWeight.push((fw === 'bold' || fw >= 700) ? "bold" : "normal");
-                    }
-                });
-
-                payloadData.push(rowData);
-                payloadBgColors.push(rowBg);
-                payloadFontColors.push(rowFont);
-                payloadFontWeights.push(rowWeight);
-            });
-
-            const payload = { 
-                action: "save",
-                username: authUsername,
-                token: authToken,
-                sheetName: sheetName, 
-                data: payloadData, 
-                styles: {
-                    bgColors: payloadBgColors,
-                    fontColors: payloadFontColors,
-                    fontWeights: payloadFontWeights
-                }
-            };
-
-            showMessage('loading', 'Đang cập nhật Sheet...');
-            fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-            .then(response => response.json())
-            .then(result => {
-                if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!');
-                else showMessage('error', 'Lỗi từ Server: ' + result.message);
-            })
-            .catch(() => showMessage('success', 'Đã gửi yêu cầu lưu dữ liệu.'));
         }
 
         const modal = document.getElementById("holidayModal");
