@@ -2,8 +2,9 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lịch Trực Khoa Nội Tổng Hợp</title>
+    <!-- Cập nhật Viewport: Khóa zoom mặc định của trình duyệt để dùng Zoom tùy chỉnh mượt hơn -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -21,6 +22,8 @@
             --holiday-bg: #f8d7da;
             --header-bg: #d9ead3; 
             --select-bg: rgba(13, 110, 253, 0.15);
+            /* Biến CSS kiểm soát mức độ Thu/Phóng */
+            --zoom-level: 1; 
         }
 
         * { box-sizing: border-box; }
@@ -45,11 +48,9 @@
         .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
         .auth-btn:hover { background-color: #23272b; }
         
-        /* Ẩn các công cụ dành riêng cho admin khi chưa đăng nhập */
         .view-only-mode .edit-only { display: none !important; }
         .view-only-mode td, .view-only-mode th { cursor: default; }
 
-        /* Nút ẩn/hiện Dashboard trên Mobile */
         #mobileMenuToggle {
             display: none; width: 100%; margin-bottom: 10px; 
             height: 36px; font-size: 14px; background-color: var(--secondary-color);
@@ -87,10 +88,16 @@
         button.load-btn { background-color: #17a2b8; color: white; flex: 1;}
         button.danger { background-color: var(--danger-color); }
         button.warning { background-color: var(--warning-color); color: #000; }
-        
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
+        /* THANH CÔNG CỤ XEM NHANH */
+        .view-controls {
+            display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
+            background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
         .collapsible-header {
             background-color: #e9ecef; color: #444; cursor: pointer;
             padding: 8px 12px; width: 100%;
@@ -123,7 +130,6 @@
             position: relative;
         }
 
-        /* Nút Fullscreen */
         #fullscreenBtn {
             position: absolute; top: 5px; right: 5px; z-index: 100;
             background: rgba(0, 0, 0, 0.4); color: white; border: none; border-radius: 4px;
@@ -133,24 +139,25 @@
         #fullscreenBtn:hover { background: rgba(0, 0, 0, 0.7); }
         :fullscreen #fullscreenBtn { background: rgba(220, 53, 69, 0.7); content: "✖"; }
         
-        .left-scrollbar {
-            overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0;
-            background-color: #f1f1f1; border-right: 1px solid #ccc;
-        }
-
+        .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
         .right-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         
-        .table-container { overflow: auto; flex: 1; width: 100%; position: relative;}
+        /* Chặn trình duyệt xử lý pinch-zoom mặc định trên bảng để script tùy chỉnh hoạt động */
+        .table-container { overflow: auto; flex: 1; width: 100%; position: relative; touch-action: pan-x pan-y;}
         .table-container::-webkit-scrollbar:vertical { width: 0px; }
         .table-container::-webkit-scrollbar:horizontal { height: 12px; }
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
 
+        /* ÁP DỤNG BIẾN ZOOM VÀO BẢNG */
         th, td {
-            border: 1px solid var(--border-color); padding: 5px; text-align: center;
-            min-width: 45px; font-size: 13px; white-space: pre-wrap; 
-            cursor: cell;
+            border: 1px solid var(--border-color); 
+            padding: calc(5px * var(--zoom-level)); 
+            text-align: center;
+            min-width: calc(45px * var(--zoom-level)); 
+            font-size: calc(13px * var(--zoom-level)); 
+            white-space: pre-wrap; cursor: cell;
         }
 
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
@@ -161,8 +168,12 @@
         }
 
         thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; }
-        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
-        thead th.header-col { z-index: 12; font-size: 15px; }
+        .header-col { 
+            background-color: var(--header-bg) !important; font-weight: bold; 
+            position: sticky; left: 0; z-index: 11; 
+            min-width: calc(90px * var(--zoom-level)) !important; 
+        }
+        thead th.header-col { z-index: 12; font-size: calc(15px * var(--zoom-level)); }
 
         .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
@@ -171,7 +182,6 @@
         .selection-right { border-right: 2px solid var(--primary-color) !important; }
 
         .header-col:focus { background-color: #c3e6cb !important; }
-        
         .weekend { background-color: var(--weekend-bg) !important; }
         .holiday { background-color: var(--holiday-bg) !important; font-weight: bold; color: #721c24 !important; }
         .red-separator { border-bottom: 3px solid red !important; }
@@ -250,12 +260,21 @@
             .popup-row button { font-size: 11px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
 
-            /* CSS vừa khít 1 Tuần */
-            th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
-            .header-col { min-width: 75px !important; font-size: 12px !important; }
-            thead th.header-col { font-size: 12px !important; }
+            /* Mặc định trên Mobile: 1 Tuần */
+            th, td { 
+                min-width: calc(40px * var(--zoom-level)); 
+                padding: calc(3px * var(--zoom-level)); 
+                font-size: calc(11px * var(--zoom-level)); 
+                word-break: break-word; 
+            }
+            .header-col { 
+                min-width: calc(75px * var(--zoom-level)) !important; 
+                font-size: calc(12px * var(--zoom-level)) !important; 
+            }
+            thead th.header-col { font-size: calc(12px * var(--zoom-level)) !important; }
             
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
+            .view-controls { justify-content: center; }
         }
     </style>
 </head>
@@ -263,7 +282,7 @@
 
     <div class="container">
         <h2>
-            Lịch Trực Khoa Nội Tổng Hợp
+            Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
                 <button id="changePassBtn" class="auth-btn edit-only" onclick="openChangePassModal()" style="background-color: #17a2b8; margin-right: 5px;">Đổi MK</button>
                 <button id="authBtn" class="auth-btn" onclick="openLoginModal()">Đăng nhập</button>
@@ -278,7 +297,6 @@
                 <h4>📅 Quản lý Dữ liệu</h4>
                 <div class="input-group">
                     <input type="month" id="monthYearPicker" value="2026-08" onchange="loadFromGoogleSheets()">
-                    <!-- Gán class edit-only vào các nút chỉ admin mới được xài -->
                     <button class="edit-only" onclick="handleGenerateNewTable()">🔄 Tạo Mới</button>
                     <button class="secondary edit-only" onclick="openHolidayModal()">🏖️ Ngày Lễ</button>
                     
@@ -330,6 +348,13 @@
         <div class="collapsible-header edit-only" onclick="toggleSection('notesSection', this)">📝 Ghi chú nháp (Không hiển thị khi xuất ảnh)</div>
         <div id="notesSection" class="collapsible-content collapsed edit-only">
             <textarea id="topNotesArea" placeholder="Nhập các ghi chú, thông báo cá nhân vào đây..."></textarea>
+        </div>
+
+        <!-- THANH ĐIỀU KHIỂN XEM NHANH -->
+        <div class="view-controls">
+            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
+            <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
+            <span style="margin-left: 10px; font-size: 12px; color: #666; font-style: italic;">(💡 Dùng 2 ngón tay vuốt trên bảng để thu phóng)</span>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
@@ -596,7 +621,7 @@
             .then(res => res.json())
             .then(result => {
                 if (result.status === 'success') {
-                    authToken = hashedNewPass; // Cập nhật token mới vào session hiện tại
+                    authToken = hashedNewPass; 
                     closeChangePassModal();
                     showMessage('success', 'Đổi mật khẩu thành công!');
                 } else {
@@ -613,6 +638,68 @@
         function unlockTableEditing() {
             if(!isEditMode) return;
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
+        }
+
+        // --- HỆ THỐNG THU PHÓNG CẢM ỨNG (PINCH TO ZOOM) ---
+        let initialPinchDistance = null;
+        let initialPinchZoom = 1;
+        const tableContainer = document.getElementById('bottomScroll');
+
+        tableContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                initialPinchZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+            }
+        }, { passive: false });
+
+        tableContainer.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2 && initialPinchDistance) {
+                e.preventDefault(); // Ngăn chặn zoom toàn trang mặc định của trình duyệt để chỉ zoom bảng
+                const currentDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                
+                let newZoom = initialPinchZoom * (currentDistance / initialPinchDistance);
+                newZoom = Math.max(0.5, Math.min(2.5, newZoom)); // Giới hạn từ 50% đến 250%
+                
+                document.documentElement.style.setProperty('--zoom-level', newZoom);
+                syncScrollbars(true);
+            }
+        }, { passive: false });
+
+        tableContainer.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialPinchDistance = null;
+            }
+        });
+
+        /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
+        function setQuickViewMode(mode) {
+            const captureSelect = document.getElementById('captureMode');
+            if (mode === 'month') {
+                captureSelect.value = 'all';
+            } else if (mode === 'week') {
+                captureSelect.value = 'week';
+                // Tự động tính toán tuần hiện tại của tháng
+                const today = new Date();
+                const pickerVal = document.getElementById('monthYearPicker').value;
+                if(pickerVal) {
+                    const [y, m] = pickerVal.split('-');
+                    if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) {
+                        const day = today.getDate();
+                        const currentWeek = Math.ceil(day / 7);
+                        document.getElementById('weekSelect').value = currentWeek > 5 ? 5 : currentWeek;
+                    } else {
+                        document.getElementById('weekSelect').value = 1;
+                    }
+                }
+            }
+            toggleCaptureInputs();
+            updateCropPreview();
         }
 
         /* HÀM ẨN/HIỆN DASHBOARD TRÊN MOBILE */
