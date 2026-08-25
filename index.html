@@ -245,15 +245,12 @@
         .bottom-nav, .bottom-nav-overlay, .action-sheet { display: none; }
 
         @media (max-width: 768px) {
-            /* Ẩn các công cụ điều khiển Desktop */
             .dashboard, h2, .auth-container, .view-controls, .collapsible-header { display: none !important; }
             
-            /* Cấu trúc Full màn hình cho Mobile */
             .container { padding: 0; padding-bottom: 60px; height: 100vh; background-color: #fff;}
             .master-wrapper { border: none; border-radius: 0; border-top: 1px solid #ccc; height: 100%;}
             .left-scrollbar, .top-scrollbar { display: none !important; }
 
-            /* Nút Bottom Navigation */
             .bottom-nav { 
                 display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
                 border-top: 1px solid #ddd; z-index: 3000; height: 60px; justify-content: space-around; 
@@ -265,7 +262,6 @@
             .nav-icon { font-size: 20px; margin-bottom: 2px;}
             .nav-text { font-size: 11px; font-weight: bold;}
 
-            /* Action Sheets (Khay trượt từ dưới lên) */
             .action-sheet { 
                 display: block; position: fixed; bottom: -500px; left: 0; width: 100%; background: #fff; 
                 border-top-left-radius: 16px; border-top-right-radius: 16px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
@@ -284,12 +280,10 @@
             .list-btn { width: 100%; height: 44px; margin-bottom: 8px; font-size: 14px; text-align: left; padding-left: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f8f9fa; color: #333;}
             .list-btn.primary { background-color: var(--primary-color); color: #fff; border: none;}
             
-            /* Tối ưu Popup Menu Edit trên Mobile */
             #cellPopupMenu { bottom: -500px; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
             #cellPopupMenu.show { bottom: 0; }
             #fabBtn { bottom: 80px; z-index: 2990;}
 
-            /* Mở rộng Touch Targets */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
                 height: 44px !important; font-size: 14px !important;
             }
@@ -299,7 +293,6 @@
             .popup-row { gap: 12px; }
             .popup-item { gap: 10px; }
 
-            /* Size bảng Mobile mặc định */
             th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
@@ -587,7 +580,7 @@
                 <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
                 <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
                 <label style="font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
-                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản trên máy này
+                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản
                 </label>
                 <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
             </div>
@@ -617,10 +610,12 @@
         let isEditMode = false;
         let authUsername = "";
         let authToken = "";
+        
+        let isScrollbarsInitialized = false;
 
         // Đồng bộ ô tháng năm giữa Desktop và Mobile
         function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
-        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; }
+        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; loadFromGoogleSheets(); }
 
         /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) */
         function activateNav(tab) {
@@ -809,7 +804,7 @@
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
         }
 
-        /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (MƯỢT MÀ 60FPS) */
+        /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU TỐI ƯU HIỆU NĂNG */
         let initialPinchDistance = null;
         let initialPinchZoom = 1;
         const tableContainer = document.getElementById('bottomScroll');
@@ -950,7 +945,6 @@
             syncMonthToMobile(document.getElementById('monthYearPicker').value);
             loadFromGoogleSheets();
             renderHolidayList();
-            syncScrollbars();
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -963,7 +957,7 @@
             });
         });
 
-        // ẨN POPUP MENU KHI BÀN PHÍM ẢO BẬT LÊN
+        // ẨN POPUP MENU KHI BÀN PHÍM ẢO BẬT LÊN ĐỂ KHÔNG CHE BẢNG
         document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
             if (e.target.isContentEditable) {
                 const popup = document.getElementById('cellPopupMenu');
@@ -1573,28 +1567,49 @@
             return "#000000";
         }
 
-        function syncScrollbars(forceUpdate = false) {
+        // TỐI ƯU HÓA HIỆU NĂNG CHO OBSERVER
+        function updateScrollDimensions() {
             const table = document.getElementById('scheduleTable');
             const bottomScroll = document.getElementById('bottomScroll'); 
             const topScrollContent = document.getElementById('topScrollContent');
             const leftScroll = document.getElementById('leftScroll');
             const leftScrollContent = document.getElementById('leftScrollContent');
 
-            const updateScrollDimensions = () => {
+            if(table && bottomScroll && topScrollContent && leftScrollContent) {
                 topScrollContent.style.width = table.offsetWidth + 'px';
                 leftScrollContent.style.height = table.offsetHeight + 'px';
                 leftScroll.style.height = bottomScroll.clientHeight + 'px';
-            };
+            }
+        }
 
-            if(forceUpdate) updateScrollDimensions();
+        function initScrollbars() {
+            if (isScrollbarsInitialized) return;
+
+            const table = document.getElementById('scheduleTable');
+            const bottomScroll = document.getElementById('bottomScroll');
+            const topScroll = document.getElementById('topScroll');
+            const leftScroll = document.getElementById('leftScroll');
+
+            updateScrollDimensions();
 
             const resizeObserver = new ResizeObserver(updateScrollDimensions);
-            resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
+            resizeObserver.observe(table); 
+            resizeObserver.observe(bottomScroll);
 
-            document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
-            bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; });
+            topScroll.addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
+            bottomScroll.addEventListener('scroll', (e) => { topScroll.scrollLeft = e.target.scrollLeft; });
             leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
             bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
+
+            isScrollbarsInitialized = true;
+        }
+
+        function syncScrollbars(forceUpdate = false) {
+            if (!isScrollbarsInitialized) {
+                initScrollbars();
+            } else if (forceUpdate) {
+                updateScrollDimensions();
+            }
         }
 
         function updateRowSelectDropdown() {
@@ -1760,7 +1775,7 @@
             }
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            historyStack = []; currentStep = -1; syncScrollbars(true); 
         }
 
         function generateTableWithCustomRoles(customRolesArray) {
@@ -1816,7 +1831,7 @@
             });
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            historyStack = []; currentStep = -1; syncScrollbars(true); 
         }
 
         function handleGenerateNewTable(hideConfirm = false) {
@@ -1895,7 +1910,7 @@
             });
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
-            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
+            historyStack = []; currentStep = -1; syncScrollbars(true); 
         }
 
         function toggleCaptureInputs() {
