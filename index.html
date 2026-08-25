@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- Cập nhật Viewport: Khóa zoom mặc định của trình duyệt để dùng Zoom tùy chỉnh mượt hơn -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -22,7 +21,6 @@
             --holiday-bg: #f8d7da;
             --header-bg: #d9ead3; 
             --select-bg: rgba(13, 110, 253, 0.15);
-            /* Biến CSS kiểm soát mức độ Thu/Phóng */
             --zoom-level: 1; 
         }
 
@@ -260,7 +258,7 @@
             .popup-row button { font-size: 11px; }
             .input-group button.save-btn, .input-group button.load-btn { flex: auto; width: 48%; }
 
-            /* Mặc định trên Mobile: 1 Tuần */
+            /* CSS áp dụng Zoom cho cả điện thoại */
             th, td { 
                 min-width: calc(40px * var(--zoom-level)); 
                 padding: calc(3px * var(--zoom-level)); 
@@ -274,6 +272,7 @@
             thead th.header-col { font-size: calc(12px * var(--zoom-level)) !important; }
             
             .auth-container { position: static; display: inline-block; margin-left: 10px; margin-top: 5px; }
+            
             .view-controls { justify-content: center; }
         }
     </style>
@@ -352,7 +351,7 @@
 
         <!-- THANH ĐIỀU KHIỂN XEM NHANH -->
         <div class="view-controls">
-            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
+            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần (Kéo ngang)</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
             <span style="margin-left: 10px; font-size: 12px; color: #666; font-style: italic;">(💡 Dùng 2 ngón tay vuốt trên bảng để thu phóng)</span>
         </div>
@@ -587,7 +586,6 @@
             .catch(() => showMessage('error', 'Lỗi mạng khi đăng nhập.'));
         }
 
-        // --- LOGIC ĐỔI MẬT KHẨU ---
         function openChangePassModal() {
             document.getElementById('cpOldPass').value = '';
             document.getElementById('cpNewPass').value = '';
@@ -631,7 +629,6 @@
             .catch(() => showMessage('error', 'Lỗi mạng khi đổi mật khẩu.'));
         }
 
-        // --- BẬT/TẮT CHẾ ĐỘ SỬA TRÊN BẢNG LỊCH ---
         function lockTableEditing() {
             document.querySelectorAll('th[contenteditable], td[contenteditable]').forEach(el => { el.setAttribute('contenteditable', 'false'); });
         }
@@ -657,14 +654,14 @@
 
         tableContainer.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2 && initialPinchDistance) {
-                e.preventDefault(); // Ngăn chặn zoom toàn trang mặc định của trình duyệt để chỉ zoom bảng
+                e.preventDefault(); 
                 const currentDistance = Math.hypot(
                     e.touches[0].pageX - e.touches[1].pageX,
                     e.touches[0].pageY - e.touches[1].pageY
                 );
                 
                 let newZoom = initialPinchZoom * (currentDistance / initialPinchDistance);
-                newZoom = Math.max(0.5, Math.min(2.5, newZoom)); // Giới hạn từ 50% đến 250%
+                newZoom = Math.max(0.25, Math.min(3.0, newZoom)); // Cho phép thu nhỏ tới 25% để xem cả tháng
                 
                 document.documentElement.style.setProperty('--zoom-level', newZoom);
                 syncScrollbars(true);
@@ -677,37 +674,65 @@
             }
         });
 
-        /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
+        // --- HÀM XEM NHANH 1 TUẦN / 1 THÁNG TỐI ƯU CẢM ỨNG ---
         function setQuickViewMode(mode) {
-            const captureSelect = document.getElementById('captureMode');
+            // Mở hiển thị tất cả các cột để có thể cuộn ngang
+            document.getElementById('captureMode').value = 'all';
+            toggleCaptureInputs();
+            updateCropPreview();
+
+            const container = document.getElementById('bottomScroll');
+            const table = document.getElementById('scheduleTable');
+            if (table.rows.length < 2) return;
+
+            const headerRow = table.rows[1]; 
+            if (!headerRow || headerRow.cells.length < 2) return;
+
+            // Tính toán kích thước zoom 
+            const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+            const containerWidth = container.clientWidth;
+            const hw = headerRow.cells[0].offsetWidth / currentZoom;
+            const dw = headerRow.cells[1].offsetWidth / currentZoom;
+            const totalDays = headerRow.cells.length - 1;
+
             if (mode === 'month') {
-                captureSelect.value = 'all';
+                let targetZoom = containerWidth / (hw + totalDays * dw);
+                targetZoom = Math.max(0.25, Math.min(2.5, targetZoom)); 
+                document.documentElement.style.setProperty('--zoom-level', targetZoom);
+                syncScrollbars(true);
+                container.scrollLeft = 0; 
             } else if (mode === 'week') {
-                captureSelect.value = 'week';
-                // Tự động tính toán tuần hiện tại của tháng
+                let targetZoom = containerWidth / (hw + 7 * dw);
+                targetZoom = Math.max(0.25, Math.min(2.5, targetZoom));
+                document.documentElement.style.setProperty('--zoom-level', targetZoom);
+                syncScrollbars(true);
+
+                // Cuộn đến ngày hiện tại
                 const today = new Date();
                 const pickerVal = document.getElementById('monthYearPicker').value;
+                let targetDay = 1;
+                
                 if(pickerVal) {
                     const [y, m] = pickerVal.split('-');
                     if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) {
-                        const day = today.getDate();
-                        const currentWeek = Math.ceil(day / 7);
-                        document.getElementById('weekSelect').value = currentWeek > 5 ? 5 : currentWeek;
-                    } else {
-                        document.getElementById('weekSelect').value = 1;
+                        targetDay = today.getDate();
                     }
                 }
+
+                setTimeout(() => {
+                    if (headerRow.cells[targetDay]) {
+                        const cellLeft = headerRow.cells[targetDay].offsetLeft;
+                        const headerWidth = headerRow.cells[0].offsetWidth;
+                        container.scrollLeft = cellLeft - headerWidth;
+                    }
+                }, 50); // Chờ xíu để CSS nhận biến Zoom mới cuộn
             }
-            toggleCaptureInputs();
-            updateCropPreview();
         }
 
-        /* HÀM ẨN/HIỆN DASHBOARD TRÊN MOBILE */
         function toggleMobileDashboard() {
             document.getElementById('mainDashboard').classList.toggle('show-dashboard');
         }
 
-        /* HÀM TOÀN MÀN HÌNH */
         function toggleFullscreen() {
             let elem = document.getElementById("masterWrapper");
             if (!document.fullscreenElement) {
@@ -754,11 +779,9 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Mặc định luôn bật Chế độ Chỉ xem khi vào web
             document.body.classList.add('view-only-mode'); 
             isEditMode = false;
             
-            // Gọi các lệnh hiển thị lịch cơ bản
             loadFromGoogleSheets();
             renderHolidayList();
             syncScrollbars();
@@ -828,7 +851,7 @@
         }
 
         table.addEventListener('mousedown', (e) => {
-            if (!isEditMode) return; // CHẶN CHỌN Ô NẾU CHƯA ĐĂNG NHẬP
+            if (!isEditMode) return; 
             let cell = e.target.closest('td, th');
             if (!cell) return;
             
