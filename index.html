@@ -145,7 +145,6 @@
 
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
-        /* CƠ CHẾ ZOOM GPU MỚI MƯỢT MÀ HƠN */
         #scheduleTable {
             zoom: var(--zoom-level);
             transform-origin: top left;
@@ -639,7 +638,7 @@
                 closeAllActionSheets();
                 if (!authToken) {
                     openLoginModal();
-                    activateNav('lich'); 
+                    activateNav('lich'); // Chặn lại nếu chưa đăng nhập
                 } else {
                     isEditMode = true;
                     document.body.classList.remove('view-only-mode');
@@ -663,7 +662,7 @@
         function closeAllActionSheets() {
             document.getElementById('bottomNavOverlay').classList.remove('show');
             document.querySelectorAll('.action-sheet').forEach(el => el.classList.remove('show'));
-            
+            // Phục hồi lại màu của tab Lịch hoặc Sửa đang chọn dở
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if(isEditMode) document.getElementById('navSua').classList.add('active');
             else document.getElementById('navLich').classList.add('active');
@@ -672,6 +671,7 @@
         function mobileHandleAuth() {
             closeAllActionSheets();
             if (authToken) {
+                // Logout Logic
                 isEditMode = false; authUsername = ""; authToken = "";
                 localStorage.removeItem('savedUser');
                 localStorage.removeItem('savedToken');
@@ -695,7 +695,7 @@
         }
 
         function openLoginModal() {
-            if (isEditMode) { 
+            if (isEditMode) { // Logic trên Desktop
                 mobileHandleAuth(); 
             } else {
                 document.getElementById('loginModal').style.display = 'block';
@@ -807,42 +807,6 @@
         function unlockTableEditing() {
             if(!isEditMode) return;
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
-        }
-
-        /* KHỞI TẠO SCROLLBARS MỘT LẦN DUY NHẤT ĐỂ TRÁNH RÒ RỈ BỘ NHỚ */
-        let isScrollbarsInitialized = false;
-
-        function syncScrollbars(forceUpdate = false) {
-            const table = document.getElementById('scheduleTable');
-            const bottomScroll = document.getElementById('bottomScroll'); 
-            const topScrollContent = document.getElementById('topScrollContent');
-            const leftScroll = document.getElementById('leftScroll');
-            const leftScrollContent = document.getElementById('leftScrollContent');
-
-            const updateScrollDimensions = () => {
-                if(!table || !bottomScroll) return;
-                topScrollContent.style.width = table.offsetWidth + 'px';
-                leftScrollContent.style.height = table.offsetHeight + 'px';
-                leftScroll.style.height = bottomScroll.clientHeight + 'px';
-            };
-
-            if(forceUpdate) {
-                updateScrollDimensions();
-            }
-
-            if (!isScrollbarsInitialized) {
-                const resizeObserver = new ResizeObserver(updateScrollDimensions);
-                resizeObserver.observe(table); 
-                resizeObserver.observe(bottomScroll);
-
-                const topScroll = document.getElementById('topScroll');
-                topScroll.addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
-                bottomScroll.addEventListener('scroll', (e) => { topScroll.scrollLeft = e.target.scrollLeft; });
-                leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
-                bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
-                
-                isScrollbarsInitialized = true;
-            }
         }
 
         /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (MƯỢT MÀ 60FPS) */
@@ -986,7 +950,7 @@
             syncMonthToMobile(document.getElementById('monthYearPicker').value);
             loadFromGoogleSheets();
             renderHolidayList();
-            syncScrollbars(); // Sẽ chỉ khởi tạo Event Listener 1 lần
+            syncScrollbars();
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -1021,6 +985,8 @@
         let isSelecting = false;
         let longPressTimer = null;
         let isScrolling = false;
+
+        const table = document.getElementById('scheduleTable');
 
         function clearSelection() {
             selectedCells.forEach(cell => {
@@ -1162,14 +1128,9 @@
             const modalElement = document.getElementById('holidayModal');
             const loginModal = document.getElementById('loginModal');
             const changePassModal = document.getElementById('changePassModal');
-            
-            // Xử lý đóng Bottom Nav khi click ra ngoài
-            const isClickInsideNav = document.querySelector('.bottom-nav').contains(event.target);
-            const isClickInsideSheets = event.target.closest('.action-sheet');
-            
             const isClickInsideTable = table.contains(event.target);
             
-            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable && !isClickInsideNav && !isClickInsideSheets) {
+            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable) {
                 closePopup();
                 clearSelection();
             }
@@ -1612,6 +1573,30 @@
             return "#000000";
         }
 
+        function syncScrollbars(forceUpdate = false) {
+            const table = document.getElementById('scheduleTable');
+            const bottomScroll = document.getElementById('bottomScroll'); 
+            const topScrollContent = document.getElementById('topScrollContent');
+            const leftScroll = document.getElementById('leftScroll');
+            const leftScrollContent = document.getElementById('leftScrollContent');
+
+            const updateScrollDimensions = () => {
+                topScrollContent.style.width = table.offsetWidth + 'px';
+                leftScrollContent.style.height = table.offsetHeight + 'px';
+                leftScroll.style.height = bottomScroll.clientHeight + 'px';
+            };
+
+            if(forceUpdate) updateScrollDimensions();
+
+            const resizeObserver = new ResizeObserver(updateScrollDimensions);
+            resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
+
+            document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
+            bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; });
+            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
+            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
+        }
+
         function updateRowSelectDropdown() {
             const select = document.getElementById('rowSelectEnd');
             select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
@@ -1982,6 +1967,7 @@
             const backupSelection = [...selectedCells];
             clearSelection();
             
+            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
             const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
             document.documentElement.style.setProperty('--zoom-level', 1);
             
@@ -2018,6 +2004,7 @@
                     }, 'image/png');
                 }
                 
+                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
