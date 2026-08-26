@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lịch Trực Khoa Nội Tổng Hợp</title>
+    <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -146,11 +146,6 @@
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
         #scheduleTable {
-            /* Dùng CSS "zoom" thay vì transform:scale — vì transform tạo "containing block" mới
-               cho các phần tử con, khiến position:sticky (cột đầu / dòng tiêu đề) bị lệch vị trí,
-               dẫn tới bị cắt nội dung (đặc biệt thấy rõ trên iOS Safari). "zoom" không có vấn đề
-               này. Đánh đổi: Firefox không hỗ trợ "zoom" nên trên Firefox tính năng phóng to/thu
-               nhỏ bảng sẽ không hoạt động (bảng luôn hiển thị 100%), nhưng mọi thứ khác vẫn đúng. */
             zoom: var(--zoom-level);
             transform-origin: top left;
         }
@@ -344,7 +339,7 @@
             <span class="hint-close" onclick="dismissOrientationHint()">&times;</span>
         </div>
         <h2>
-            Lịch Trực Khoa Nội Tổng Hợp
+            Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
                 <button id="changePassBtn" class="auth-btn edit-only" onclick="openChangePassModal()" style="background-color: #17a2b8; margin-right: 5px;">Đổi MK</button>
                 <button id="authBtn" class="auth-btn" onclick="openLoginModal()">Đăng nhập</button>
@@ -687,8 +682,6 @@
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlaF3gVNhm_s-kAilknWyeUM5eaIHERNPazL7mklG6FHQYnpuC10wp3SO26MFnGzyZRw/exec'; 
 
         // Bọc fetch() với timeout để tránh treo vô thời hạn khi mạng di động chập chờn.
-        // Trả về cùng dạng Promise như fetch() bình thường, nhưng tự huỷ (AbortError) nếu
-        // quá lâu không có phản hồi, để .catch() có thể báo lỗi rõ ràng cho người dùng.
         function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -697,7 +690,6 @@
         }
 
         // Thông báo lỗi mạng thân thiện, phân biệt trường hợp timeout với lỗi mạng khác.
-        // context là một cụm từ mô tả hành động, ví dụ: "đăng nhập", "lưu dữ liệu".
         function networkErrorMessage(error, context) {
             const action = context ? ' khi ' + context : '';
             if (error && error.name === 'AbortError') {
@@ -712,6 +704,25 @@
         let isEditMode = false;
         let authUsername = "";
         let authToken = "";
+
+        // --- HỆ THỐNG AUTO SAVE ---
+        let autoSaveTimeout = null;
+
+        function triggerAutoSave() {
+            // Chỉ tự động lưu khi đang ở chế độ sửa và đã đăng nhập
+            if (!isEditMode || !authToken) return;
+
+            // Hủy lệnh lưu trước đó nếu người dùng vẫn đang tiếp tục thao tác
+            if (autoSaveTimeout) {
+                clearTimeout(autoSaveTimeout);
+            }
+
+            // Thiết lập đếm ngược 3 giây (3000ms) sau khi ngừng thao tác
+            autoSaveTimeout = setTimeout(() => {
+                saveToGoogleSheets(true); // Truyền true để báo đây là Auto-save
+            }, 3000);
+        }
+        // -------------------------
 
         // Đồng bộ ô tháng năm giữa Desktop và Mobile
         function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
@@ -955,8 +966,6 @@
             const headerRow = table.rows[1]; 
             if (!headerRow || headerRow.cells.length < 2) return;
 
-            // Với CSS "zoom", offsetWidth đã tự bao gồm hệ số zoom hiện tại -> cần chia lại để có
-            // kích thước GỐC (1x) trước khi tính hệ số zoom mục tiêu vừa khít khung nhìn.
             const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             const containerWidth = container.clientWidth;
             const hw = headerRow.cells[0].offsetWidth / currentZoom;
@@ -988,8 +997,6 @@
 
                 setTimeout(() => {
                     if (headerRow.cells[targetDay]) {
-                        // Với CSS "zoom", offsetLeft/offsetWidth đã ở đúng không gian toạ độ
-                        // (đã phóng to) khớp với scrollLeft -> không cần nhân thêm targetZoom.
                         const cellLeft = headerRow.cells[targetDay].offsetLeft;
                         const headerWidth = headerRow.cells[0].offsetWidth;
                         container.scrollLeft = cellLeft - headerWidth;
@@ -1020,6 +1027,9 @@
             currentStep++;
 
             if (historyStack.length > 50) { historyStack.shift(); currentStep--; }
+            
+            // --- GỌI HÀM AUTO SAVE TẠI ĐÂY ---
+            triggerAutoSave();
         }
 
         function undo() {
@@ -1027,6 +1037,7 @@
                 currentStep--;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!');
+                triggerAutoSave(); // Kích hoạt auto save sau khi Undo
             } else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
         }
 
@@ -1035,6 +1046,7 @@
                 currentStep++;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã khôi phục thao tác!');
+                triggerAutoSave(); // Kích hoạt auto save sau khi Redo
             } else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
         }
 
@@ -1070,8 +1082,6 @@
         document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
             if (e.target.isContentEditable) {
                 if (isMobileView()) {
-                    // Trên mobile: không cho gõ trực tiếp vào ô bảng (quá nhỏ, dễ gõ nhầm và bị
-                    // bàn phím ảo che mất ô đang gõ) -> huỷ focus và mở popup có ô nhập liệu to hơn.
                     e.target.blur();
                     const cell = e.target.closest('td, th');
                     if (cell) {
@@ -1156,7 +1166,6 @@
             }
         }
 
-        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS 300MS
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
             if (e.touches.length > 1) return; 
@@ -1254,22 +1263,16 @@
             if (event.target == changePassModal) { closeChangePassModal(); }
         });
 
-        // Nhận biết đang ở chế độ giao diện mobile (cùng breakpoint với CSS @media max-width:768px,
-        // và cả trường hợp điện thoại xoay ngang có bề ngang lớn nhưng chiều cao thấp)
         function isMobileView() {
             return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
         }
 
-        // Tự động canh vừa khung nhìn "7 ngày trong tuần hiện tại" trên mobile mỗi khi bảng được
-        // tải/tạo mới hoặc vào lại chế độ xem, để luôn thấy trọn vẹn tuần đang trực ngay từ đầu.
         function autoFitMobileOverview() {
             if (isMobileView()) {
                 setTimeout(() => setQuickViewMode('week'), 60);
             }
         }
 
-        // Gợi ý xoay ngang máy để xem bao quát hơn: chỉ hiện trên mobile (portrait, vì landscape
-        // CSS đã tự ẩn), và chỉ nếu người dùng chưa từng bấm tắt gợi ý này trước đây.
         function updateOrientationHint() {
             const hint = document.getElementById('orientationHint');
             const shouldShow = isMobileView() && localStorage.getItem('hideOrientationHint') !== '1';
@@ -1280,7 +1283,6 @@
             document.getElementById('orientationHint').classList.add('hidden');
         }
 
-        // Gõ nội dung ô đang chọn (chỉ áp dụng khi chọn đúng 1 ô) thông qua ô nhập liệu lớn trong popup
         function applyCellTextEdit() {
             if (selectedCells.length !== 1) return;
             selectedCells[0].innerText = document.getElementById('cellTextEditor').value;
@@ -1338,9 +1340,6 @@
             document.getElementById('popupCellName').innerText = cellName;
         }
 
-        // Biến lưu ID của setTimeout ẩn popup (trong closePopup), để openPopup có thể huỷ nó nếu
-        // được gọi lại gần như ngay sau đó — tránh lỗi popup "hiện lên rồi mất" do timeout ẩn cũ
-        // (300ms) chạy đè lên sau khi popup đã được mở lại.
         let popupHideTimer = null;
 
         function openPopup() {
@@ -1351,8 +1350,6 @@
             popup.style.display = 'block';
             setTimeout(() => { 
                 popup.classList.add('show'); 
-                // Trên mobile, khi chỉ chọn 1 ô: tự đưa con trỏ vào ô nhập liệu lớn để gõ ngay,
-                // thay vì phải gõ trực tiếp vào ô bảng nhỏ (dễ bị bàn phím ảo che khuất).
                 if (isMobileView() && selectedCells.length === 1) {
                     document.getElementById('cellTextEditor').focus();
                 }
@@ -1751,7 +1748,6 @@
             const leftScrollContent = document.getElementById('leftScrollContent');
 
             const updateScrollDimensions = () => {
-                // Với CSS "zoom", offsetWidth/offsetHeight đã tự bao gồm hệ số phóng to sẵn rồi.
                 topScrollContent.style.width = table.offsetWidth + 'px';
                 leftScrollContent.style.height = table.offsetHeight + 'px';
                 leftScroll.style.height = bottomScroll.clientHeight + 'px';
@@ -2086,7 +2082,6 @@
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
             document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'inline-block' : 'none';
 
-            // Đồng bộ hiển thị/giá trị sang bảng điều khiển Cắt & Xuất Ảnh bên mobile (nếu có)
             const mobileCaptureMode = document.getElementById('mobileCaptureMode');
             if (mobileCaptureMode) {
                 mobileCaptureMode.value = mode;
@@ -2095,8 +2090,6 @@
             }
         }
 
-        // Mở màn hình "Cắt & Xuất Ảnh" trên mobile: đồng bộ giá trị hiện tại từ bộ điều khiển
-        // gốc (desktop, bị ẩn trên mobile) sang các ô chọn hiển thị cho mobile rồi mở action-sheet.
         function openCropSheet() {
             document.getElementById('mobileCaptureMode').value = document.getElementById('captureMode').value;
             document.getElementById('mobileWeekSelect').value = document.getElementById('weekSelect').value;
@@ -2110,7 +2103,6 @@
             openActionSheet('sheetCrop');
         }
 
-        // Ô chọn "Toàn bộ/Tuần/Khoảng ngày" bên mobile ghi lại vào ô gốc rồi chạy lại logic cũ
         function syncCaptureModeToDesktop(value) {
             document.getElementById('captureMode').value = value;
             toggleCaptureInputs();
@@ -2180,7 +2172,6 @@
             const backupSelection = [...selectedCells];
             clearSelection();
             
-            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
             const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
             document.documentElement.style.setProperty('--zoom-level', 1);
             
@@ -2217,7 +2208,6 @@
                     }, 'image/png');
                 }
                 
-                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
@@ -2228,10 +2218,13 @@
             });
         }
 
-        function saveToGoogleSheets() {
-            closePopup(); clearSelection();
-            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
-            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
+        // HÀM SAVE ĐÃ ĐƯỢC CẬP NHẬT ĐỂ HỖ TRỢ AUTO SAVE VÀ VƯỢ QUA KIỂM TRA BẢO MẬT (HMAC SIGNATURE)
+        async function saveToGoogleSheets(isAutoSave = false) {
+            if (!isAutoSave) {
+                closePopup(); clearSelection();
+                document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
+                document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
+            }
             
             const table = document.getElementById('scheduleTable');
             const [year, month] = document.getElementById('monthYearPicker').value.split('-');
@@ -2274,10 +2267,16 @@
                 payloadFontWeights.push(rowWeight);
             });
 
+            // --- TẠO CHỮ KÝ BẢO MẬT GỬI KÈM REQUEST ---
+            const timestamp = new Date().getTime();
+            const signature = await hashPassword(authToken + timestamp.toString());
+
             const payload = { 
                 action: "save",
                 username: authUsername,
                 token: authToken,
+                timestamp: timestamp,
+                signature: signature,
                 sheetName: sheetName, 
                 data: payloadData, 
                 styles: {
@@ -2287,14 +2286,29 @@
                 }
             };
 
-            showMessage('loading', 'Đang cập nhật Sheet...');
+            if (isAutoSave) {
+                showMessage('loading', 'Đang tự động lưu ngầm...');
+            } else {
+                showMessage('loading', 'Đang cập nhật Sheet...');
+            }
+
             fetchWithTimeout(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
             .then(response => response.json())
             .then(result => {
-                if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!');
+                if(result.status === 'success') {
+                    if (isAutoSave) {
+                        const status = document.getElementById('statusMessage');
+                        status.className = 'success'; status.innerText = 'Đã tự động lưu!'; status.style.display = 'block';
+                        setTimeout(() => { status.style.display = 'none'; }, 2000); 
+                    } else {
+                        showMessage('success', 'Đã lưu xong vào Google Sheets!');
+                    }
+                }
                 else showMessage('error', 'Lỗi từ Server: ' + result.message);
             })
-            .catch((error) => showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.'));
+            .catch((error) => {
+                if (!isAutoSave) showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.');
+            });
         }
 
         const modal = document.getElementById("holidayModal");
