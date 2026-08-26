@@ -146,11 +146,13 @@
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
         #scheduleTable {
-            /* Dùng transform:scale thay cho CSS "zoom" vì "zoom" không được Firefox
-               (kể cả Firefox Android) hỗ trợ. transform:scale tương thích mọi trình duyệt. */
-            transform: scale(var(--zoom-level));
+            /* Dùng CSS "zoom" thay vì transform:scale — vì transform tạo "containing block" mới
+               cho các phần tử con, khiến position:sticky (cột đầu / dòng tiêu đề) bị lệch vị trí,
+               dẫn tới bị cắt nội dung (đặc biệt thấy rõ trên iOS Safari). "zoom" không có vấn đề
+               này. Đánh đổi: Firefox không hỗ trợ "zoom" nên trên Firefox tính năng phóng to/thu
+               nhỏ bảng sẽ không hoạt động (bảng luôn hiển thị 100%), nhưng mọi thứ khác vẫn đúng. */
+            zoom: var(--zoom-level);
             transform-origin: top left;
-            will-change: transform;
         }
 
         th, td {
@@ -953,11 +955,12 @@
             const headerRow = table.rows[1]; 
             if (!headerRow || headerRow.cells.length < 2) return;
 
-            // offsetWidth giờ luôn trả về kích thước GỐC (transform:scale không đổi layout box),
-            // nên không cần chia cho currentZoom như trước (khi còn dùng CSS zoom) nữa.
+            // Với CSS "zoom", offsetWidth đã tự bao gồm hệ số zoom hiện tại -> cần chia lại để có
+            // kích thước GỐC (1x) trước khi tính hệ số zoom mục tiêu vừa khít khung nhìn.
+            const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             const containerWidth = container.clientWidth;
-            const hw = headerRow.cells[0].offsetWidth;
-            const dw = headerRow.cells[1].offsetWidth;
+            const hw = headerRow.cells[0].offsetWidth / currentZoom;
+            const dw = headerRow.cells[1].offsetWidth / currentZoom;
             const totalDays = headerRow.cells.length - 1;
 
             if (mode === 'month') {
@@ -985,11 +988,10 @@
 
                 setTimeout(() => {
                     if (headerRow.cells[targetDay]) {
-                        // scrollLeft của container đo theo không gian ĐÃ phóng to (transform:scale
-                        // vẫn được trình duyệt tính vào scrollable overflow), trong khi offsetLeft/
-                        // offsetWidth là kích thước GỐC (chưa phóng to) -> phải nhân với targetZoom.
-                        const cellLeft = headerRow.cells[targetDay].offsetLeft * targetZoom;
-                        const headerWidth = headerRow.cells[0].offsetWidth * targetZoom;
+                        // Với CSS "zoom", offsetLeft/offsetWidth đã ở đúng không gian toạ độ
+                        // (đã phóng to) khớp với scrollLeft -> không cần nhân thêm targetZoom.
+                        const cellLeft = headerRow.cells[targetDay].offsetLeft;
+                        const headerWidth = headerRow.cells[0].offsetWidth;
                         container.scrollLeft = cellLeft - headerWidth;
                     }
                 }, 50); 
@@ -1051,7 +1053,7 @@
             syncScrollbars();
             updateOrientationHint();
             window.addEventListener('resize', updateOrientationHint);
-            window.addEventListener('orientationchange', () => setTimeout(() => { updateOrientationHint(); if (isMobileView()) setQuickViewMode('month'); }, 200));
+            window.addEventListener('orientationchange', () => setTimeout(() => { updateOrientationHint(); if (isMobileView()) setQuickViewMode('week'); }, 200));
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -1258,11 +1260,11 @@
             return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
         }
 
-        // Tự động canh vừa khung nhìn "Cả Tháng" trên mobile mỗi khi bảng được tải/tạo mới,
-        // để luôn thấy toàn cảnh lịch ngay từ đầu thay vì chỉ thấy vài ngày đầu bị cắt ngang.
+        // Tự động canh vừa khung nhìn "7 ngày trong tuần hiện tại" trên mobile mỗi khi bảng được
+        // tải/tạo mới hoặc vào lại chế độ xem, để luôn thấy trọn vẹn tuần đang trực ngay từ đầu.
         function autoFitMobileOverview() {
             if (isMobileView()) {
-                setTimeout(() => setQuickViewMode('month'), 60);
+                setTimeout(() => setQuickViewMode('week'), 60);
             }
         }
 
@@ -1301,7 +1303,7 @@
             
             document.getElementById('textColorPicker').value = rgbToHex(comp.color);
             let bg = comp.backgroundColor;
-            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(comp.color);
+            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(bg);
             
             document.getElementById('fontSizePicker').value = parseInt(comp.fontSize) || 13;
 
@@ -1749,11 +1751,9 @@
             const leftScrollContent = document.getElementById('leftScrollContent');
 
             const updateScrollDimensions = () => {
-                // table.offsetWidth/offsetHeight là kích thước GỐC (chưa phóng to) vì giờ dùng
-                // transform:scale thay vì zoom, nên phải nhân thêm hệ số zoom hiện tại.
-                const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
-                topScrollContent.style.width = (table.offsetWidth * currentZoom) + 'px';
-                leftScrollContent.style.height = (table.offsetHeight * currentZoom) + 'px';
+                // Với CSS "zoom", offsetWidth/offsetHeight đã tự bao gồm hệ số phóng to sẵn rồi.
+                topScrollContent.style.width = table.offsetWidth + 'px';
+                leftScrollContent.style.height = table.offsetHeight + 'px';
                 leftScroll.style.height = bottomScroll.clientHeight + 'px';
             };
 
