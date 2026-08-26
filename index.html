@@ -246,8 +246,9 @@
 
         /* CSS MỚI CHO BOTTOM NAVIGATION (MOBILE CHUẨN APP) */
         .bottom-nav, .bottom-nav-overlay, .action-sheet { display: none; }
+        #orientationHint { display: none; }
 
-        @media (max-width: 768px) {
+        @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
             /* Ẩn các công cụ điều khiển Desktop */
             .dashboard, h2, .auth-container, .view-controls, .collapsible-header { display: none !important; }
             
@@ -307,12 +308,39 @@
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
             #fullscreenBtn { top: 10px; right: 10px; }
+
+            /* Gợi ý xoay ngang máy để xem bao quát bảng hơn (chỉ hiện khi đang đứng dọc) */
+            #orientationHint {
+                display: flex; align-items: center; gap: 8px;
+                position: fixed; top: 8px; left: 8px; right: 8px; z-index: 3500;
+                background: #333; color: #fff; font-size: 12px; padding: 8px 10px;
+                border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            #orientationHint.hidden { display: none !important; }
+            #orientationHint .hint-close { margin-left: auto; font-size: 18px; cursor: pointer; line-height: 1; padding: 0 4px; }
+        }
+
+        /* Điện thoại đang XOAY NGANG (kể cả máy có bề ngang > 768px khi xoay): thu gọn thanh điều
+           hướng dưới cùng để dành tối đa chiều cao cho bảng lịch, giúp nhìn bao quát hơn.
+           Banner gợi ý xoay ngang cũng tự ẩn vì lúc này không còn cần thiết nữa. */
+        @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+            #orientationHint { display: none !important; }
+            .bottom-nav { height: 40px; }
+            .nav-icon { font-size: 14px; margin-bottom: 0; }
+            .nav-text { display: none; }
+            .container { padding-bottom: 40px !important; }
+            #fabBtn { bottom: 52px; }
+            .action-sheet { padding-bottom: 55px; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div id="orientationHint">
+            <span>🔄 Xoay ngang máy để xem bao quát bảng lịch hơn</span>
+            <span class="hint-close" onclick="dismissOrientationHint()">&times;</span>
+        </div>
         <h2>
             Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
@@ -698,6 +726,7 @@
                 document.body.classList.add('view-only-mode');
                 lockTableEditing();
                 clearSelection();
+                autoFitMobileOverview();
             } 
             else if (tab === 'sua') {
                 closeAllActionSheets();
@@ -1020,6 +1049,9 @@
             loadFromGoogleSheets();
             renderHolidayList();
             syncScrollbars();
+            updateOrientationHint();
+            window.addEventListener('resize', updateOrientationHint);
+            window.addEventListener('orientationchange', () => setTimeout(() => { updateOrientationHint(); if (isMobileView()) setQuickViewMode('month'); }, 200));
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -1220,9 +1252,30 @@
             if (event.target == changePassModal) { closeChangePassModal(); }
         });
 
-        // Nhận biết đang ở chế độ giao diện mobile (cùng breakpoint với CSS @media max-width:768px)
+        // Nhận biết đang ở chế độ giao diện mobile (cùng breakpoint với CSS @media max-width:768px,
+        // và cả trường hợp điện thoại xoay ngang có bề ngang lớn nhưng chiều cao thấp)
         function isMobileView() {
-            return window.matchMedia('(max-width: 768px)').matches;
+            return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
+        }
+
+        // Tự động canh vừa khung nhìn "Cả Tháng" trên mobile mỗi khi bảng được tải/tạo mới,
+        // để luôn thấy toàn cảnh lịch ngay từ đầu thay vì chỉ thấy vài ngày đầu bị cắt ngang.
+        function autoFitMobileOverview() {
+            if (isMobileView()) {
+                setTimeout(() => setQuickViewMode('month'), 60);
+            }
+        }
+
+        // Gợi ý xoay ngang máy để xem bao quát hơn: chỉ hiện trên mobile (portrait, vì landscape
+        // CSS đã tự ẩn), và chỉ nếu người dùng chưa từng bấm tắt gợi ý này trước đây.
+        function updateOrientationHint() {
+            const hint = document.getElementById('orientationHint');
+            const shouldShow = isMobileView() && localStorage.getItem('hideOrientationHint') !== '1';
+            hint.classList.toggle('hidden', !shouldShow);
+        }
+        function dismissOrientationHint() {
+            localStorage.setItem('hideOrientationHint', '1');
+            document.getElementById('orientationHint').classList.add('hidden');
         }
 
         // Gõ nội dung ô đang chọn (chỉ áp dụng khi chọn đúng 1 ô) thông qua ô nhập liệu lớn trong popup
@@ -1887,6 +1940,7 @@
             }
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            autoFitMobileOverview();
             historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
@@ -1943,6 +1997,7 @@
             });
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            autoFitMobileOverview();
             historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
@@ -2022,6 +2077,7 @@
             });
 
             updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            autoFitMobileOverview();
             historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
