@@ -542,13 +542,51 @@
             <button class="list-btn" onclick="setQuickViewMode('month'); closeAllActionSheets();">🗓️ Căn vừa lịch Cả Tháng</button>
             <button class="list-btn" onclick="setQuickViewMode('week'); closeAllActionSheets();">📅 Căn vừa lịch 1 Tuần</button>
             <button class="list-btn edit-only" onclick="openHolidayModal(); closeAllActionSheets();">🏖️ Quản lý Ngày Lễ</button>
-            <button class="list-btn" onclick="takeScreenshot('download'); closeAllActionSheets();" style="color: var(--jpg-color);">⬇️ Xuất Lưu thành Ảnh JPG</button>
-            <button class="list-btn" onclick="takeScreenshot('share'); closeAllActionSheets();" style="color: var(--capture-color);">📤 Chụp Ảnh & Chia sẻ</button>
+            <button class="list-btn" onclick="openCropSheet();" style="color: var(--capture-color);">📸 Cắt & Xuất Ảnh...</button>
             
             <hr style="border-top:1px solid #ddd; width: 100%; margin: 15px 0;">
             
             <button id="mobileAuthBtn" class="list-btn" onclick="mobileHandleAuth()" style="background-color: #343a40; color: white; border: none;">Đăng nhập Quản trị</button>
             <button class="list-btn edit-only" onclick="openChangePassModal(); closeAllActionSheets();" style="background-color: #17a2b8; color: white; border: none;">Đổi Mật Khẩu</button>
+        </div>
+    </div>
+
+    <!-- Màn hình Cắt & Xuất Ảnh (Mobile) - tương đương "Công cụ Cắt & Xuất Ảnh" bên bản Desktop -->
+    <div id="sheetCrop" class="action-sheet">
+        <div class="sheet-header">
+            <h4>📸 Cắt & Xuất Ảnh</h4>
+            <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+        </div>
+        <div class="sheet-body">
+            <div class="input-group" style="width: 100%;">
+                <select id="mobileCaptureMode" style="flex: 1; width: 100%;" onchange="syncCaptureModeToDesktop(this.value)">
+                    <option value="all">Toàn bộ Cột</option>
+                    <option value="week">Cắt theo Tuần</option>
+                    <option value="date">Khoảng Ngày</option>
+                </select>
+            </div>
+            <div class="input-group" id="mobileWeekSelectGroup" style="width: 100%; display: none;">
+                <select id="mobileWeekSelect" style="flex: 1; width: 100%;" onchange="document.getElementById('weekSelect').value = this.value; updateCropPreview();">
+                    <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
+                    <option value="3">Tuần 3</option><option value="4">Tuần 4</option>
+                    <option value="5">Tuần 5</option>
+                </select>
+            </div>
+            <div class="input-group" id="mobileDateSelectGroup" style="width: 100%; display: none;">
+                <input type="number" id="mobileStartDay" min="1" max="31" value="1" style="flex: 1;" oninput="document.getElementById('startDay').value = this.value; updateCropPreview();">
+                <span>đến ngày</span>
+                <input type="number" id="mobileEndDay" min="1" max="31" value="15" style="flex: 1;" oninput="document.getElementById('endDay').value = this.value; updateCropPreview();">
+            </div>
+            <div class="input-group" style="width: 100%;">
+                <select id="mobileRowSelectEnd" style="flex: 1; width: 100%;" onchange="document.getElementById('rowSelectEnd').value = this.value; updateCropPreview();">
+                    <option value="all">Toàn bộ Hàng</option>
+                </select>
+            </div>
+            <label style="font-size: 13px; display: flex; align-items: center; gap: 8px; color: #555; margin: 10px 0 15px;">
+                <input type="checkbox" id="mobileShowRoleCol" checked style="width: 18px; height: 18px !important; margin: 0;" onchange="document.getElementById('showRoleCol').checked = this.checked; toggleRoleCol();"> Hiện Cột Vị trí
+            </label>
+            <button class="list-btn" onclick="takeScreenshot('download'); closeAllActionSheets();" style="color: var(--jpg-color);">⬇️ Xuất Lưu thành Ảnh JPG</button>
+            <button class="list-btn" onclick="takeScreenshot('share'); closeAllActionSheets();" style="color: var(--capture-color);">📤 Chụp Ảnh & Chia sẻ</button>
         </div>
     </div>
 
@@ -1245,8 +1283,14 @@
             document.getElementById('popupCellName').innerText = cellName;
         }
 
+        // Biến lưu ID của setTimeout ẩn popup (trong closePopup), để openPopup có thể huỷ nó nếu
+        // được gọi lại gần như ngay sau đó — tránh lỗi popup "hiện lên rồi mất" do timeout ẩn cũ
+        // (300ms) chạy đè lên sau khi popup đã được mở lại.
+        let popupHideTimer = null;
+
         function openPopup() {
             if(selectedCells.length === 0) return;
+            clearTimeout(popupHideTimer);
             updatePopupUI();
             const popup = document.getElementById('cellPopupMenu');
             popup.style.display = 'block';
@@ -1264,7 +1308,8 @@
         function closePopup() {
             const popup = document.getElementById('cellPopupMenu');
             popup.classList.remove('show');
-            setTimeout(() => { popup.style.display = 'none'; }, 300);
+            clearTimeout(popupHideTimer);
+            popupHideTimer = setTimeout(() => { popup.style.display = 'none'; }, 300);
             if(selectedCells.length > 0) document.getElementById('fabBtn').style.display = 'block';
         }
 
@@ -1672,14 +1717,23 @@
 
         function updateRowSelectDropdown() {
             const select = document.getElementById('rowSelectEnd');
+            const mobileSelect = document.getElementById('mobileRowSelectEnd');
             select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
+            if (mobileSelect) mobileSelect.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
             document.getElementById('scheduleBody').querySelectorAll('tr').forEach((row, index) => {
                 const firstCellText = row.children.length > 0 ? row.children[0].innerText.replace('\n', ' ').trim() : "Trống";
+                const labelText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`;
                 const option = document.createElement('option');
-                option.value = index; option.innerText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`;
+                option.value = index; option.innerText = labelText;
                 select.appendChild(option);
+                if (mobileSelect) {
+                    const mOption = document.createElement('option');
+                    mOption.value = index; mOption.innerText = labelText;
+                    mobileSelect.appendChild(mOption);
+                }
             });
             select.value = "all";
+            if (mobileSelect) mobileSelect.value = "all";
         }
 
         function checkIsHoliday(year, month, day) {
@@ -1975,6 +2029,36 @@
             const mode = document.getElementById('captureMode').value;
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
             document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'inline-block' : 'none';
+
+            // Đồng bộ hiển thị/giá trị sang bảng điều khiển Cắt & Xuất Ảnh bên mobile (nếu có)
+            const mobileCaptureMode = document.getElementById('mobileCaptureMode');
+            if (mobileCaptureMode) {
+                mobileCaptureMode.value = mode;
+                document.getElementById('mobileWeekSelectGroup').style.display = mode === 'week' ? 'flex' : 'none';
+                document.getElementById('mobileDateSelectGroup').style.display = mode === 'date' ? 'flex' : 'none';
+            }
+        }
+
+        // Mở màn hình "Cắt & Xuất Ảnh" trên mobile: đồng bộ giá trị hiện tại từ bộ điều khiển
+        // gốc (desktop, bị ẩn trên mobile) sang các ô chọn hiển thị cho mobile rồi mở action-sheet.
+        function openCropSheet() {
+            document.getElementById('mobileCaptureMode').value = document.getElementById('captureMode').value;
+            document.getElementById('mobileWeekSelect').value = document.getElementById('weekSelect').value;
+            document.getElementById('mobileStartDay').value = document.getElementById('startDay').value;
+            document.getElementById('mobileEndDay').value = document.getElementById('endDay').value;
+            document.getElementById('mobileShowRoleCol').checked = document.getElementById('showRoleCol').checked;
+            const rowVal = document.getElementById('rowSelectEnd').value;
+            const mobileRowSelect = document.getElementById('mobileRowSelectEnd');
+            if (mobileRowSelect.querySelector(`option[value="${rowVal}"]`)) mobileRowSelect.value = rowVal;
+            toggleCaptureInputs();
+            openActionSheet('sheetCrop');
+        }
+
+        // Ô chọn "Toàn bộ/Tuần/Khoảng ngày" bên mobile ghi lại vào ô gốc rồi chạy lại logic cũ
+        function syncCaptureModeToDesktop(value) {
+            document.getElementById('captureMode').value = value;
+            toggleCaptureInputs();
+            updateCropPreview();
         }
 
         function toggleRoleCol() {
