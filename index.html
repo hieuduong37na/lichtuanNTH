@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -31,7 +31,6 @@
             margin: 0; padding: 10px;
             background-color: var(--bg-color); color: var(--text-color);
             user-select: none;
-            overflow: hidden; /* Cố định viewport, cuộn diễn ra bên trong container */
         }
 
         .container {
@@ -42,6 +41,7 @@
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
 
+        /* CSS CHO ĐĂNG NHẬP VÀ PHÂN QUYỀN */
         .auth-container { position: absolute; right: 10px; top: 0px; }
         .auth-btn { background-color: #343a40; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;}
         .auth-btn:hover { background-color: #23272b; }
@@ -49,11 +49,18 @@
         .view-only-mode .edit-only { display: none !important; }
         .view-only-mode td, .view-only-mode th { cursor: default; }
 
-        #mobileMenuToggle { display: none; }
         .dashboard { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; user-select: text;}
-        .panel { flex: 1; min-width: 300px; background: white; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        .panel {
+            flex: 1; min-width: 300px;
+            background: white; padding: 10px;
+            border-radius: 8px; border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
         .panel h4 { margin: 0 0 8px 0; color: #444; font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .input-group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 6px; }
+        .input-group:last-child { margin-bottom: 0; }
 
         select, input[type="month"], input[type="number"], input[type="color"] {
             padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; height: 28px;
@@ -64,8 +71,8 @@
             background-color: var(--primary-color); border: none; border-radius: 4px;
             cursor: pointer; transition: opacity 0.2s; white-space: nowrap; height: 28px;
         }
+
         button:hover { opacity: 0.85; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
         button.secondary { background-color: var(--secondary-color); color: #fff;}
         button.capture { background-color: var(--capture-color); }
         button.jpg-btn { background-color: var(--jpg-color); }
@@ -76,24 +83,56 @@
         button.font-style-btn { flex: 0.5 !important; background-color: #e9ecef; color: #333; border: 1px solid #ccc; min-width: 35px !important;}
         button.font-style-btn.active { background-color: var(--secondary-color); color: white; border-color: var(--secondary-color);}
 
+        /* THANH CÔNG CỤ XEM NHANH & LƯU NHANH (Desktop) */
         .view-controls {
             display: flex; gap: 8px; margin-bottom: 8px; align-items: center; flex-wrap: wrap; 
-            background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background: #fff; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        .quick-save-btn { background-color: var(--save-color) !important; color: #000 !important; font-weight: bold; margin-left: auto; }
+        .quick-save-btn {
+            background-color: var(--save-color) !important; color: #000 !important; font-weight: bold;
+            margin-left: auto; 
+        }
         
         .collapsible-header {
-            background-color: #e9ecef; color: #444; cursor: pointer; padding: 8px 12px; width: 100%; border: 1px solid #ced4da; border-radius: 6px;
-            text-align: left; font-size: 13px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;
+            background-color: #e9ecef; color: #444; cursor: pointer;
+            padding: 8px 12px; width: 100%;
+            border: 1px solid #ced4da; border-radius: 6px;
+            text-align: left; font-size: 13px; font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background-color 0.2s ease; margin-bottom: 5px; user-select: text;
         }
+
+        .collapsible-header:hover { background-color: #dde2e6; }
         .collapsible-header:after { content: '\25BC'; font-size: 10px; transition: transform 0.3s; }
         .collapsible-header.active:after { content: '\25B2'; }
-        .collapsible-content { padding: 0; max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out; background-color: transparent; margin-bottom: 10px; }
-        .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
-        #topNotesArea { width: 100%; min-height: 60px; border: 1px solid #ccc; border-radius: 4px; padding: 8px; font-family: inherit; font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text; }
 
-        .master-wrapper { display: flex; border: 2px solid #555; background-color: white; flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px; position: relative; }
-        #fullscreenBtn { position: absolute; top: 5px; right: 5px; z-index: 100; background: rgba(0, 0, 0, 0.4); color: white; border: none; border-radius: 4px; width: 30px; height: 30px; font-size: 16px; cursor: pointer; }
+        .collapsible-content {
+            padding: 0; max-height: 1000px;
+            overflow: hidden; transition: max-height 0.3s ease-out, margin 0.3s ease;
+            background-color: transparent; margin-bottom: 10px;
+        }
+        .collapsible-content.collapsed { max-height: 0; margin-bottom: 0; }
+
+        #topNotesArea {
+            width: 100%; min-height: 60px; border: 1px solid #ccc;
+            border-radius: 4px; padding: 8px; font-family: inherit;
+            font-size: 13px; resize: vertical; background-color: #fff8dc; user-select: text;
+        }
+
+        .master-wrapper {
+            display: flex; border: 2px solid #555; background-color: white;
+            flex: 1; overflow: hidden; border-radius: 4px; min-height: 250px;
+            position: relative;
+        }
+
+        #fullscreenBtn {
+            position: absolute; top: 5px; right: 5px; z-index: 100;
+            background: rgba(0, 0, 0, 0.4); color: white; border: none; border-radius: 4px;
+            width: 30px; height: 30px; font-size: 16px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(2px); transition: background 0.2s;
+        }
+        #fullscreenBtn:hover { background: rgba(0, 0, 0, 0.7); }
         :fullscreen #fullscreenBtn { background: rgba(220, 53, 69, 0.7); content: "✖"; }
         
         .left-scrollbar { overflow-y: auto; overflow-x: hidden; width: 14px; flex-shrink: 0; background-color: #f1f1f1; border-right: 1px solid #ccc; }
@@ -101,29 +140,34 @@
         .top-scrollbar { width: 100%; overflow-x: auto; overflow-y: hidden; height: 14px; background-color: #f1f1f1; border-bottom: 1px solid #ccc; }
         
         .table-container { overflow: auto; flex: 1; width: 100%; position: relative; touch-action: pan-x pan-y;}
+        .table-container::-webkit-scrollbar:vertical { width: 0px; }
+        .table-container::-webkit-scrollbar:horizontal { height: 12px; }
+
+        table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
-        /* FIX ZOOM: Sử dụng GPU Scale thay vì CSS Zoom */
-        #tableWrapper {
+        #scheduleTable {
+            /* Dùng transform:scale thay cho CSS "zoom" vì "zoom" không được Firefox
+               (kể cả Firefox Android) hỗ trợ. transform:scale tương thích mọi trình duyệt. */
             transform: scale(var(--zoom-level));
             transform-origin: top left;
-            will-change: transform; /* Tối ưu GPU */
+            will-change: transform;
         }
-        table { border-collapse: collapse; width: max-content; background-color: white; table-layout: auto;}
-        
-        th, td { border: 1px solid var(--border-color); padding: 5px; text-align: center; min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell; }
-        
-        /* Ẩn trỏ chuột thật trên Mobile để dùng Edit Modal */
-        .mobile-edit-mode td[contenteditable="true"] { caret-color: transparent; user-select: none !important; }
-        
+
+        th, td {
+            border: 1px solid var(--border-color); padding: 5px; text-align: center;
+            min-width: 45px; font-size: 13px; white-space: pre-wrap; cursor: cell;
+        }
+
         td[contenteditable="true"]:focus, th[contenteditable="true"]:focus {
+            user-select: text; cursor: text;
             background-color: rgba(255, 255, 255, 0.9) !important;
             outline: 2px solid var(--primary-color) !important; outline-offset: -2px;
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
         }
 
-        thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; cursor: s-resize; } /* Thêm cursor chọn cột */
-        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; cursor: e-resize; } /* Thêm cursor chọn hàng */
-        thead th.header-col { z-index: 12; font-size: 15px; cursor: cell; }
+        thead th { background-color: #fff; position: sticky; top: 0; z-index: 10; font-weight: bold; }
+        .header-col { background-color: var(--header-bg) !important; font-weight: bold; position: sticky; left: 0; z-index: 11; min-width: 90px; }
+        thead th.header-col { z-index: 12; font-size: 15px; }
 
         .selected-cell { background-color: var(--select-bg) !important; }
         .selection-top { border-top: 2px solid var(--primary-color) !important; }
@@ -131,70 +175,110 @@
         .selection-left { border-left: 2px solid var(--primary-color) !important; }
         .selection-right { border-right: 2px solid var(--primary-color) !important; }
 
+        .header-col:focus { background-color: #c3e6cb !important; }
         .weekend { background-color: var(--weekend-bg) !important; }
         .holiday { background-color: var(--holiday-bg) !important; font-weight: bold; color: #721c24 !important; }
         .red-separator { border-bottom: 3px solid red !important; }
 
-        #fabBtn { display: none; position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; background-color: var(--primary-color); color: white; border-radius: 50%; text-align: center; line-height: 50px; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 2000; }
-        
-        #cellPopupMenu { display: none; position: fixed; z-index: 2001; bottom: -500px; left: 50%; transform: translateX(-50%); background-color: #ffffff; border: 1px solid #ced4da; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); border-radius: 12px 12px 0 0; width: 100%; max-width: 500px; font-size: 13px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text; }
+        #fabBtn {
+            display: none; position: fixed; bottom: 20px; right: 20px;
+            width: 50px; height: 50px; background-color: var(--primary-color);
+            color: white; border-radius: 50%; text-align: center; line-height: 50px;
+            font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 2000; transition: transform 0.2s, background-color 0.2s;
+        }
+        #fabBtn:hover { background-color: #0b5ed7; transform: scale(1.05); }
+
+        #cellPopupMenu {
+            display: none; position: fixed; z-index: 2001; bottom: -400px; 
+            left: 50%; transform: translateX(-50%);
+            background-color: #ffffff; border: 1px solid #ced4da;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2); border-radius: 12px 12px 0 0;
+            width: 100%; max-width: 500px; font-size: 13px;
+            transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); user-select: text;
+        }
         #cellPopupMenu.show { bottom: 0; }
-        .popup-header { background-color: #f1f3f5; padding: 12px 15px; border-bottom: 1px solid #ddd; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; }
+
+        .popup-header {
+            background-color: #f1f3f5; padding: 12px 15px; border-bottom: 1px solid #ddd;
+            border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; color: #333;
+        }
         .popup-close { cursor: pointer; color: #888; font-size: 24px; font-weight: bold; line-height: 1; padding: 0 10px; }
+        .popup-close:hover { color: #dc3545; }
+
         .popup-tabs { display: flex; border-bottom: 1px solid #ddd; background: #fafafa; }
         .popup-tab { flex: 1; text-align: center; padding: 12px 5px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 2px solid transparent;}
+        .popup-tab:hover { background: #f0f0f0; }
         .popup-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white;}
+
         .popup-body { padding: 15px; max-height: 60vh; overflow-y: auto; }
         .popup-section { display: none; flex-direction: column; gap: 12px; }
         .popup-section.active { display: flex; }
+
         .popup-item { display: flex; flex-direction: column; gap: 5px; }
         .popup-title { font-size: 11px; text-transform: uppercase; color: #888; font-weight: bold; letter-spacing: 0.5px;}
         .popup-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;}
         .popup-row button { flex: 1; min-width: 80px; height: 34px; font-size: 12px;}
         .popup-row select { flex: 1; min-width: 100px; height: 34px;}
+        .popup-row input[type="color"] { width: 40px; height: 34px; padding: 0; cursor: pointer;}
+        
         .color-picker-wrapper { display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1; justify-content: center;}
+        .color-picker-wrapper label { font-size: 11px; color: #555; }
 
-        #statusMessage, #syncBadge {
+        #statusMessage {
             position: fixed; top: 10px; right: 10px; z-index: 9999; font-weight: bold; 
             padding: 12px 20px; border-radius: 6px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
-        #syncBadge { right: 50%; transform: translateX(50%); font-size: 12px; padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.95); border: 1px solid #ddd; white-space: nowrap;}
-        
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
         .loading { background-color: #cce5ff; color: #004085; border: 1px solid #b8daff;}
+        .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-height: 80vh; overflow-y: auto; }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
+        .close-modal:hover { color: black; }
+        .holiday-list { list-style-type: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;}
+        .holiday-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
+        .holiday-list li:nth-child(even) { background-color: #f9f9f9; }
+        .holiday-list button { padding: 4px 8px; background-color: #dc3545; font-size: 11px; height: auto;}
 
-        /* CSS MỚI CHO BOTTOM NAVIGATION VÀ ACTION SHEETS (MOBILE) */
+        /* CSS MỚI CHO BOTTOM NAVIGATION (MOBILE CHUẨN APP) */
         .bottom-nav, .bottom-nav-overlay, .action-sheet { display: none; }
 
         @media (max-width: 768px) {
+            /* Ẩn các công cụ điều khiển Desktop */
             .dashboard, h2, .auth-container, .view-controls, .collapsible-header { display: none !important; }
+            
+            /* Cấu trúc Full màn hình cho Mobile */
             .container { padding: 0; padding-bottom: 60px; height: 100vh; background-color: #fff;}
             .master-wrapper { border: none; border-radius: 0; border-top: 1px solid #ccc; height: 100%;}
             .left-scrollbar, .top-scrollbar { display: none !important; }
 
+            /* Nút Bottom Navigation */
             .bottom-nav { 
                 display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
                 border-top: 1px solid #ddd; z-index: 3000; height: 60px; justify-content: space-around; 
                 align-items: center; padding-bottom: env(safe-area-inset-bottom);
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             }
             .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: #6c757d; cursor: pointer; height: 100%;}
             .nav-item.active { color: var(--primary-color); }
             .nav-icon { font-size: 20px; margin-bottom: 2px;}
             .nav-text { font-size: 11px; font-weight: bold;}
 
+            /* Action Sheets (Khay trượt từ dưới lên) */
             .action-sheet { 
-                display: block; position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; 
+                display: block; position: fixed; bottom: -500px; left: 0; width: 100%; background: #fff; 
                 border-top-left-radius: 16px; border-top-right-radius: 16px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
                 z-index: 2999; padding: 20px; padding-bottom: 80px; transition: bottom 0.3s ease; visibility: hidden;
-                max-height: 85vh; overflow-y: auto;
             }
             .action-sheet.show { bottom: 0; visibility: visible; }
-            .bottom-nav-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2998; }
+            .bottom-nav-overlay { 
+                display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                background: rgba(0,0,0,0.5); z-index: 2998; 
+            }
             .bottom-nav-overlay.show { display: block; }
             
             .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
@@ -203,20 +287,22 @@
             .list-btn { width: 100%; height: 44px; margin-bottom: 8px; font-size: 14px; text-align: left; padding-left: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f8f9fa; color: #333;}
             .list-btn.primary { background-color: var(--primary-color); color: #fff; border: none;}
             
-            #cellPopupMenu { bottom: -100%; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
+            /* Tối ưu Popup Menu Edit trên Mobile */
+            #cellPopupMenu { bottom: -500px; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
             #cellPopupMenu.show { bottom: 0; }
             #fabBtn { bottom: 80px; z-index: 2990;}
 
-            /* Mở rộng Touch Targets 44px chuẩn UX Mobile */
-            button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"], textarea {
+            /* Mở rộng Touch Targets */
+            button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
                 height: 44px !important; font-size: 14px !important;
             }
-            textarea { height: auto !important; min-height: 100px !important; }
             .popup-row button { font-size: 13px; }
             .popup-header { padding: 15px 20px; }
+            .popup-close { font-size: 30px; padding: 5px 15px; }
             .popup-row { gap: 12px; }
             .popup-item { gap: 10px; }
-            
+
+            /* Size bảng Mobile mặc định */
             th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
             .header-col { min-width: 75px !important; font-size: 12px !important; }
             thead th.header-col { font-size: 12px !important; }
@@ -226,10 +312,7 @@
 </head>
 <body>
 
-    <div id="syncBadge" class="edit-only">🟢 Đã đồng bộ</div>
-
     <div class="container">
-        <!-- Desktop UI -->
         <h2>
             Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
@@ -264,13 +347,16 @@
 
                     <span id="weekSelectGroup" style="display: none;">
                         <select id="weekSelect" onchange="updateCropPreview()">
-                            <option value="1">Tuần 1</option><option value="2">Tuần 2</option><option value="3">Tuần 3</option><option value="4">Tuần 4</option><option value="5">Tuần 5</option>
+                            <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
+                            <option value="3">Tuần 3</option><option value="4">Tuần 4</option>
+                            <option value="5">Tuần 5</option>
                         </select>
                     </span>
                     <span id="dateSelectGroup" style="display: none;">
                         <input type="number" id="startDay" min="1" max="31" style="width: 45px;" value="1" oninput="updateCropPreview()"> - 
                         <input type="number" id="endDay" min="1" max="31" style="width: 45px;" value="15" oninput="updateCropPreview()">
                     </span>
+                    
                     <select id="rowSelectEnd" onchange="updateCropPreview()" style="margin-left: 5px;">
                         <option value="all">Toàn bộ Hàng</option>
                     </select>
@@ -294,13 +380,12 @@
         <div class="view-controls">
             <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
-            <span style="font-size: 11px; color: #666; font-style: italic;">(💡 Vuốt 2 ngón tay thu phóng)</span>
-            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets(true)">💾 Lưu Lên Máy Chủ</button>
+            <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Giữ 1 ô để bôi đen - Vuốt 2 ngón để thu phóng)</span>
+            <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ</button>
         </div>
 
         <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
 
-        <!-- Popup Menu Edit Phía dưới -->
         <div id="cellPopupMenu">
             <div class="popup-header">
                 <span id="popupCellName">Tùy chọn Ô</span>
@@ -312,6 +397,10 @@
             </div>
             <div class="popup-body">
                 <div id="formatTab" class="popup-section active">
+                    <div class="popup-item" id="quickEditGroup">
+                        <span class="popup-title">Nội dung ô (dễ gõ hơn ô nhỏ trên bảng)</span>
+                        <textarea id="cellTextEditor" rows="2" oninput="applyCellTextEdit()" onblur="saveState()" placeholder="Nhập nội dung ca trực..." style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; font-size:14px; resize:vertical; box-sizing:border-box;"></textarea>
+                    </div>
                     <div class="popup-item">
                         <span class="popup-title">Phạm vi áp dụng</span>
                         <select id="colorScope" style="width:100%;" onchange="updateSelectedScope()">
@@ -320,21 +409,29 @@
                             <option value="col">Toàn bộ Cột của ô chọn</option>
                         </select>
                     </div>
+                    
                     <div class="popup-item">
                         <span class="popup-title">Cỡ chữ & Kiểu chữ</span>
                         <div class="popup-row">
-                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;">
+                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
                             <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold;">B</button>
                             <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif;">I</button>
                             <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline;">U</button>
-                            <button class="secondary" onclick="forceLineBreak()" style="flex:1;">↵ Xuống dòng</button>
+                            <button class="secondary" onclick="forceLineBreak()" style="flex:1;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
                         </div>
                     </div>
+                    
                     <div class="popup-item">
                         <span class="popup-title">Màu sắc</span>
                         <div class="popup-row">
-                            <div class="color-picker-wrapper"><label>Chữ</label><input type="color" id="textColorPicker" value="#000000" onchange="applyColorFormat('text')"></div>
-                            <div class="color-picker-wrapper"><label>Nền</label><input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')"></div>
+                            <div class="color-picker-wrapper">
+                                <label>Chữ</label>
+                                <input type="color" id="textColorPicker" value="#000000" onchange="applyColorFormat('text')">
+                            </div>
+                            <div class="color-picker-wrapper">
+                                <label>Nền</label>
+                                <input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')">
+                            </div>
                             <button class="secondary" onclick="clearCellFormat()" style="flex:0.8; color:#000; background:#e2e6ea;">Xóa Màu</button>
                         </div>
                     </div>
@@ -342,12 +439,25 @@
                         <span class="popup-title">Dọn dẹp Nội dung</span>
                         <div class="popup-row">
                             <select id="clearScopeMode" onchange="toggleClearInputs()" style="flex: 2;">
-                                <option value="cell">Xóa Text vùng chọn</option><option value="row">Xóa Text cả Hàng</option><option value="col">Xóa Text cả Cột</option><option value="week">Xóa Text theo Tuần</option><option value="range">Xóa Text theo Ngày</option><option value="all" style="color:red; font-weight:bold;">Xóa Tất Cả Text</option>
+                                <option value="cell">Xóa Text vùng chọn</option>
+                                <option value="row">Xóa Text cả Hàng</option>
+                                <option value="col">Xóa Text cả Cột</option>
+                                <option value="week">Xóa Text theo Tuần</option>
+                                <option value="range">Xóa Text theo Ngày</option>
+                                <option value="all" style="color:red; font-weight:bold;">Xóa Tất Cả Text</option>
                             </select>
                             <button class="warning" onclick="executeClearContent()" style="flex: 1;">🗑️ Xóa</button>
                         </div>
-                        <div class="popup-row" id="clearWeekGroup" style="display: none; margin-top:5px;"><select id="clearWeekSelect" style="width:100%;"><option value="1">Tuần 1</option><option value="2">Tuần 2</option><option value="3">Tuần 3</option><option value="4">Tuần 4</option><option value="5">Tuần 5</option></select></div>
-                        <div class="popup-row" id="clearDateGroup" style="display: none; margin-top:5px;"><input type="number" id="clearStart" min="1" max="31" placeholder="Từ" style="flex:1;"> <input type="number" id="clearEnd" min="1" max="31" placeholder="Đến" style="flex:1;"></div>
+                        <div class="popup-row" id="clearWeekGroup" style="display: none; margin-top:5px;">
+                            <select id="clearWeekSelect" style="width:100%;">
+                                <option value="1">Tuần 1</option><option value="2">Tuần 2</option>
+                                <option value="3">Tuần 3</option><option value="4">Tuần 4</option><option value="5">Tuần 5</option>
+                            </select>
+                        </div>
+                        <div class="popup-row" id="clearDateGroup" style="display: none; margin-top:5px;">
+                            <input type="number" id="clearStart" min="1" max="31" placeholder="Từ" style="flex:1;"> 
+                            <input type="number" id="clearEnd" min="1" max="31" placeholder="Đến" style="flex:1;">
+                        </div>
                     </div>
                 </div>
 
@@ -360,12 +470,21 @@
                     </div>
                     <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
                         <span class="popup-title">Thêm Hàng/Cột (Cạnh ô chọn)</span>
-                        <div class="popup-row"><button onclick="insertRow('above')">+ Hàng Lên</button><button onclick="insertRow('below')">+ Hàng Xuống</button></div>
-                        <div class="popup-row"><button onclick="insertColumn('left')">+ Cột Trái</button><button onclick="insertColumn('right')">+ Cột Phải</button></div>
+                        <div class="popup-row">
+                            <button onclick="insertRow('above')">+ Hàng Lên</button>
+                            <button onclick="insertRow('below')">+ Hàng Xuống</button>
+                        </div>
+                        <div class="popup-row">
+                            <button onclick="insertColumn('left')">+ Cột Trái</button>
+                            <button onclick="insertColumn('right')">+ Cột Phải</button>
+                        </div>
                     </div>
                     <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
                         <span class="popup-title">Phá hủy Cấu trúc Khung</span>
-                        <div class="popup-row"><button class="danger" onclick="deleteSelectedRow()">Xóa Hàng Này</button><button class="danger" onclick="deleteSelectedColumn()">Xóa Cột Này</button></div>
+                        <div class="popup-row">
+                            <button class="danger" onclick="deleteSelectedRow()">Xóa Hàng Này</button>
+                            <button class="danger" onclick="deleteSelectedColumn()">Xóa Cột Này</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -373,34 +492,39 @@
 
         <div id="statusMessage"></div>
 
-        <!-- BẢNG LỊCH CHÍNH (Bọc thêm div tableWrapper để dùng GPU Transform) -->
         <div class="master-wrapper" id="masterWrapper">
             <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Bật/Tắt Toàn Màn Hình">⛶</button>
             <div class="left-scrollbar" id="leftScroll"><div id="leftScrollContent" style="width: 1px;"></div></div>
             <div class="right-content" id="captureArea"> 
                 <div class="top-scrollbar" id="topScroll"><div id="topScrollContent" style="height: 1px;"></div></div>
                 <div class="table-container" id="bottomScroll">
-                    <div id="tableWrapper">
-                        <table id="scheduleTable">
-                            <thead><tr id="dateHeaderRow1"></tr><tr id="dateHeaderRow2"></tr></thead>
-                            <tbody id="scheduleBody"></tbody>
-                        </table>
-                    </div>
+                    <table id="scheduleTable">
+                        <thead>
+                            <tr id="dateHeaderRow1"></tr>
+                            <tr id="dateHeaderRow2"></tr>
+                        </thead>
+                        <tbody id="scheduleBody"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- HỆ THỐNG GIAO DIỆN MOBILE CHUẨN APP -->
+    <!-- HỆ THỐNG GIAO DIỆN MOBILE CHUẨN APP (BOTTOM NAV & SHEETS) -->
     <div class="bottom-nav-overlay" id="bottomNavOverlay" onclick="closeAllActionSheets()"></div>
     
+    <!-- Màn hình Dữ liệu (Bảng) -->
     <div id="sheetBang" class="action-sheet">
-        <div class="sheet-header"><h4>📊 Quản lý Dữ liệu</h4><span class="sheet-close" onclick="closeAllActionSheets()">&times;</span></div>
+        <div class="sheet-header">
+            <h4>📊 Quản lý Dữ liệu</h4>
+            <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+        </div>
         <div class="sheet-body">
             <input type="month" id="mobileMonthPicker" style="width: 100%; margin-bottom: 10px;" onchange="syncMonthToDesktop(this.value)">
             <button class="list-btn primary" onclick="loadFromGoogleSheets(); closeAllActionSheets();">⬇️ Tải Dữ liệu Lịch về</button>
-            <button class="list-btn edit-only" style="background-color: var(--save-color); color: #000; font-weight: bold; border: none;" onclick="saveToGoogleSheets(true); closeAllActionSheets();">💾 Lưu Lên Máy Chủ GG Sheets</button>
+            <button class="list-btn edit-only" style="background-color: var(--save-color); color: #000; font-weight: bold; border: none;" onclick="saveToGoogleSheets(); closeAllActionSheets();">💾 Lưu Lên Máy Chủ GG Sheets</button>
             <button class="list-btn edit-only" onclick="handleGenerateNewTable(); closeAllActionSheets();">🔄 Tạo Bảng Trắng Mới</button>
+            
             <div style="display: flex; gap: 10px; margin-top: 10px;" class="edit-only">
                 <button class="list-btn" onclick="undo(); closeAllActionSheets();" style="flex:1; justify-content: center; margin-bottom: 0;">↩️ Hoàn tác</button>
                 <button class="list-btn" onclick="redo(); closeAllActionSheets();" style="flex:1; justify-content: center; margin-bottom: 0;">↪️ Làm lại</button>
@@ -408,46 +532,60 @@
         </div>
     </div>
 
+    <!-- Màn hình Khác (Settings) -->
     <div id="sheetKhac" class="action-sheet">
-        <div class="sheet-header"><h4>⚙️ Tùy chọn khác</h4><span class="sheet-close" onclick="closeAllActionSheets()">&times;</span></div>
+        <div class="sheet-header">
+            <h4>⚙️ Tùy chọn khác</h4>
+            <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+        </div>
         <div class="sheet-body">
             <button class="list-btn" onclick="setQuickViewMode('month'); closeAllActionSheets();">🗓️ Căn vừa lịch Cả Tháng</button>
             <button class="list-btn" onclick="setQuickViewMode('week'); closeAllActionSheets();">📅 Căn vừa lịch 1 Tuần</button>
             <button class="list-btn edit-only" onclick="openHolidayModal(); closeAllActionSheets();">🏖️ Quản lý Ngày Lễ</button>
             <button class="list-btn" onclick="takeScreenshot('download'); closeAllActionSheets();" style="color: var(--jpg-color);">⬇️ Xuất Lưu thành Ảnh JPG</button>
             <button class="list-btn" onclick="takeScreenshot('share'); closeAllActionSheets();" style="color: var(--capture-color);">📤 Chụp Ảnh & Chia sẻ</button>
+            
             <hr style="border-top:1px solid #ddd; width: 100%; margin: 15px 0;">
+            
             <button id="mobileAuthBtn" class="list-btn" onclick="mobileHandleAuth()" style="background-color: #343a40; color: white; border: none;">Đăng nhập Quản trị</button>
             <button class="list-btn edit-only" onclick="openChangePassModal(); closeAllActionSheets();" style="background-color: #17a2b8; color: white; border: none;">Đổi Mật Khẩu</button>
         </div>
     </div>
 
-    <!-- KHUNG NHẬP LIỆU MOBILE TRÁNH BÀN PHÍM CHE -->
-    <div id="mobileEditModal" class="action-sheet" style="padding-bottom: 20px;">
-        <div class="sheet-header"><h4>✏️ Nhập Nội Dung</h4><span class="sheet-close" onclick="closeMobileEdit()">&times;</span></div>
-        <textarea id="mobileEditInput" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px;"></textarea>
-        <button class="list-btn primary" onclick="saveMobileEdit()">✅ Xong</button>
-    </div>
-
+    <!-- Thanh Điều Hướng Dưới Cùng -->
     <div class="bottom-nav">
-        <div class="nav-item active" id="navLich" onclick="activateNav('lich')"><div class="nav-icon">📅</div><div class="nav-text">Lịch</div></div>
-        <div class="nav-item" id="navSua" onclick="activateNav('sua')"><div class="nav-icon">✏️</div><div class="nav-text">Sửa</div></div>
-        <div class="nav-item" id="navBang" onclick="activateNav('bang')"><div class="nav-icon">📊</div><div class="nav-text">Bảng</div></div>
-        <div class="nav-item" id="navKhac" onclick="activateNav('khac')"><div class="nav-icon">⚙️</div><div class="nav-text">Khác</div></div>
+        <div class="nav-item active" id="navLich" onclick="activateNav('lich')">
+            <div class="nav-icon">📅</div><div class="nav-text">Lịch</div>
+        </div>
+        <div class="nav-item" id="navSua" onclick="activateNav('sua')">
+            <div class="nav-icon">✏️</div><div class="nav-text">Sửa</div>
+        </div>
+        <div class="nav-item" id="navBang" onclick="activateNav('bang')">
+            <div class="nav-icon">📊</div><div class="nav-text">Bảng</div>
+        </div>
+        <div class="nav-item" id="navKhac" onclick="activateNav('khac')">
+            <div class="nav-icon">⚙️</div><div class="nav-text">Khác</div>
+        </div>
     </div>
 
-    <!-- CÁC MODAL HỆ THỐNG -->
+    <!-- MODAL QUẢN LÝ NGÀY LỄ -->
     <div id="holidayModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeHolidayModal()">&times;</span>
             <h3 style="margin-top: 0; color: var(--primary-color);">🏖️ Quản lý Ngày Lễ</h3>
+            <p style="font-size: 13px; color: #555; margin-bottom: 15px;">Danh sách ngày lễ (Định dạng tự động lặp lại hàng năm MM-DD hoặc ngày cụ thể YYYY-MM-DD):</p>
+            
             <ul id="holidayList" class="holiday-list"></ul>
+            
             <div class="input-group" style="margin-top: 15px; flex-wrap: nowrap;">
-                <input type="date" id="newHolidayDate" style="flex: 1;"><input type="text" id="newHolidayName" placeholder="Tên ngày lễ..." style="flex: 2;"><button onclick="addHoliday()">Thêm</button>
+                <input type="date" id="newHolidayDate" style="flex: 1;" title="Chọn ngày">
+                <input type="text" id="newHolidayName" placeholder="Tên ngày lễ..." style="flex: 2;">
+                <button onclick="addHoliday()">Thêm</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL ĐĂNG NHẬP -->
     <div id="loginModal" class="modal">
         <div class="modal-content" style="max-width: 300px;">
             <span class="close-modal" onclick="closeLoginModal()">&times;</span>
@@ -455,14 +593,15 @@
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <input type="text" id="loginUser" placeholder="Tên tài khoản (vd: admin)">
                 <input type="password" id="loginPass" placeholder="Mật khẩu (vd: 123456)">
-                <label style="font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555;">
-                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản
+                <label style="font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: #555; margin-top: 5px;">
+                    <input type="checkbox" id="rememberMe" checked style="width: 18px; height: 18px !important; margin: 0;"> Nhớ tài khoản trên máy này
                 </label>
                 <button onclick="handleLogin()" style="margin-top: 5px;">Đăng nhập</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL ĐỔI MẬT KHẨU -->
     <div id="changePassModal" class="modal">
         <div class="modal-content" style="max-width: 300px;">
             <span class="close-modal" onclick="closeChangePassModal()">&times;</span>
@@ -478,44 +617,67 @@
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlaF3gVNhm_s-kAilknWyeUM5eaIHERNPazL7mklG6FHQYnpuC10wp3SO26MFnGzyZRw/exec'; 
-        
-        let historyStack = []; let currentStep = -1;
-        let isEditMode = false; let authUsername = ""; let authToken = "";
-        let isScrollbarsInitialized = false; let resizeObserver = null; let autoSaveTimeout = null;
 
-        // FETCH TIMEOUT WRAPPER
-        async function fetchWithTimeout(resource, options = {}) {
-            const { timeout = 15000 } = options;
+        // Bọc fetch() với timeout để tránh treo vô thời hạn khi mạng di động chập chờn.
+        // Trả về cùng dạng Promise như fetch() bình thường, nhưng tự huỷ (AbortError) nếu
+        // quá lâu không có phản hồi, để .catch() có thể báo lỗi rõ ràng cho người dùng.
+        function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeout);
-            const response = await fetch(resource, { ...options, signal: controller.signal });
-            clearTimeout(id);
-            return response;
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            return fetch(url, { ...options, signal: controller.signal })
+                .finally(() => clearTimeout(timeoutId));
         }
 
-        // Đồng bộ ô tháng năm
-        function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
-        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; loadFromGoogleSheets(); }
+        // Thông báo lỗi mạng thân thiện, phân biệt trường hợp timeout với lỗi mạng khác.
+        // context là một cụm từ mô tả hành động, ví dụ: "đăng nhập", "lưu dữ liệu".
+        function networkErrorMessage(error, context) {
+            const action = context ? ' khi ' + context : '';
+            if (error && error.name === 'AbortError') {
+                return `Kết nối quá lâu (mạng yếu)${action}. Vui lòng kiểm tra mạng và thử lại.`;
+            }
+            return `Mất kết nối mạng${action}. Vui lòng thử lại.`;
+        }
+        
+        let historyStack = [];
+        let currentStep = -1;
 
-        /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV */
+        let isEditMode = false;
+        let authUsername = "";
+        let authToken = "";
+
+        // Đồng bộ ô tháng năm giữa Desktop và Mobile
+        function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
+        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; }
+
+        /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) */
         function activateNav(tab) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
 
             if (tab === 'lich') {
                 closeAllActionSheets();
-                isEditMode = false; document.body.classList.add('view-only-mode'); document.body.classList.remove('mobile-edit-mode');
-                lockTableEditing(); clearSelection(); updateSyncStatus('none');
-            } else if (tab === 'sua') {
+                isEditMode = false;
+                document.body.classList.add('view-only-mode');
+                lockTableEditing();
+                clearSelection();
+            } 
+            else if (tab === 'sua') {
                 closeAllActionSheets();
-                if (!authToken) { openLoginModal(); activateNav('lich'); } 
-                else {
-                    isEditMode = true; document.body.classList.remove('view-only-mode');
-                    if(window.innerWidth <= 768) document.body.classList.add('mobile-edit-mode'); // Ẩn nháy chuột trên đt
+                if (!authToken) {
+                    openLoginModal();
+                    activateNav('lich'); // Chặn lại nếu chưa đăng nhập
+                } else {
+                    isEditMode = true;
+                    document.body.classList.remove('view-only-mode');
                     unlockTableEditing();
                 }
-            } else if (tab === 'bang') { openActionSheet('sheetBang'); } 
-            else if (tab === 'khac') { openActionSheet('sheetKhac'); }
+            }
+            else if (tab === 'bang') {
+                openActionSheet('sheetBang');
+            }
+            else if (tab === 'khac') {
+                openActionSheet('sheetKhac');
+            }
         }
 
         function openActionSheet(id) {
@@ -523,9 +685,11 @@
             document.getElementById('bottomNavOverlay').classList.add('show');
             document.getElementById(id).classList.add('show');
         }
+
         function closeAllActionSheets() {
             document.getElementById('bottomNavOverlay').classList.remove('show');
             document.querySelectorAll('.action-sheet').forEach(el => el.classList.remove('show'));
+            // Phục hồi lại màu của tab Lịch hoặc Sửa đang chọn dở
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             if(isEditMode) document.getElementById('navSua').classList.add('active');
             else document.getElementById('navLich').classList.add('active');
@@ -534,15 +698,22 @@
         function mobileHandleAuth() {
             closeAllActionSheets();
             if (authToken) {
+                // Logout Logic
                 isEditMode = false; authUsername = ""; authToken = "";
-                localStorage.removeItem('savedUser'); localStorage.removeItem('savedToken');
-                document.getElementById('authBtn').innerText = "Đăng nhập"; document.getElementById('mobileAuthBtn').innerText = "Đăng nhập Quản trị";
-                document.body.classList.add('view-only-mode'); document.body.classList.remove('mobile-edit-mode');
-                clearSelection(); lockTableEditing(); updateSyncStatus('none'); activateNav('lich'); showMessage('success', 'Đã đăng xuất.');
-            } else openLoginModal();
+                localStorage.removeItem('savedUser');
+                localStorage.removeItem('savedToken');
+                document.getElementById('authBtn').innerText = "Đăng nhập";
+                document.getElementById('mobileAuthBtn').innerText = "Đăng nhập Quản trị";
+                document.body.classList.add('view-only-mode');
+                clearSelection();
+                lockTableEditing();
+                activateNav('lich');
+                showMessage('success', 'Đã đăng xuất.');
+            } else {
+                openLoginModal();
+            }
         }
 
-        /* --- XÁC THỰC VÀ BẢO MẬT HMAC --- */
         async function hashPassword(password) {
             const msgUint8 = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -550,24 +721,21 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        async function generateHMAC(token, timestamp) {
-            const msgUint8 = new TextEncoder().encode(token + timestamp.toString());
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         function openLoginModal() {
-            if (isEditMode) mobileHandleAuth(); else {
+            if (isEditMode) { // Logic trên Desktop
+                mobileHandleAuth(); 
+            } else {
                 document.getElementById('loginModal').style.display = 'block';
-                setTimeout(() => { document.getElementById('loginUser').focus(); }, 100);
             }
         }
+        
         function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; }
 
         async function handleLogin(isAutoLogin = false, savedUser = null, savedToken = null) {
             if (typeof isAutoLogin !== 'boolean') isAutoLogin = false;
-            let user = savedUser; let hashedPass = savedToken;
+
+            let user = savedUser;
+            let hashedPass = savedToken;
 
             if (!isAutoLogin) {
                 user = document.getElementById('loginUser').value.trim();
@@ -577,184 +745,108 @@
                 hashedPass = await hashPassword(pass);
             }
 
-            try {
-                const res = await fetchWithTimeout(SCRIPT_URL, { 
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify({ action: "login", username: user, token: hashedPass }) 
-                });
-                const result = await res.json();
-                
+            fetchWithTimeout(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ action: "login", username: user, token: hashedPass }) 
+            })
+            .then(res => res.json())
+            .then(result => {
                 if (result.status === 'success') {
                     isEditMode = true; authUsername = user; authToken = hashedPass;
-                    document.getElementById('authBtn').innerText = "Đăng xuất (" + user + ")"; document.getElementById('mobileAuthBtn').innerText = "Đăng xuất (" + user + ")";
+                    document.getElementById('authBtn').innerText = "Đăng xuất (" + user + ")";
+                    document.getElementById('mobileAuthBtn').innerText = "Đăng xuất (" + user + ")";
                     document.body.classList.remove('view-only-mode');
-                    if(window.innerWidth <= 768) document.body.classList.add('mobile-edit-mode');
-                    closeLoginModal(); unlockTableEditing();
+                    closeLoginModal();
+                    unlockTableEditing();
                     
                     if (!isAutoLogin && document.getElementById('rememberMe').checked) {
-                        localStorage.setItem('savedUser', user); localStorage.setItem('savedToken', hashedPass);
+                        localStorage.setItem('savedUser', user);
+                        localStorage.setItem('savedToken', hashedPass);
                     }
-                    if (!isAutoLogin) { showMessage('success', 'Đăng nhập thành công!'); if(window.innerWidth <= 768) activateNav('sua'); }
+                    
+                    if (!isAutoLogin) {
+                        showMessage('success', 'Đăng nhập thành công! Đã mở khóa chỉnh sửa.');
+                        if(window.innerWidth <= 768) activateNav('sua');
+                    }
                 } else {
-                    if (!isAutoLogin) showMessage('error', result.message); else { localStorage.removeItem('savedUser'); localStorage.removeItem('savedToken'); }
+                    if (!isAutoLogin) showMessage('error', result.message);
+                    else {
+                        localStorage.removeItem('savedUser');
+                        localStorage.removeItem('savedToken');
+                    }
                 }
-            } catch (err) {
-                if (!isAutoLogin) showMessage('error', 'Lỗi mạng khi đăng nhập (Timeout).');
-            }
+            })
+            .catch((error) => {
+                if (!isAutoLogin) showMessage('error', networkErrorMessage(error, 'đăng nhập'));
+            });
         }
 
         function openChangePassModal() {
-            document.getElementById('cpOldPass').value = ''; document.getElementById('cpNewPass').value = ''; document.getElementById('cpConfirmPass').value = '';
+            document.getElementById('cpOldPass').value = '';
+            document.getElementById('cpNewPass').value = '';
+            document.getElementById('cpConfirmPass').value = '';
             document.getElementById('changePassModal').style.display = 'block';
-            setTimeout(() => { document.getElementById('cpOldPass').focus(); }, 100);
         }
         function closeChangePassModal() { document.getElementById('changePassModal').style.display = 'none'; }
 
         async function handleChangePassword() {
-            const oldPass = document.getElementById('cpOldPass').value; const newPass = document.getElementById('cpNewPass').value; const confirmPass = document.getElementById('cpConfirmPass').value;
-            if(!oldPass || !newPass || !confirmPass) return alert("Vui lòng nhập đủ!"); if(newPass !== confirmPass) return alert("MK mới không khớp!");
+            const oldPass = document.getElementById('cpOldPass').value;
+            const newPass = document.getElementById('cpNewPass').value;
+            const confirmPass = document.getElementById('cpConfirmPass').value;
+
+            if(!oldPass || !newPass || !confirmPass) return alert("Vui lòng nhập đầy đủ thông tin!");
+            if(newPass !== confirmPass) return alert("Mật khẩu mới không khớp!");
 
             showMessage('loading', 'Đang xử lý...');
-            const hashedOldPass = await hashPassword(oldPass); const hashedNewPass = await hashPassword(newPass);
-            const ts = new Date().getTime(); const sig = await generateHMAC(authToken, ts);
+            const hashedOldPass = await hashPassword(oldPass);
+            const hashedNewPass = await hashPassword(newPass);
 
-            try {
-                const res = await fetchWithTimeout(SCRIPT_URL, { 
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                    body: JSON.stringify({ action: "changePassword", username: authUsername, timestamp: ts, signature: sig, newToken: hashedNewPass }) 
-                });
-                const result = await res.json();
+            fetchWithTimeout(SCRIPT_URL, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                body: JSON.stringify({ 
+                    action: "changePassword", 
+                    username: authUsername, 
+                    oldToken: hashedOldPass,
+                    newToken: hashedNewPass
+                }) 
+            })
+            .then(res => res.json())
+            .then(result => {
                 if (result.status === 'success') {
                     authToken = hashedNewPass; 
-                    if(localStorage.getItem('savedUser')) localStorage.setItem('savedToken', hashedNewPass);
-                    closeChangePassModal(); showMessage('success', 'Đổi MK thành công!');
-                } else showMessage('error', result.message);
-            } catch (err) { showMessage('error', 'Lỗi mạng (Timeout).'); }
-        }
-
-        function lockTableEditing() { document.querySelectorAll('th[contenteditable], td[contenteditable]').forEach(el => { el.setAttribute('contenteditable', 'false'); }); }
-        function unlockTableEditing() { if(isEditMode) document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); }); }
-
-        /* --- AUTO-SAVE DEBOUNCE VỚI BẢO MẬT HMAC --- */
-        function triggerAutoSave() {
-            if (!isEditMode || !authToken) return;
-            updateSyncStatus('waiting');
-            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = setTimeout(() => { performAutoSave(); }, 2500);
-        }
-
-        function updateSyncStatus(status) {
-            const badge = document.getElementById('syncBadge');
-            if (!isEditMode || status === 'none') { badge.style.display = 'none'; return; }
-            badge.style.display = 'flex';
-            if (status === 'waiting') { badge.innerHTML = '🟡 Chờ lưu...'; badge.style.color = '#856404'; } 
-            else if (status === 'saving') { badge.innerHTML = '🔄 Đang lưu...'; badge.style.color = '#004085'; } 
-            else if (status === 'success') { badge.innerHTML = '🟢 Đã đồng bộ'; badge.style.color = '#155724'; setTimeout(() => { if (badge.innerHTML.includes('Đã đồng bộ')) badge.style.display = 'none'; }, 3000); } 
-            else if (status === 'error') { badge.innerHTML = '🔴 Lỗi lưu mạng'; badge.style.color = '#721c24'; }
-        }
-
-        async function buildSavePayload() {
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value;
-            const [year, month] = pickerValue.split('-');
-            const sheetName = `Thang_${month}_${year}`;
-            
-            const payloadData = []; const payloadBgColors = []; const payloadFontColors = []; const payloadFontWeights = [];
-            const table = document.getElementById('scheduleTable');
-            table.querySelectorAll('tr').forEach(row => {
-                const rowData = []; const rowBg = []; const rowFont = []; const rowWeight = [];
-                row.querySelectorAll('th, td').forEach(cell => {
-                    if(cell.style.display === 'none') { rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal"); } 
-                    else {
-                        rowData.push(cell.innerText.trim());
-                        let comp = window.getComputedStyle(cell);
-                        rowBg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? "#ffffff" : rgbToHex(comp.backgroundColor));
-                        rowFont.push(comp.color ? rgbToHex(comp.color) : "#000000");
-                        rowWeight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? "bold" : "normal");
+                    if(localStorage.getItem('savedUser')) {
+                        localStorage.setItem('savedToken', hashedNewPass);
                     }
-                });
-                payloadData.push(rowData); payloadBgColors.push(rowBg); payloadFontColors.push(rowFont); payloadFontWeights.push(rowWeight);
-            });
-
-            const ts = new Date().getTime(); const sig = await generateHMAC(authToken, ts);
-            return { action: "save", username: authUsername, timestamp: ts, signature: sig, sheetName: sheetName, data: payloadData, styles: { bgColors: payloadBgColors, fontColors: payloadFontColors, fontWeights: payloadFontWeights } };
+                    closeChangePassModal();
+                    showMessage('success', 'Đổi mật khẩu thành công!');
+                } else {
+                    showMessage('error', result.message);
+                }
+            })
+            .catch((error) => showMessage('error', networkErrorMessage(error, 'đổi mật khẩu')));
         }
 
-        async function performAutoSave() {
-            if (!isEditMode || !authToken) return;
-            updateSyncStatus('saving');
-            try {
-                const payload = await buildSavePayload();
-                const res = await fetchWithTimeout(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-                const result = await res.json();
-                updateSyncStatus(result.status === 'success' ? 'success' : 'error');
-            } catch (err) { updateSyncStatus('error'); }
+        function lockTableEditing() {
+            document.querySelectorAll('th[contenteditable], td[contenteditable]').forEach(el => { el.setAttribute('contenteditable', 'false'); });
+        }
+        function unlockTableEditing() {
+            if(!isEditMode) return;
+            document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
         }
 
-        async function saveToGoogleSheets(manual = false) {
-            closePopup(); clearSelection();
-            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all'; document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
-            
-            if(manual) showMessage('loading', 'Đang cập nhật Sheet...');
-            updateSyncStatus('saving');
-            try {
-                const payload = await buildSavePayload();
-                const res = await fetchWithTimeout(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
-                const result = await res.json();
-                if(result.status === 'success') { if(manual) showMessage('success', 'Đã lưu xong!'); updateSyncStatus('success'); } 
-                else { if(manual) showMessage('error', 'Lỗi: ' + result.message); updateSyncStatus('error'); }
-            } catch (err) { if(manual) showMessage('error', 'Lỗi mạng khi lưu.'); updateSyncStatus('error'); }
-        }
-
-        /* --- GPU ZOOM VÀ OBSERVER TỐI ƯU --- */
-        function initScrollbars() {
-            if (isScrollbarsInitialized) return;
-            const tableW = document.getElementById('tableWrapper');
-            const bottomScroll = document.getElementById('bottomScroll');
-            const topScroll = document.getElementById('topScroll');
-            const leftScroll = document.getElementById('leftScroll');
-
-            updateScrollDimensions();
-            resizeObserver = new ResizeObserver(updateScrollDimensions);
-            resizeObserver.observe(tableW); resizeObserver.observe(bottomScroll);
-
-            topScroll.addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
-            bottomScroll.addEventListener('scroll', (e) => { topScroll.scrollLeft = e.target.scrollLeft; });
-            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
-            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
-            isScrollbarsInitialized = true;
-        }
-
-        function updateScrollDimensions() {
-            const table = document.getElementById('scheduleTable');
-            const tableW = document.getElementById('tableWrapper');
-            const bottomScroll = document.getElementById('bottomScroll'); 
-            const topScrollContent = document.getElementById('topScrollContent');
-            const leftScroll = document.getElementById('leftScroll');
-            const leftScrollContent = document.getElementById('leftScrollContent');
-
-            if(table && bottomScroll && topScrollContent && leftScrollContent) {
-                // Tính kích thước thực sau khi Scale
-                let zoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
-                let scaledW = table.offsetWidth * zoom;
-                let scaledH = table.offsetHeight * zoom;
-                
-                tableW.style.width = scaledW + 'px'; tableW.style.height = scaledH + 'px';
-                topScrollContent.style.width = scaledW + 'px'; leftScrollContent.style.height = scaledH + 'px';
-                leftScroll.style.height = bottomScroll.clientHeight + 'px';
-            }
-        }
-
-        function syncScrollbars(forceUpdate = false) {
-            if (!isScrollbarsInitialized) initScrollbars();
-            else if (forceUpdate) updateScrollDimensions();
-        }
-
-        let initialPinchDistance = null; let initialPinchZoom = 1;
+        /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (MƯỢT MÀ 60FPS) */
+        let initialPinchDistance = null;
+        let initialPinchZoom = 1;
         const tableContainer = document.getElementById('bottomScroll');
 
         tableContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
-                initialPinchDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+                initialPinchDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
                 initialPinchZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             }
         }, { passive: false });
@@ -762,386 +854,1384 @@
         tableContainer.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2 && initialPinchDistance) {
                 e.preventDefault(); 
-                const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-                let newZoom = initialPinchZoom * (dist / initialPinchDistance);
+                const currentDistance = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                
+                let newZoom = initialPinchZoom * (currentDistance / initialPinchDistance);
                 newZoom = Math.max(0.25, Math.min(3.0, newZoom)); 
+                
                 document.documentElement.style.setProperty('--zoom-level', newZoom);
                 syncScrollbars(true);
             }
         }, { passive: false });
-        tableContainer.addEventListener('touchend', (e) => { if (e.touches.length < 2) initialPinchDistance = null; });
 
+        tableContainer.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialPinchDistance = null;
+            }
+        });
+
+        /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
         function setQuickViewMode(mode) {
-            document.getElementById('captureMode').value = 'all'; toggleCaptureInputs(); updateCropPreview();
-            const container = document.getElementById('bottomScroll'); const table = document.getElementById('scheduleTable');
-            if (table.rows.length < 2) return; const headerRow = table.rows[1]; if (!headerRow || headerRow.cells.length < 2) return;
+            document.getElementById('captureMode').value = 'all';
+            toggleCaptureInputs();
+            updateCropPreview();
 
-            const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+            const container = document.getElementById('bottomScroll');
+            const table = document.getElementById('scheduleTable');
+            if (table.rows.length < 2) return;
+
+            const headerRow = table.rows[1]; 
+            if (!headerRow || headerRow.cells.length < 2) return;
+
+            // offsetWidth giờ luôn trả về kích thước GỐC (transform:scale không đổi layout box),
+            // nên không cần chia cho currentZoom như trước (khi còn dùng CSS zoom) nữa.
             const containerWidth = container.clientWidth;
-            const hw = headerRow.cells[0].offsetWidth; const dw = headerRow.cells[1].offsetWidth;
+            const hw = headerRow.cells[0].offsetWidth;
+            const dw = headerRow.cells[1].offsetWidth;
             const totalDays = headerRow.cells.length - 1;
 
             if (mode === 'month') {
-                let tz = containerWidth / (hw + totalDays * dw); tz = Math.max(0.25, Math.min(2.5, tz)); 
-                document.documentElement.style.setProperty('--zoom-level', tz); syncScrollbars(true); container.scrollLeft = 0; 
+                let targetZoom = containerWidth / (hw + totalDays * dw);
+                targetZoom = Math.max(0.25, Math.min(2.5, targetZoom)); 
+                document.documentElement.style.setProperty('--zoom-level', targetZoom);
+                syncScrollbars(true);
+                container.scrollLeft = 0; 
             } else if (mode === 'week') {
-                let tz = containerWidth / (hw + 7 * dw); tz = Math.max(0.25, Math.min(2.5, tz));
-                document.documentElement.style.setProperty('--zoom-level', tz); syncScrollbars(true);
+                let targetZoom = containerWidth / (hw + 7 * dw);
+                targetZoom = Math.max(0.25, Math.min(2.5, targetZoom));
+                document.documentElement.style.setProperty('--zoom-level', targetZoom);
+                syncScrollbars(true);
 
-                const today = new Date(); const pVal = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value; let tDay = 1;
-                if(pVal) { const [y, m] = pVal.split('-'); if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) tDay = today.getDate(); }
+                const today = new Date();
+                const pickerVal = document.getElementById('monthYearPicker').value;
+                let targetDay = 1;
+                
+                if(pickerVal) {
+                    const [y, m] = pickerVal.split('-');
+                    if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) {
+                        targetDay = today.getDate();
+                    }
+                }
 
                 setTimeout(() => {
-                    if (headerRow.cells[tDay]) { container.scrollLeft = (headerRow.cells[tDay].offsetLeft * tz) - (hw * tz); }
+                    if (headerRow.cells[targetDay]) {
+                        // scrollLeft của container đo theo không gian ĐÃ phóng to (transform:scale
+                        // vẫn được trình duyệt tính vào scrollable overflow), trong khi offsetLeft/
+                        // offsetWidth là kích thước GỐC (chưa phóng to) -> phải nhân với targetZoom.
+                        const cellLeft = headerRow.cells[targetDay].offsetLeft * targetZoom;
+                        const headerWidth = headerRow.cells[0].offsetWidth * targetZoom;
+                        container.scrollLeft = cellLeft - headerWidth;
+                    }
                 }, 50); 
             }
         }
 
         function toggleFullscreen() {
             let elem = document.getElementById("masterWrapper");
-            if (!document.fullscreenElement) elem.requestFullscreen().catch(() => {}); else document.exitFullscreen();
+            if (!document.fullscreenElement) {
+                elem.requestFullscreen().catch((err) => {
+                    showMessage('error', `Lỗi khi mở toàn màn hình: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
         }
 
         function saveState() {
-            const table = document.getElementById('scheduleTable'); const htmlState = table.innerHTML;
+            const table = document.getElementById('scheduleTable');
+            const htmlState = table.innerHTML;
+            
             if (currentStep >= 0 && historyStack[currentStep] === htmlState) return;
-            historyStack = historyStack.slice(0, currentStep + 1); historyStack.push(htmlState); currentStep++;
+
+            historyStack = historyStack.slice(0, currentStep + 1);
+            historyStack.push(htmlState);
+            currentStep++;
+
             if (historyStack.length > 50) { historyStack.shift(); currentStep--; }
-            triggerAutoSave();
         }
 
-        function undo() { if (currentStep > 0) { currentStep--; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã hoàn tác!'); triggerAutoSave(); } }
-        function redo() { if (currentStep < historyStack.length - 1) { currentStep++; document.getElementById('scheduleTable').innerHTML = historyStack[currentStep]; clearSelection(); showMessage('success', 'Đã khôi phục!'); triggerAutoSave(); } }
+        function undo() {
+            if (currentStep > 0) {
+                currentStep--;
+                document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
+                clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!');
+            } else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
+        }
 
-        document.addEventListener('keydown', function(e) { if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); } if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); } });
+        function redo() {
+            if (currentStep < historyStack.length - 1) {
+                currentStep++;
+                document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
+                clearSelection(); showMessage('success', 'Đã khôi phục thao tác!');
+            } else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+            if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.body.classList.add('view-only-mode'); isEditMode = false;
+            document.body.classList.add('view-only-mode'); 
+            isEditMode = false;
+            
             syncMonthToMobile(document.getElementById('monthYearPicker').value);
-            loadFromGoogleSheets(); renderHolidayList(); syncScrollbars();
+            loadFromGoogleSheets();
+            renderHolidayList();
+            syncScrollbars();
             
-            const savedUser = localStorage.getItem('savedUser'); const savedToken = localStorage.getItem('savedToken');
-            if (savedUser && savedToken) handleLogin(true, savedUser, savedToken);
+            const savedUser = localStorage.getItem('savedUser');
+            const savedToken = localStorage.getItem('savedToken');
+            if (savedUser && savedToken) {
+                handleLogin(true, savedUser, savedToken);
+            }
             
-            document.getElementById('scheduleTable').addEventListener('focusout', function(e) { if(e.target.isContentEditable) saveState(); });
-            document.getElementById('scheduleTable').addEventListener('input', function(e) { triggerAutoSave(); });
+            document.getElementById('scheduleTable').addEventListener('focusout', function(e) {
+                if(e.target.isContentEditable) saveState();
+            });
         });
 
-        // FOCUS KHI GÕ CHỮ (DESKTOP) TỰ ĐÓNG POPUP
+        // ẨN POPUP MENU KHI BÀN PHÍM ẢO BẬT LÊN (Desktop) / CHUYỂN HƯỚNG SANG Ô NHẬP LIỆU LỚN (Mobile)
         document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
-            if (e.target.isContentEditable && window.innerWidth > 768) {
-                closePopup(); document.getElementById('fabBtn').style.display = 'none';
+            if (e.target.isContentEditable) {
+                if (isMobileView()) {
+                    // Trên mobile: không cho gõ trực tiếp vào ô bảng (quá nhỏ, dễ gõ nhầm và bị
+                    // bàn phím ảo che mất ô đang gõ) -> huỷ focus và mở popup có ô nhập liệu to hơn.
+                    e.target.blur();
+                    const cell = e.target.closest('td, th');
+                    if (cell) {
+                        startCell = cell;
+                        selectRange(cell, cell);
+                        openPopup();
+                    }
+                    return;
+                }
+                const popup = document.getElementById('cellPopupMenu');
+                popup.classList.remove('show');
+                setTimeout(() => { popup.style.display = 'none'; }, 300);
+                document.getElementById('fabBtn').style.display = 'none';
             }
         });
+
         document.getElementById('scheduleTable').addEventListener('focusout', (e) => {
-            if (selectedCells.length > 0 && isEditMode && window.innerWidth > 768) document.getElementById('fabBtn').style.display = 'block';
+            if (selectedCells.length > 0 && isEditMode) {
+                document.getElementById('fabBtn').style.display = 'block';
+            }
         });
 
-        /* --- XỬ LÝ CHỌN Ô MOBILE / DESKTOP --- */
-        let isMouseDown = false; let startCell = null; let selectedCells = []; 
-        let isSelecting = false; let longPressTimer = null; let isScrolling = false;
+        let isMouseDown = false;
+        let startCell = null;
+        let selectedCells = []; 
+        let isSelecting = false;
+        let longPressTimer = null;
+        let isScrolling = false;
 
-        function clearSelection() { selectedCells.forEach(cell => { cell.classList.remove('selected-cell', 'selection-top', 'selection-bottom', 'selection-left', 'selection-right'); }); selectedCells = []; document.getElementById('fabBtn').style.display = 'none'; }
-        function getCellCoords(cell) { const row = cell.closest('tr'); return { r: Array.from(row.parentElement.children).indexOf(row) + (row.parentElement.tagName === 'TBODY' ? 2 : 0), c: Array.from(row.children).indexOf(cell) }; }
-        function getCellAt(r, c) { let theadRows = table.querySelectorAll('thead tr'); let tbodyRows = table.querySelectorAll('tbody tr'); let row = r < 2 ? theadRows[r] : tbodyRows[r - 2]; return row ? row.children[c] : null; }
+        const table = document.getElementById('scheduleTable');
+
+        function clearSelection() {
+            selectedCells.forEach(cell => {
+                cell.classList.remove('selected-cell', 'selection-top', 'selection-bottom', 'selection-left', 'selection-right');
+            });
+            selectedCells = [];
+            document.getElementById('fabBtn').style.display = 'none';
+        }
+
+        function getCellCoords(cell) {
+            const row = cell.closest('tr');
+            return {
+                r: Array.from(row.parentElement.children).indexOf(row) + (row.parentElement.tagName === 'TBODY' ? 2 : 0),
+                c: Array.from(row.children).indexOf(cell)
+            };
+        }
+
+        function getCellAt(r, c) {
+            let theadRows = table.querySelectorAll('thead tr');
+            let tbodyRows = table.querySelectorAll('tbody tr');
+            let row = r < 2 ? theadRows[r] : tbodyRows[r - 2];
+            return row ? row.children[c] : null;
+        }
 
         function selectRange(cell1, cell2) {
-            clearSelection(); const pos1 = getCellCoords(cell1); const pos2 = getCellCoords(cell2);
-            const rMin = Math.min(pos1.r, pos2.r); const rMax = Math.max(pos1.r, pos2.r); const cMin = Math.min(pos1.c, pos2.c); const cMax = Math.max(pos1.c, pos2.c);
+            clearSelection();
+            const pos1 = getCellCoords(cell1);
+            const pos2 = getCellCoords(cell2);
+            
+            const rMin = Math.min(pos1.r, pos2.r);
+            const rMax = Math.max(pos1.r, pos2.r);
+            const cMin = Math.min(pos1.c, pos2.c);
+            const cMax = Math.max(pos1.c, pos2.c);
 
             for (let r = rMin; r <= rMax; r++) {
                 for (let c = cMin; c <= cMax; c++) {
                     let cell = getCellAt(r, c);
                     if (cell && cell.style.display !== 'none') {
                         cell.classList.add('selected-cell');
-                        if (r === rMin) cell.classList.add('selection-top'); if (r === rMax) cell.classList.add('selection-bottom');
-                        if (c === cMin) cell.classList.add('selection-left'); if (c === cMax) cell.classList.add('selection-right');
+                        if (r === rMin) cell.classList.add('selection-top');
+                        if (r === rMax) cell.classList.add('selection-bottom');
+                        if (c === cMin) cell.classList.add('selection-left');
+                        if (c === cMax) cell.classList.add('selection-right');
                         selectedCells.push(cell);
                     }
                 }
             }
+
             if(selectedCells.length > 0) {
-                if(window.innerWidth > 768) { document.getElementById('fabBtn').style.display = 'block'; updatePopupUI(); }
+                document.getElementById('fabBtn').style.display = 'block';
+                updatePopupUI();
             }
         }
 
-        // CHỌN CẢ HÀNG/CỘT KHI CLICK HEADER
-        function selectFullLine(thCell) {
-            const pos = getCellCoords(thCell);
-            if(pos.c === 0 && pos.r >= 2) { // Kích cột trái -> Bôi đen hàng
-                const row = thCell.closest('tr');
-                selectRange(row.children[1], row.children[row.children.length-1]);
-            } else if (pos.r < 2 && pos.c > 0) { // Kích hàng trên -> Bôi đen cột
-                const tbody = document.getElementById('scheduleBody');
-                if(tbody.rows.length > 0) selectRange(tbody.rows[0].children[pos.c], tbody.rows[tbody.rows.length-1].children[pos.c]);
-            }
-        }
-
+        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS 300MS
         table.addEventListener('touchstart', (e) => {
-            if (!isEditMode || e.touches.length > 1) return; 
-            let cell = e.target.closest('td, th'); if (!cell) return;
+            if (!isEditMode) return; 
+            if (e.touches.length > 1) return; 
+            
+            let cell = e.target.closest('td, th');
+            if (!cell) return;
+            
             isScrolling = false;
+            
             longPressTimer = setTimeout(() => {
-                isSelecting = true; startCell = cell; closePopup(); selectRange(cell, cell);
+                isSelecting = true;
+                startCell = cell;
+                closePopup();
+                selectRange(cell, cell);
                 if (navigator.vibrate) navigator.vibrate(50); 
             }, 300);
         }, { passive: true });
 
         table.addEventListener('touchmove', (e) => {
             if (e.touches.length > 1) { clearTimeout(longPressTimer); return; }
-            if (!isSelecting) { isScrolling = true; clearTimeout(longPressTimer); return; }
+            
+            if (!isSelecting) {
+                isScrolling = true; 
+                clearTimeout(longPressTimer);
+                return;
+            }
+            
             e.preventDefault(); 
-            let touch = e.touches[0]; let elem = document.elementFromPoint(touch.clientX, touch.clientY); if (!elem) return;
-            let cell = elem.closest('td, th'); if (cell && startCell && cell !== startCell) selectRange(startCell, cell);
+            let touch = e.touches[0];
+            let elem = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (!elem) return;
+            
+            let cell = elem.closest('td, th');
+            if (cell && startCell && cell !== startCell) {
+                selectRange(startCell, cell);
+            }
         }, { passive: false });
 
         table.addEventListener('touchend', (e) => {
             clearTimeout(longPressTimer);
             if (isSelecting) {
                 isSelecting = false;
-                if(window.innerWidth <= 768 && selectedCells.length > 0) openPopup(); // Hiển thị popup edit mobile
             } else if (!isScrolling) {
                 let cell = e.target.closest('td, th');
                 if (cell) {
-                    if(cell.tagName === 'TH' && (cell.cellIndex === 0 || cell.parentElement.rowIndex < 2)) {
-                        selectFullLine(cell); // Chọn hàng/cột
-                        if(window.innerWidth <= 768) openPopup();
-                    } else {
-                        closePopup(); startCell = cell; selectRange(cell, cell);
-                        // MOBILE EDIT MODAL (Khi nhấp 1 ô bình thường)
-                        if(window.innerWidth <= 768 && cell.tagName === 'TD') {
-                            document.getElementById('mobileEditInput').value = cell.innerText;
-                            openActionSheet('mobileEditModal');
-                            setTimeout(() => { document.getElementById('mobileEditInput').focus(); }, 100);
+                    closePopup();
+                    startCell = cell;
+                    selectRange(cell, cell);
+                }
+            }
+        });
+
+        table.addEventListener('mousedown', (e) => {
+            if (!isEditMode) return; 
+            let cell = e.target.closest('td, th');
+            if (!cell) return;
+            
+            closePopup();
+
+            if (e.shiftKey && startCell) {
+                selectRange(startCell, cell);
+            } else {
+                isMouseDown = true;
+                startCell = cell;
+                selectRange(cell, cell);
+            }
+        });
+
+        table.addEventListener('mouseover', (e) => {
+            if (!isMouseDown || !isEditMode) return;
+            let cell = e.target.closest('td, th');
+            if (cell && startCell) {
+                selectRange(startCell, cell);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+
+        document.addEventListener('mousedown', function(event) {
+            const popup = document.getElementById('cellPopupMenu');
+            const fab = document.getElementById('fabBtn');
+            const modalElement = document.getElementById('holidayModal');
+            const loginModal = document.getElementById('loginModal');
+            const changePassModal = document.getElementById('changePassModal');
+            const isClickInsideTable = table.contains(event.target);
+            
+            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable) {
+                closePopup();
+                clearSelection();
+            }
+            if (event.target == modalElement) { closeHolidayModal(); }
+            if (event.target == loginModal) { closeLoginModal(); }
+            if (event.target == changePassModal) { closeChangePassModal(); }
+        });
+
+        // Nhận biết đang ở chế độ giao diện mobile (cùng breakpoint với CSS @media max-width:768px)
+        function isMobileView() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        // Gõ nội dung ô đang chọn (chỉ áp dụng khi chọn đúng 1 ô) thông qua ô nhập liệu lớn trong popup
+        function applyCellTextEdit() {
+            if (selectedCells.length !== 1) return;
+            selectedCells[0].innerText = document.getElementById('cellTextEditor').value;
+        }
+
+        function updatePopupUI() {
+            if (selectedCells.length === 0) return;
+            
+            const targetCell = selectedCells[0];
+            const comp = window.getComputedStyle(targetCell);
+
+            const quickEditGroup = document.getElementById('quickEditGroup');
+            const cellTextEditor = document.getElementById('cellTextEditor');
+            if (selectedCells.length === 1) {
+                quickEditGroup.style.display = '';
+                cellTextEditor.value = targetCell.innerText;
+            } else {
+                quickEditGroup.style.display = 'none';
+            }
+            
+            document.getElementById('textColorPicker').value = rgbToHex(comp.color);
+            let bg = comp.backgroundColor;
+            document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(comp.color);
+            
+            document.getElementById('fontSizePicker').value = parseInt(comp.fontSize) || 13;
+
+            document.getElementById('btnBold').classList.toggle('active', comp.fontWeight === 'bold' || comp.fontWeight >= 700);
+            document.getElementById('btnItalic').classList.toggle('active', comp.fontStyle === 'italic');
+            document.getElementById('btnUnderline').classList.toggle('active', comp.textDecorationLine === 'underline');
+
+            const mergeBtn = document.getElementById('btnMerge');
+            if (selectedCells.length > 1) {
+                mergeBtn.innerText = "◧ Gộp các ô đã chọn";
+                mergeBtn.style.backgroundColor = "#6f42c1";
+                mergeBtn.onclick = mergeCells;
+                mergeBtn.disabled = false;
+                mergeBtn.style.opacity = "1";
+            } else {
+                if (targetCell.colSpan > 1 || targetCell.rowSpan > 1) {
+                    mergeBtn.innerText = "◨ Hủy gộp ô này";
+                    mergeBtn.style.backgroundColor = "#dc3545";
+                    mergeBtn.onclick = unmergeCell;
+                    mergeBtn.disabled = false;
+                    mergeBtn.style.opacity = "1";
+                } else {
+                    mergeBtn.innerText = "◧ Cần chọn nhiều ô để gộp";
+                    mergeBtn.style.backgroundColor = "#6c757d";
+                    mergeBtn.onclick = null;
+                    mergeBtn.disabled = true;
+                    mergeBtn.style.opacity = "0.6";
+                }
+            }
+            
+            let cellName = selectedCells.length > 1 ? `Đã chọn ${selectedCells.length} ô` : "Tùy chọn Ô";
+            document.getElementById('popupCellName').innerText = cellName;
+        }
+
+        function openPopup() {
+            if(selectedCells.length === 0) return;
+            updatePopupUI();
+            const popup = document.getElementById('cellPopupMenu');
+            popup.style.display = 'block';
+            setTimeout(() => { 
+                popup.classList.add('show'); 
+                // Trên mobile, khi chỉ chọn 1 ô: tự đưa con trỏ vào ô nhập liệu lớn để gõ ngay,
+                // thay vì phải gõ trực tiếp vào ô bảng nhỏ (dễ bị bàn phím ảo che khuất).
+                if (isMobileView() && selectedCells.length === 1) {
+                    document.getElementById('cellTextEditor').focus();
+                }
+            }, 10);
+            document.getElementById('fabBtn').style.display = 'none';
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('cellPopupMenu');
+            popup.classList.remove('show');
+            setTimeout(() => { popup.style.display = 'none'; }, 300);
+            if(selectedCells.length > 0) document.getElementById('fabBtn').style.display = 'block';
+        }
+
+        function switchPopupTab(tabId) {
+            document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function getCellsToFormat() {
+            const scope = document.getElementById('colorScope').value;
+            let cellsToFormat = [];
+            
+            if (scope === 'cell') {
+                cellsToFormat = [...selectedCells];
+            } else if (scope === 'row') {
+                const rows = new Set();
+                selectedCells.forEach(cell => rows.add(cell.closest('tr')));
+                rows.forEach(row => {
+                    Array.from(row.children).forEach(c => cellsToFormat.push(c));
+                });
+            } else if (scope === 'col') {
+                const colIndexes = new Set();
+                selectedCells.forEach(cell => colIndexes.add(Array.from(cell.closest('tr').children).indexOf(cell)));
+                document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
+                    colIndexes.forEach(index => {
+                        if(row.children[index]) cellsToFormat.push(row.children[index]);
+                    });
+                });
+            }
+            return cellsToFormat;
+        }
+
+        function updateSelectedScope() {
+            if(selectedCells.length === 0) return;
+            const cells = getCellsToFormat();
+            
+            document.querySelectorAll('.selected-cell-preview').forEach(c => c.classList.remove('selected-cell-preview'));
+            
+            cells.forEach(cell => {
+                cell.style.transition = "background-color 0.2s";
+                const oldBg = cell.style.backgroundColor;
+                cell.style.backgroundColor = "rgba(13, 110, 253, 0.2)";
+                setTimeout(() => { cell.style.backgroundColor = oldBg; }, 400);
+            });
+        }
+
+        function applyColorFormat(type) {
+            const cells = getCellsToFormat();
+            const color = type === 'text' ? document.getElementById('textColorPicker').value : document.getElementById('bgColorPicker').value;
+            
+            cells.forEach(el => {
+                if(type === 'text') el.style.color = color;
+                else el.style.setProperty('background-color', color, 'important');
+            });
+            saveState(); 
+        }
+
+        function applyFontSize() {
+            const size = document.getElementById('fontSizePicker').value;
+            const cells = getCellsToFormat();
+            
+            cells.forEach(el => {
+                el.style.fontSize = size + 'px';
+            });
+            saveState(); 
+        }
+
+        function forceLineBreak() {
+            const cells = getCellsToFormat();
+            cells.forEach(el => {
+                el.innerText += "\n"; 
+                
+                if(el === cells[0]) {
+                    el.focus();
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(el);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
+            saveState();
+        }
+
+        function toggleFormat(styleProperty, activeValue, inactiveValue) {
+            const cells = getCellsToFormat();
+            if(cells.length === 0) return;
+
+            const targetCell = cells[0];
+            const comp = window.getComputedStyle(targetCell);
+            
+            let isCurrentlyActive = false;
+            if(styleProperty === 'fontWeight') isCurrentlyActive = (comp.fontWeight === 'bold' || comp.fontWeight >= 700);
+            else if(styleProperty === 'fontStyle') isCurrentlyActive = (comp.fontStyle === 'italic');
+            else if(styleProperty === 'textDecoration') isCurrentlyActive = (comp.textDecorationLine === 'underline');
+
+            const newValue = isCurrentlyActive ? inactiveValue : activeValue;
+
+            cells.forEach(el => { el.style[styleProperty] = newValue; });
+            updatePopupUI();
+            saveState();
+        }
+
+        function clearCellFormat() {
+            const cells = getCellsToFormat();
+            cells.forEach(el => { 
+                el.style.color = ''; 
+                el.style.removeProperty('background-color'); 
+                el.style.fontWeight = 'normal';
+                el.style.fontStyle = 'normal';
+                el.style.textDecoration = 'none';
+                el.style.fontSize = ''; 
+            });
+            updatePopupUI();
+            saveState();
+        }
+
+        function mergeCells() {
+            if (selectedCells.length < 2) return;
+            
+            let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+            
+            selectedCells.forEach(cell => {
+                const pos = getCellCoords(cell);
+                if (pos.r < minR) minR = pos.r;
+                if (pos.r > maxR) maxR = pos.r;
+                if (pos.c < minC) minC = pos.c;
+                if (pos.c > maxC) maxC = pos.c;
+            });
+
+            const rowSpan = maxR - minR + 1;
+            const colSpan = maxC - minC + 1;
+
+            const top_left_cell = getCellAt(minR, minC);
+            
+            let mergedText = "";
+            for (let r = minR; r <= maxR; r++) {
+                for (let c = minC; c <= maxC; c++) {
+                    let cell = getCellAt(r, c);
+                    if (cell) {
+                        let text = cell.innerText.trim();
+                        if(text !== "") {
+                            mergedText += (mergedText === "" ? "" : "\n") + text;
+                        }
+                        if (r !== minR || c !== minC) {
+                            cell.style.display = 'none'; 
+                            cell.innerHTML = "";
+                            cell.classList.add('merged-hidden');
                         }
                     }
                 }
             }
-        });
 
-        // Desktop Mouse Event
-        table.addEventListener('mousedown', (e) => {
-            if (!isEditMode) return; let cell = e.target.closest('td, th'); if (!cell) return;
-            closePopup();
-            if(cell.tagName === 'TH' && (cell.cellIndex === 0 || cell.parentElement.rowIndex < 2)) {
-                selectFullLine(cell); isMouseDown = false;
-            } else {
-                if (e.shiftKey && startCell) selectRange(startCell, cell); else { isMouseDown = true; startCell = cell; selectRange(cell, cell); }
-            }
-        });
-        table.addEventListener('mouseover', (e) => { if (!isMouseDown || !isEditMode) return; let cell = e.target.closest('td, th'); if (cell && startCell) selectRange(startCell, cell); });
-        document.addEventListener('mouseup', () => { isMouseDown = false; });
-
-        document.addEventListener('mousedown', function(event) {
-            if(!isEditMode) return;
-            const modals = [document.getElementById('cellPopupMenu'), document.getElementById('fabBtn'), document.getElementById('holidayModal'), document.getElementById('loginModal'), document.getElementById('changePassModal')];
-            const isClickInside = table.contains(event.target) || modals.some(m => m.contains(event.target)) || event.target.closest('.action-sheet') || event.target.closest('.bottom-nav');
-            if (!isClickInside) { closePopup(); clearSelection(); }
-            if (event.target == document.getElementById('holidayModal')) closeHolidayModal();
-        });
-
-        // MOBILE EDIT SAVE
-        function saveMobileEdit() {
-            if(selectedCells.length > 0) {
-                selectedCells[0].innerText = document.getElementById('mobileEditInput').value;
-                saveState(); triggerAutoSave();
-            }
-            closeMobileEdit();
-        }
-        function closeMobileEdit() { document.getElementById('mobileEditInput').blur(); closeAllActionSheets(); }
-
-        /* HÀM FORMAT GIỮ NGUYÊN */
-        function updatePopupUI() {
-            if (selectedCells.length === 0) return;
-            const targetCell = selectedCells[0]; const comp = window.getComputedStyle(targetCell);
-            document.getElementById('textColorPicker').value = rgbToHex(comp.color);
-            let bg = comp.backgroundColor; document.getElementById('bgColorPicker').value = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? '#ffffff' : rgbToHex(comp.color);
-            document.getElementById('fontSizePicker').value = parseInt(comp.fontSize) || 13;
-            document.getElementById('btnBold').classList.toggle('active', comp.fontWeight === 'bold' || comp.fontWeight >= 700);
-            document.getElementById('btnItalic').classList.toggle('active', comp.fontStyle === 'italic');
-            document.getElementById('btnUnderline').classList.toggle('active', comp.textDecorationLine === 'underline');
-            const mergeBtn = document.getElementById('btnMerge');
-            if (selectedCells.length > 1) { mergeBtn.innerText = "◧ Gộp các ô đã chọn"; mergeBtn.style.backgroundColor = "#6f42c1"; mergeBtn.onclick = mergeCells; mergeBtn.disabled = false; mergeBtn.style.opacity = "1"; } 
-            else { if (targetCell.colSpan > 1 || targetCell.rowSpan > 1) { mergeBtn.innerText = "◨ Hủy gộp ô này"; mergeBtn.style.backgroundColor = "#dc3545"; mergeBtn.onclick = unmergeCell; mergeBtn.disabled = false; mergeBtn.style.opacity = "1"; } else { mergeBtn.innerText = "◧ Cần chọn nhiều ô để gộp"; mergeBtn.style.backgroundColor = "#6c757d"; mergeBtn.onclick = null; mergeBtn.disabled = true; mergeBtn.style.opacity = "0.6"; } }
-            document.getElementById('popupCellName').innerText = selectedCells.length > 1 ? `Đã chọn ${selectedCells.length} ô` : "Tùy chọn Ô";
-        }
-
-        function openPopup() { if(selectedCells.length === 0) return; updatePopupUI(); const popup = document.getElementById('cellPopupMenu'); popup.style.display = 'block'; setTimeout(() => { popup.classList.add('show'); }, 10); document.getElementById('fabBtn').style.display = 'none'; }
-        function closePopup() { const popup = document.getElementById('cellPopupMenu'); popup.classList.remove('show'); setTimeout(() => { popup.style.display = 'none'; }, 300); if(selectedCells.length > 0 && window.innerWidth > 768) document.getElementById('fabBtn').style.display = 'block'; }
-        function switchPopupTab(tabId) { document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active')); document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active')); event.target.classList.add('active'); document.getElementById(tabId).classList.add('active'); }
-        function getCellsToFormat() {
-            const scope = document.getElementById('colorScope').value; let cellsToFormat = [];
-            if (scope === 'cell') cellsToFormat = [...selectedCells];
-            else if (scope === 'row') { const rows = new Set(); selectedCells.forEach(cell => rows.add(cell.closest('tr'))); rows.forEach(row => { Array.from(row.children).forEach(c => cellsToFormat.push(c)); }); } 
-            else if (scope === 'col') { const colIndexes = new Set(); selectedCells.forEach(cell => colIndexes.add(Array.from(cell.closest('tr').children).indexOf(cell))); document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => { colIndexes.forEach(index => { if(row.children[index]) cellsToFormat.push(row.children[index]); }); }); }
-            return cellsToFormat;
-        }
-        function updateSelectedScope() { if(selectedCells.length === 0) return; const cells = getCellsToFormat(); document.querySelectorAll('.selected-cell-preview').forEach(c => c.classList.remove('selected-cell-preview')); cells.forEach(cell => { cell.style.transition = "background-color 0.2s"; const oldBg = cell.style.backgroundColor; cell.style.backgroundColor = "rgba(13, 110, 253, 0.2)"; setTimeout(() => { cell.style.backgroundColor = oldBg; }, 400); }); }
-        function applyColorFormat(type) { const cells = getCellsToFormat(); const color = type === 'text' ? document.getElementById('textColorPicker').value : document.getElementById('bgColorPicker').value; cells.forEach(el => { if(type === 'text') el.style.color = color; else el.style.setProperty('background-color', color, 'important'); }); saveState(); }
-        function applyFontSize() { const size = document.getElementById('fontSizePicker').value; const cells = getCellsToFormat(); cells.forEach(el => { el.style.fontSize = size + 'px'; }); saveState(); }
-        function forceLineBreak() { const cells = getCellsToFormat(); cells.forEach(el => { el.innerText += "\n"; if(el === cells[0]) { el.focus(); const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(el); range.collapse(false); selection.removeAllRanges(); selection.addRange(range); } }); saveState(); }
-        function toggleFormat(styleProperty, activeValue, inactiveValue) { const cells = getCellsToFormat(); if(cells.length === 0) return; const targetCell = cells[0]; const comp = window.getComputedStyle(targetCell); let isCurrentlyActive = false; if(styleProperty === 'fontWeight') isCurrentlyActive = (comp.fontWeight === 'bold' || comp.fontWeight >= 700); else if(styleProperty === 'fontStyle') isCurrentlyActive = (comp.fontStyle === 'italic'); else if(styleProperty === 'textDecoration') isCurrentlyActive = (comp.textDecorationLine === 'underline'); const newValue = isCurrentlyActive ? inactiveValue : activeValue; cells.forEach(el => { el.style[styleProperty] = newValue; }); updatePopupUI(); saveState(); }
-        function clearCellFormat() { const cells = getCellsToFormat(); cells.forEach(el => { el.style.color = ''; el.style.removeProperty('background-color'); el.style.fontWeight = 'normal'; el.style.fontStyle = 'normal'; el.style.textDecoration = 'none'; el.style.fontSize = ''; }); updatePopupUI(); saveState(); }
-
-        function mergeCells() {
-            if (selectedCells.length < 2) return;
-            let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
-            selectedCells.forEach(cell => { const pos = getCellCoords(cell); if (pos.r < minR) minR = pos.r; if (pos.r > maxR) maxR = pos.r; if (pos.c < minC) minC = pos.c; if (pos.c > maxC) maxC = pos.c; });
-            const top_left_cell = getCellAt(minR, minC); let mergedText = "";
-            for (let r = minR; r <= maxR; r++) { for (let c = minC; c <= maxC; c++) { let cell = getCellAt(r, c); if (cell) { let text = cell.innerText.trim(); if(text !== "") { mergedText += (mergedText === "" ? "" : "\n") + text; } if (r !== minR || c !== minC) { cell.style.display = 'none'; cell.innerHTML = ""; cell.classList.add('merged-hidden'); } } } }
-            top_left_cell.rowSpan = maxR - minR + 1; top_left_cell.colSpan = maxC - minC + 1; top_left_cell.innerText = mergedText;
-            selectRange(top_left_cell, top_left_cell); saveState();
+            top_left_cell.rowSpan = rowSpan;
+            top_left_cell.colSpan = colSpan;
+            top_left_cell.innerText = mergedText;
+            
+            selectRange(top_left_cell, top_left_cell);
+            saveState();
         }
 
         function unmergeCell() {
-            if (selectedCells.length !== 1) return; let cell = selectedCells[0];
-            const rSpan = cell.rowSpan; const cSpan = cell.colSpan; if (rSpan <= 1 && cSpan <= 1) return; 
+            if (selectedCells.length !== 1) return;
+            let cell = selectedCells[0];
+            
+            const rSpan = cell.rowSpan;
+            const cSpan = cell.colSpan;
+
+            if (rSpan <= 1 && cSpan <= 1) return; 
+
             const pos = getCellCoords(cell);
-            for (let r = pos.r; r < pos.r + rSpan; r++) { for (let c = pos.c; c < pos.c + cSpan; c++) { if (r === pos.r && c === pos.c) continue; let hiddenCell = getCellAt(r, c); if (hiddenCell && hiddenCell.classList.contains('merged-hidden')) { hiddenCell.style.display = ''; hiddenCell.classList.remove('merged-hidden'); } } }
-            cell.rowSpan = 1; cell.colSpan = 1; selectRange(cell, cell); saveState();
+
+            for (let r = pos.r; r < pos.r + rSpan; r++) {
+                for (let c = pos.c; c < pos.c + cSpan; c++) {
+                    if (r === pos.r && c === pos.c) continue; 
+                    let hiddenCell = getCellAt(r, c);
+                    if (hiddenCell && hiddenCell.classList.contains('merged-hidden')) {
+                        hiddenCell.style.display = '';
+                        hiddenCell.classList.remove('merged-hidden');
+                    }
+                }
+            }
+
+            cell.rowSpan = 1;
+            cell.colSpan = 1;
+            
+            selectRange(cell, cell);
+            saveState();
         }
 
-        function insertRow(position) { if (selectedCells.length === 0) return; const currentRow = selectedCells[selectedCells.length-1].closest('tr'); if (currentRow.parentElement.tagName === 'THEAD') return alert("Không chèn vào vùng Tiêu đề!"); const colCount = document.getElementById('dateHeaderRow1').children.length; const newRow = document.createElement('tr'); for (let i = 0; i < colCount; i++) { const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; } newRow.appendChild(td); } if (position === 'above') currentRow.parentNode.insertBefore(newRow, currentRow); else currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling); updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState(); }
-        function insertColumn(position) { if (selectedCells.length === 0) return; const tr = selectedCells[selectedCells.length-1].closest('tr'); const colIndex = Array.from(tr.children).indexOf(selectedCells[selectedCells.length-1]); if (colIndex === 0 && position === 'left') return alert("Không chèn trước Cột Vị trí!"); const targetIndex = position === 'left' ? colIndex : colIndex + 1; const thead1 = document.getElementById('dateHeaderRow1'); const th1 = document.createElement('th'); th1.contentEditable = isEditMode ? "true" : "false"; th1.innerText = "MỚI"; thead1.insertBefore(th1, thead1.children[targetIndex] || null); const thead2 = document.getElementById('dateHeaderRow2'); const th2 = document.createElement('th'); th2.contentEditable = isEditMode ? "true" : "false"; th2.innerText = "00"; thead2.insertBefore(th2, thead2.children[targetIndex] || null); document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => { const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; row.insertBefore(td, row.children[targetIndex] || null); }); syncScrollbars(true); closePopup(); clearSelection(); saveState(); }
-        function deleteSelectedRow() { if (selectedCells.length === 0) return; const rowsToDelete = new Set(); selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr'))); let hasHeader = false; rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; }); if(hasHeader) return alert("Không xóa hàng Tiêu đề!"); if (confirm(`Bạn có chắc muốn xóa ${rowsToDelete.size} Hàng này?`)) { rowsToDelete.forEach(row => row.remove()); updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState(); } }
-        function deleteSelectedColumn() { if (selectedCells.length === 0) return; const colsToDelete = new Set(); selectedCells.forEach(cell => colsToDelete.add(Array.from(cell.closest('tr').children).indexOf(cell))); if (colsToDelete.has(0)) return alert("Không xóa Cột Vị trí!"); if (confirm(`Bạn có chắc muốn xóa ${colsToDelete.size} Cột này?`)) { const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a); table.querySelectorAll('thead tr, tbody tr').forEach(tr => { sortedCols.forEach(colIndex => { if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]); }); }); syncScrollbars(true); closePopup(); clearSelection(); saveState(); } }
+        function insertRow(position) {
+            if (selectedCells.length === 0) return;
+            const currentRow = selectedCells[selectedCells.length-1].closest('tr');
+            if (currentRow.parentElement.tagName === 'THEAD') return alert("Không chèn vào vùng Tiêu đề!");
 
-        function toggleClearInputs() { document.getElementById('clearWeekGroup').style.display = document.getElementById('clearScopeMode').value === 'week' ? 'flex' : 'none'; document.getElementById('clearDateGroup').style.display = document.getElementById('clearScopeMode').value === 'range' ? 'flex' : 'none'; }
-        function executeClearContent() { const mode = document.getElementById('clearScopeMode').value; const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr'); if (mode === 'cell') { if (selectedCells.length === 0) return; selectedCells.forEach(cell => { if(cell.tagName === 'TD') cell.innerText = ''; }); } else if (mode === 'row') { if (selectedCells.length === 0) return; const rows = new Set(); selectedCells.forEach(cell => rows.add(cell.closest('tr'))); let hasHeader = false; rows.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; }); if(hasHeader) return alert("Không xóa nội dung Tiêu đề!"); rows.forEach(row => { Array.from(row.children).forEach((td, i) => { if (i > 0 && td.tagName === 'TD') td.innerText = ''; }); }); } else if (mode === 'col') { if (selectedCells.length === 0) return; const cols = new Set(); selectedCells.forEach(cell => cols.add(Array.from(cell.closest('tr').children).indexOf(cell))); if (cols.has(0)) return alert("Không xóa nội dung Cột Vị trí!"); tbodyRows.forEach(row => { cols.forEach(colIndex => { if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') row.children[colIndex].innerText = ''; }); }); } else { let start = 1, end = 999; const [year, month] = (document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value).split('-'); const daysInMonth = new Date(year, parseInt(month), 0).getDate(); if (mode === 'week') { const w = parseInt(document.getElementById('clearWeekSelect').value); start = (w - 1) * 7 + 1; end = Math.min(w * 7, daysInMonth); } else if (mode === 'range') { start = parseInt(document.getElementById('clearStart').value) || 1; end = parseInt(document.getElementById('clearEnd').value) || daysInMonth; } else if (mode === 'all') { if(!confirm("CẢNH BÁO: Xóa TOÀN BỘ dữ liệu. Vẫn tiếp tục?")) return; start = 1; end = 999; } tbodyRows.forEach(row => { const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all' || (i >= start && i <= end)) { if (cells[i].tagName === 'TD') cells[i].innerText = ''; } } }); } showMessage('success', 'Đã xóa nội dung!'); closePopup(); saveState(); }
+            const colCount = document.getElementById('dateHeaderRow1').children.length;
+            const newRow = document.createElement('tr');
+            for (let i = 0; i < colCount; i++) {
+                const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
+                if (i === 0) { td.classList.add('header-col'); td.innerText = "HÀNG MỚI"; }
+                newRow.appendChild(td);
+            }
 
-        function toggleSection(sectionId, headerElement) { const content = document.getElementById(sectionId); if (content.classList.contains('collapsed')) { content.classList.remove('collapsed'); headerElement.classList.add('active'); } else { content.classList.add('collapsed'); headerElement.classList.remove('active'); } setTimeout(() => syncScrollbars(true), 350); }
-
-        const jobRolesTemplate = [ { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" }, { name: " ", headerColor: "#000", dataColor: "#000" }, { name: "LẦU 12", headerColor: "#000", dataColor: "#000" }, { name: "KHU C", headerColor: "#673ab7", dataColor: "#673ab7" }, { name: "TRẦN CC", headerColor: "#673ab7", dataColor: "#673ab7" }, { name: "TRỰC", headerColor: "#28a745", dataColor: "#28a745" }, { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, { name: "RA TRỰC", headerColor: "#e83e8c", dataColor: "#e83e8c" }, { name: "PK 121", headerColor: "red", dataColor: "#e83e8c" }, { name: "PK 120s", headerColor: "#000", dataColor: "#000" }, { name: "PK 120c", headerColor: "#000", dataColor: "#000" }, { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" }, { name: "HỘI CHẨN", headerColor: "#17a2b8", dataColor: "#17a2b8" }, { name: "TRẠI CHIỀU", headerColor: "#673ab7", dataColor: "#000" }, { name: "53\n54", headerColor: "#673ab7", dataColor: "#000", separator: true }, { name: "33-34", headerColor: "#000", dataColor: "#000" }, { name: "35-36", headerColor: "#000", dataColor: "#000" }, { name: "37-38", headerColor: "#000", dataColor: "#000" }, { name: "46", headerColor: "#000", dataColor: "#000" } ];
-        let holidays = JSON.parse(localStorage.getItem('holidays')) || [ { date: "09-02", name: "Quốc khánh" }, { date: "01-01", name: "Tết Dương lịch" }, { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" } ];
-
-        function rgbToHex(rgb) { if (rgb.startsWith('#')) return rgb; let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i); if(m) return "#" + ("0" + parseInt(m[1],10).toString(16)).slice(-2) + ("0" + parseInt(m[2],10).toString(16)).slice(-2) + ("0" + parseInt(m[3],10).toString(16)).slice(-2); return "#000000"; }
-        function updateRowSelectDropdown() { const select = document.getElementById('rowSelectEnd'); select.innerHTML = '<option value="all">Toàn bộ Hàng</option>'; document.getElementById('scheduleBody').querySelectorAll('tr').forEach((row, index) => { const firstCellText = row.children.length > 0 ? row.children[0].innerText.replace('\n', ' ').trim() : "Trống"; const option = document.createElement('option'); option.value = index; option.innerText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`; select.appendChild(option); }); select.value = "all"; }
-        function checkIsHoliday(year, month, day) { const formatMMDD = `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; const formatYYYYMMDD = `${year}-${formatMMDD}`; return holidays.some(h => { let hDate = h.date; if(hDate.length === 10) return (hDate === formatYYYYMMDD || hDate.substring(5) === formatMMDD); else if (hDate.length === 5) return hDate === formatMMDD; return false; }); }
-
-        async function loadFromGoogleSheets() {
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value; if (!pickerValue) return;
-            const [year, month] = pickerValue.split('-'); const sheetName = `Thang_${month}_${year}`;
-            showMessage('loading', 'Đang tải dữ liệu từ máy chủ...'); clearSelection(); updateSyncStatus('none');
-
-            try {
-                const res = await fetchWithTimeout(`${SCRIPT_URL}?sheetName=${sheetName}`); const result = await res.json();
-                if (result.status === "success" && result.data && result.data.text && result.data.text.length > 0) { renderTableFromData(result.data); showMessage('success', 'Đã tải dữ liệu thành công!'); } 
-                else fetchPreviousMonthHeader(year, month);
-            } catch (err) { handleGenerateNewTable(true); showMessage('warning-toast', 'Lỗi mạng hoặc Timeout. Đã tạo bảng trắng.'); }
+            if (position === 'above') currentRow.parentNode.insertBefore(newRow, currentRow);
+            else currentRow.parentNode.insertBefore(newRow, currentRow.nextSibling);
+            
+            updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState();
         }
 
-        async function fetchPreviousMonthHeader(currentYearStr, currentMonthStr) {
-            let yearNum = parseInt(currentYearStr); let monthNum = parseInt(currentMonthStr) - 1; if (monthNum === 0) { monthNum = 12; yearNum -= 1; }
-            const prevSheetName = `Thang_${("0" + monthNum).slice(-2)}_${yearNum}`; showMessage('loading', 'Đang tạo bảng từ tháng trước...');
-            try {
-                const res = await fetchWithTimeout(`${SCRIPT_URL}?action=getFirstColumn&sheetName=${prevSheetName}`); const result = await res.json();
-                if (result.status === "success" && result.data && result.data.length > 0) { generateTableWithCustomRoles(result.data); showMessage('success', 'Đã copy cấu trúc từ tháng trước!'); } 
-                else { generateTable(true); showMessage('success', 'Chưa có dữ liệu. Đã tạo bảng trắng mặc định!'); }
-            } catch (err) { generateTable(true); }
+        function insertColumn(position) {
+            if (selectedCells.length === 0) return;
+            const tr = selectedCells[selectedCells.length-1].closest('tr');
+            const colIndex = Array.from(tr.children).indexOf(selectedCells[selectedCells.length-1]);
+            if (colIndex === 0 && position === 'left') return alert("Không chèn trước Cột Vị trí!");
+
+            const targetIndex = position === 'left' ? colIndex : colIndex + 1;
+
+            const thead1 = document.getElementById('dateHeaderRow1');
+            const th1 = document.createElement('th'); th1.contentEditable = isEditMode ? "true" : "false"; th1.innerText = "MỚI";
+            thead1.insertBefore(th1, thead1.children[targetIndex] || null);
+
+            const thead2 = document.getElementById('dateHeaderRow2');
+            const th2 = document.createElement('th'); th2.contentEditable = isEditMode ? "true" : "false"; th2.innerText = "00";
+            thead2.insertBefore(th2, thead2.children[targetIndex] || null);
+
+            document.getElementById('scheduleBody').querySelectorAll('tr').forEach(row => {
+                const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
+                row.insertBefore(td, row.children[targetIndex] || null);
+            });
+            syncScrollbars(true); closePopup(); clearSelection(); saveState();
+        }
+
+        function deleteSelectedRow() {
+            if (selectedCells.length === 0) return;
+            
+            const rowsToDelete = new Set();
+            selectedCells.forEach(cell => rowsToDelete.add(cell.closest('tr')));
+            
+            let hasHeader = false;
+            rowsToDelete.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; });
+            if(hasHeader) return alert("Không xóa hàng Tiêu đề!");
+
+            if (confirm(`Bạn có chắc chắn muốn xóa ${rowsToDelete.size} Hàng này?`)) {
+                rowsToDelete.forEach(row => row.remove());
+                updateRowSelectDropdown(); syncScrollbars(true); closePopup(); clearSelection(); saveState();
+            }
+        }
+
+        function deleteSelectedColumn() {
+            if (selectedCells.length === 0) return;
+            
+            const colsToDelete = new Set();
+            selectedCells.forEach(cell => colsToDelete.add(Array.from(cell.closest('tr').children).indexOf(cell)));
+            
+            if (colsToDelete.has(0)) return alert("Không xóa Cột Vị trí (cột đầu tiên)!");
+
+            if (confirm(`Bạn có chắc chắn muốn xóa ${colsToDelete.size} Cột này?`)) {
+                const table = document.getElementById('scheduleTable');
+                const sortedCols = Array.from(colsToDelete).sort((a,b) => b-a);
+                
+                table.querySelectorAll('thead tr, tbody tr').forEach(tr => {
+                    sortedCols.forEach(colIndex => {
+                        if (tr.children[colIndex]) tr.removeChild(tr.children[colIndex]);
+                    });
+                });
+                syncScrollbars(true); closePopup(); clearSelection(); saveState();
+            }
+        }
+
+        function toggleClearInputs() {
+            const mode = document.getElementById('clearScopeMode').value;
+            document.getElementById('clearWeekGroup').style.display = mode === 'week' ? 'flex' : 'none';
+            document.getElementById('clearDateGroup').style.display = mode === 'range' ? 'flex' : 'none';
+        }
+
+        function executeClearContent() {
+            const mode = document.getElementById('clearScopeMode').value;
+            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            
+            if (mode === 'cell') {
+                if (selectedCells.length === 0) return;
+                selectedCells.forEach(cell => { if(cell.tagName === 'TD') cell.innerText = ''; });
+            } else if (mode === 'row') {
+                if (selectedCells.length === 0) return;
+                const rows = new Set();
+                selectedCells.forEach(cell => rows.add(cell.closest('tr')));
+                
+                let hasHeader = false;
+                rows.forEach(row => { if (row.parentElement.tagName === 'THEAD') hasHeader = true; });
+                if(hasHeader) return alert("Không xóa nội dung Tiêu đề!");
+                
+                rows.forEach(row => {
+                    Array.from(row.children).forEach((td, i) => { if (i > 0 && td.tagName === 'TD') td.innerText = ''; });
+                });
+            } else if (mode === 'col') {
+                if (selectedCells.length === 0) return;
+                const cols = new Set();
+                selectedCells.forEach(cell => cols.add(Array.from(cell.closest('tr').children).indexOf(cell)));
+                if (cols.has(0)) return alert("Không xóa nội dung Cột Vị trí!");
+                
+                tbodyRows.forEach(row => { 
+                    cols.forEach(colIndex => {
+                        if (row.children[colIndex] && row.children[colIndex].tagName === 'TD') row.children[colIndex].innerText = ''; 
+                    });
+                });
+            } else {
+                let start = 1, end = 999;
+                const [year, month] = document.getElementById('monthYearPicker').value.split('-');
+                const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+
+                if (mode === 'week') {
+                    const w = parseInt(document.getElementById('clearWeekSelect').value);
+                    start = (w - 1) * 7 + 1; end = Math.min(w * 7, daysInMonth);
+                } else if (mode === 'range') {
+                    start = parseInt(document.getElementById('clearStart').value) || 1;
+                    end = parseInt(document.getElementById('clearEnd').value) || daysInMonth;
+                } else if (mode === 'all') {
+                    if(!confirm("CẢNH BÁO: Xóa TOÀN BỘ dữ liệu. Vẫn tiếp tục?")) return;
+                    start = 1; end = 999; 
+                }
+
+                tbodyRows.forEach(row => {
+                    const cells = row.children;
+                    for (let i = 1; i < cells.length; i++) { 
+                        if (mode === 'all' || (i >= start && i <= end)) { if (cells[i].tagName === 'TD') cells[i].innerText = ''; }
+                    }
+                });
+            }
+            showMessage('success', 'Đã xóa nội dung!'); closePopup(); saveState();
+        }
+
+        function toggleSection(sectionId, headerElement) {
+            const content = document.getElementById(sectionId);
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed'); headerElement.classList.add('active');
+            } else {
+                content.classList.add('collapsed'); headerElement.classList.remove('active');
+            }
+            setTimeout(() => syncScrollbars(true), 350);
+        }
+
+        const jobRolesTemplate = [
+            { name: "GHI CHÚ", headerColor: "#000", dataColor: "#000" },
+            { name: " ", headerColor: "#000", dataColor: "#000" }, 
+            { name: "LẦU 12", headerColor: "#000", dataColor: "#000" },
+            { name: "KHU C", headerColor: "#673ab7", dataColor: "#673ab7" },
+            { name: "TRẦN CC", headerColor: "#673ab7", dataColor: "#673ab7" },
+            { name: "TRỰC", headerColor: "#28a745", dataColor: "#28a745" }, 
+            { name: "TRỰC T", headerColor: "#000", dataColor: "#000", bold: true }, 
+            { name: "RA TRỰC", headerColor: "#e83e8c", dataColor: "#e83e8c" }, 
+            { name: "PK 121", headerColor: "red", dataColor: "#e83e8c" }, 
+            { name: "PK 120s", headerColor: "#000", dataColor: "#000" },
+            { name: "PK 120c", headerColor: "#000", dataColor: "#000" },
+            { name: "TĂNG CƯỜNG", headerColor: "#000", dataColor: "#000" },
+            { name: "HỘI CHẨN", headerColor: "#17a2b8", dataColor: "#17a2b8" }, 
+            { name: "TRẠI CHIỀU", headerColor: "#673ab7", dataColor: "#000" },
+            { name: "53\n54", headerColor: "#673ab7", dataColor: "#000", separator: true }, 
+            { name: "33-34", headerColor: "#000", dataColor: "#000" },
+            { name: "35-36", headerColor: "#000", dataColor: "#000" },
+            { name: "37-38", headerColor: "#000", dataColor: "#000" },
+            { name: "46", headerColor: "#000", dataColor: "#000" }
+        ];
+
+        let holidays = JSON.parse(localStorage.getItem('holidays')) || [
+            { date: "09-02", name: "Quốc khánh" }, { date: "01-01", name: "Tết Dương lịch" },
+            { date: "04-30", name: "Giải phóng miền Nam" }, { date: "05-01", name: "Quốc tế Lao động" }
+        ];
+
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb;
+            let m = rgb.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+            if(m) return "#" + ("0" + parseInt(m[1],10).toString(16)).slice(-2) + ("0" + parseInt(m[2],10).toString(16)).slice(-2) + ("0" + parseInt(m[3],10).toString(16)).slice(-2);
+            return "#000000";
+        }
+
+        function syncScrollbars(forceUpdate = false) {
+            const table = document.getElementById('scheduleTable');
+            const bottomScroll = document.getElementById('bottomScroll'); 
+            const topScrollContent = document.getElementById('topScrollContent');
+            const leftScroll = document.getElementById('leftScroll');
+            const leftScrollContent = document.getElementById('leftScrollContent');
+
+            const updateScrollDimensions = () => {
+                // table.offsetWidth/offsetHeight là kích thước GỐC (chưa phóng to) vì giờ dùng
+                // transform:scale thay vì zoom, nên phải nhân thêm hệ số zoom hiện tại.
+                const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+                topScrollContent.style.width = (table.offsetWidth * currentZoom) + 'px';
+                leftScrollContent.style.height = (table.offsetHeight * currentZoom) + 'px';
+                leftScroll.style.height = bottomScroll.clientHeight + 'px';
+            };
+
+            if(forceUpdate) updateScrollDimensions();
+
+            const resizeObserver = new ResizeObserver(updateScrollDimensions);
+            resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
+
+            document.getElementById('topScroll').addEventListener('scroll', (e) => { bottomScroll.scrollLeft = e.target.scrollLeft; });
+            bottomScroll.addEventListener('scroll', (e) => { document.getElementById('topScroll').scrollLeft = e.target.scrollLeft; });
+            leftScroll.addEventListener('scroll', (e) => { bottomScroll.scrollTop = e.target.scrollTop; });
+            bottomScroll.addEventListener('scroll', (e) => { leftScroll.scrollTop = e.target.scrollTop; });
+        }
+
+        function updateRowSelectDropdown() {
+            const select = document.getElementById('rowSelectEnd');
+            select.innerHTML = '<option value="all">Toàn bộ Hàng</option>';
+            document.getElementById('scheduleBody').querySelectorAll('tr').forEach((row, index) => {
+                const firstCellText = row.children.length > 0 ? row.children[0].innerText.replace('\n', ' ').trim() : "Trống";
+                const option = document.createElement('option');
+                option.value = index; option.innerText = `Đến dòng: ${firstCellText === "" ? "Dòng trống" : firstCellText}`;
+                select.appendChild(option);
+            });
+            select.value = "all";
+        }
+
+        function checkIsHoliday(year, month, day) {
+            const mmStr = String(month + 1).padStart(2, '0');
+            const ddStr = String(day).padStart(2, '0');
+            const formatMMDD = `${mmStr}-${ddStr}`; 
+            const formatYYYYMMDD = `${year}-${mmStr}-${ddStr}`;
+            
+            return holidays.some(h => {
+                let hDate = h.date;
+                if(hDate.length === 10) { 
+                   if (hDate === formatYYYYMMDD) return true;
+                   if (hDate.substring(5) === formatMMDD) return true;
+                } else if (hDate.length === 5) { 
+                   if (hDate === formatMMDD) return true;
+                }
+                return false;
+            });
+        }
+
+        function loadFromGoogleSheets() {
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            if (!pickerValue) return;
+            const [year, month] = pickerValue.split('-');
+            const sheetName = `Thang_${month}_${year}`;
+
+            showMessage('loading', 'Đang tải dữ liệu từ Google Sheets...');
+            clearSelection();
+
+            fetchWithTimeout(`${SCRIPT_URL}?sheetName=${sheetName}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "success" && result.data && result.data.text && result.data.text.length > 0) {
+                    renderTableFromData(result.data);
+                    showMessage('success', 'Đã tải dữ liệu thành công!');
+                } else {
+                    fetchPreviousMonthHeader(year, month);
+                }
+            })
+            .catch(error => {
+                handleGenerateNewTable(true);
+                showMessage('warning-toast', networkErrorMessage(error, 'tải dữ liệu') + ' Đã tạo bảng trắng tạm thời.');
+            });
+        }
+
+        function fetchPreviousMonthHeader(currentYearStr, currentMonthStr) {
+            let yearNum = parseInt(currentYearStr);
+            let monthNum = parseInt(currentMonthStr) - 1; 
+
+            if (monthNum === 0) { monthNum = 12; yearNum -= 1; }
+            const prevSheetName = `Thang_${("0" + monthNum).slice(-2)}_${yearNum}`;
+
+            showMessage('loading', 'Đang tạo bảng từ cấu trúc tháng trước...');
+
+            fetchWithTimeout(`${SCRIPT_URL}?action=getFirstColumn&sheetName=${prevSheetName}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "success" && result.data && result.data.length > 0) {
+                    generateTableWithCustomRoles(result.data);
+                    showMessage('success', 'Đã copy cấu trúc từ tháng trước!');
+                } else {
+                    generateTable(true); 
+                    showMessage('success', 'Chưa có dữ liệu. Đã tạo bảng trắng mặc định!');
+                }
+            })
+            .catch(error => {
+                generateTable(true);
+            });
         }
 
         function renderTableFromData(payload) {
-            const dataText = payload.text; const dataBgColors = payload.bgColors; const dataFontColors = payload.fontColors; const dataFontWeights = payload.fontWeights;
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value;
-            const [yearStr, monthStr] = pickerValue.split('-'); const yearNum = parseInt(yearStr); const monthNum = parseInt(monthStr) - 1;
-            const thead1 = document.getElementById('dateHeaderRow1'); const thead2 = document.getElementById('dateHeaderRow2'); const tbody = document.getElementById('scheduleBody');
-            thead1.innerHTML = ''; thead2.innerHTML = ''; tbody.innerHTML = ''; if (!dataText || dataText.length < 2) return; 
+            const dataText = payload.text;
+            const dataBgColors = payload.bgColors;
+            const dataFontColors = payload.fontColors;
+            const dataFontWeights = payload.fontWeights;
 
-            dataText[0].forEach((cellText, index) => { const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText; if(index === 0) th.classList.add('header-col'); else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } } thead1.appendChild(th); });
-            dataText[1].forEach((cellText, index) => { const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText; if(index === 0) th.classList.add('header-col'); else { const dayNum = parseInt(cellText); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend'); } } thead2.appendChild(th); });
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            const [yearStr, monthStr] = pickerValue.split('-');
+            const yearNum = parseInt(yearStr); 
+            const monthNum = parseInt(monthStr) - 1;
+
+            const thead1 = document.getElementById('dateHeaderRow1');
+            const thead2 = document.getElementById('dateHeaderRow2');
+            const tbody = document.getElementById('scheduleBody');
+            
+            thead1.innerHTML = ''; thead2.innerHTML = ''; tbody.innerHTML = '';
+            if (!dataText || dataText.length < 2) return; 
+
+            dataText[0].forEach((cellText, index) => {
+                const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText;
+                if(index === 0) th.classList.add('header-col');
+                else {
+                    const dayNum = parseInt(dataText[1][index]);
+                    if (!isNaN(dayNum)) {
+                        const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
+                        if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday');
+                        else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend');
+                    }
+                }
+                thead1.appendChild(th);
+            });
+
+            dataText[1].forEach((cellText, index) => {
+                const th = document.createElement('th'); th.contentEditable = isEditMode ? "true" : "false"; th.innerText = cellText;
+                if(index === 0) th.classList.add('header-col');
+                else {
+                    const dayNum = parseInt(cellText);
+                    if (!isNaN(dayNum)) {
+                        const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
+                        if (checkIsHoliday(yearNum, monthNum, dayNum)) th.classList.add('holiday');
+                        else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) th.classList.add('weekend');
+                    }
+                }
+                thead2.appendChild(th);
+            });
+
             for (let i = 2; i < dataText.length; i++) {
-                const tr = document.createElement('tr'); const roleTemplate = jobRolesTemplate.find(r => r.name === dataText[i][0]); if (roleTemplate && roleTemplate.separator) tr.classList.add('red-separator');
-                dataText[i].forEach((cellText, index) => {
+                const rowData = dataText[i];
+                const tr = document.createElement('tr');
+                
+                const roleTemplate = jobRolesTemplate.find(r => r.name === rowData[0]);
+                if (roleTemplate && roleTemplate.separator) tr.classList.add('red-separator');
+
+                rowData.forEach((cellText, index) => {
                     const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; td.innerText = cellText;
-                    if (index === 0) td.classList.add('header-col'); else { const dayNum = parseInt(dataText[1][index]); if (!isNaN(dayNum)) { const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay(); if (checkIsHoliday(yearNum, monthNum, dayNum)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend'); } }
-                    if (dataBgColors && dataBgColors[i] && dataBgColors[i][index] !== '#ffffff') td.style.setProperty('background-color', dataBgColors[i][index], 'important');
-                    if (dataFontColors && dataFontColors[i] && dataFontColors[i][index] !== '#000000') td.style.color = dataFontColors[i][index];
-                    if (dataFontWeights && dataFontWeights[i] && dataFontWeights[i][index] === 'bold') td.style.fontWeight = 'bold';
+                    
+                    if (index === 0) {
+                        td.classList.add('header-col');
+                    } else {
+                        const dayNum = parseInt(dataText[1][index]);
+                        if (!isNaN(dayNum)) {
+                            const dayOfWeekIndex = new Date(yearNum, monthNum, dayNum).getDay();
+                            if (checkIsHoliday(yearNum, monthNum, dayNum)) td.classList.add('holiday');
+                            else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
+                        }
+                    }
+
+                    if (dataBgColors && dataBgColors[i] && dataBgColors[i][index] !== '#ffffff') {
+                        td.style.setProperty('background-color', dataBgColors[i][index], 'important');
+                    }
+                    if (dataFontColors && dataFontColors[i] && dataFontColors[i][index] !== '#000000') {
+                        td.style.color = dataFontColors[i][index];
+                    }
+                    if (dataFontWeights && dataFontWeights[i] && dataFontWeights[i][index] === 'bold') {
+                        td.style.fontWeight = 'bold';
+                    }
+
                     tr.appendChild(td);
-                }); tbody.appendChild(tr);
+                });
+                tbody.appendChild(tr);
             }
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection(); historyStack = []; currentStep = -1; syncScrollbars(true); 
+
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
         function generateTableWithCustomRoles(customRolesArray) {
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value;
-            const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            const [year, month] = pickerValue.split('-');
+            const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; 
+            const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
+            
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`;
+            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
+
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-            for (let day = 1; day <= daysInMonth; day++) { const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day; if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); } document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum); }
-            const scheduleBody = document.getElementById('scheduleBody'); scheduleBody.innerHTML = ''; 
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
+                const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex];
+                const thNum = document.createElement('th'); thNum.innerText = day;
+                
+                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } 
+                else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
+
+                document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum);
+            }
+
+            const scheduleBody = document.getElementById('scheduleBody');
+            scheduleBody.innerHTML = ''; 
+            
             customRolesArray.forEach((roleObj) => {
-                const tr = document.createElement('tr'); const template = jobRolesTemplate.find(r => r.name === roleObj.text); if (template && template.separator) tr.classList.add('red-separator');
-                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; tdRole.innerText = roleObj.text; if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color; if(roleObj.bold) tdRole.style.fontWeight = "bold"; let dataColor = roleObj.color || "#000"; tr.appendChild(tdRole);
-                for (let day = 1; day <= daysInMonth; day++) { const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend'); td.style.color = dataColor; td.style.fontWeight = roleObj.bold ? "bold" : "normal"; tr.appendChild(td); } scheduleBody.appendChild(tr);
+                const tr = document.createElement('tr');
+                const template = jobRolesTemplate.find(r => r.name === roleObj.text);
+                if (template && template.separator) tr.classList.add('red-separator');
+                
+                const tdRole = document.createElement('td');
+                tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; 
+                tdRole.innerText = roleObj.text; 
+                if(roleObj.color && roleObj.color !== '#000000') tdRole.style.color = roleObj.color;
+                if(roleObj.bold) tdRole.style.fontWeight = "bold";
+
+                let dataColor = roleObj.color || "#000";
+
+                tr.appendChild(tdRole);
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
+                    const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
+
+                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
+                    else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
+                    
+                    td.style.color = dataColor; td.style.fontWeight = roleObj.bold ? "bold" : "normal";
+                    tr.appendChild(td);
+                }
+                scheduleBody.appendChild(tr);
             });
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection(); historyStack = []; currentStep = -1; syncScrollbars(true); 
+
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        function handleGenerateNewTable(hideConfirm = false) { if(hideConfirm || confirm("Hành động này sẽ TẠO BẢNG TRẮNG. Những dữ liệu bạn chưa lưu sẽ bị mất. Tiếp tục?")) generateTable(true); }
+        function handleGenerateNewTable(hideConfirm = false) {
+            if(hideConfirm || confirm("Hành động này sẽ TẠO BẢNG TRẮNG. \nNhững dữ liệu bạn chưa lưu vào GG Sheets sẽ bị mất. Tiếp tục?")) {
+                generateTable(true);
+            }
+        }
 
         function generateTable(forceReset = false) {
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value; if (!pickerValue) return;
-            const [year, month] = pickerValue.split('-'); const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-            let savedJobRoles = []; const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
-            if (!forceReset && tbodyRows.length > 0) { tbodyRows.forEach(row => { const firstCell = row.children[0]; if (firstCell) savedJobRoles.push({ name: firstCell.innerText, headerColor: firstCell.style.color || "#000", isBold: firstCell.style.fontWeight === "bold" }); }); } else { savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator })); }
-            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`; document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            if (!pickerValue) return;
+
+            const [year, month] = pickerValue.split('-');
+            const yearNum = parseInt(year); const monthNum = parseInt(month) - 1; 
+            const daysInMonth = new Date(yearNum, monthNum + 1, 0).getDate();
+            
+            let savedJobRoles = [];
+            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            
+            if (!forceReset && tbodyRows.length > 0) {
+                tbodyRows.forEach(row => {
+                    const firstCell = row.children[0];
+                    if (firstCell) {
+                        savedJobRoles.push({ name: firstCell.innerText, headerColor: firstCell.style.color || "#000", isBold: firstCell.style.fontWeight === "bold" });
+                    }
+                });
+            } else {
+                savedJobRoles = jobRolesTemplate.map(role => ({ name: role.name, headerColor: role.headerColor, isBold: role.bold, dataColor: role.dataColor, separator: role.separator }));
+            }
+
+            document.getElementById('dateHeaderRow1').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${yearNum}</th>`;
+            document.getElementById('dateHeaderRow2').innerHTML = `<th class="header-col" contenteditable="${isEditMode ? 'true' : 'false'}">${monthNum + 1}</th>`;
+
             const daysOfWeek = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-            for (let day = 1; day <= daysInMonth; day++) { const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex]; const thNum = document.createElement('th'); thNum.innerText = day; if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); } document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum); }
-            const scheduleBody = document.getElementById('scheduleBody'); scheduleBody.innerHTML = ''; 
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
+                const thName = document.createElement('th'); thName.innerText = daysOfWeek[dayOfWeekIndex];
+                const thNum = document.createElement('th'); thNum.innerText = day;
+                
+                if (checkIsHoliday(yearNum, monthNum, day)) { thName.classList.add('holiday'); thNum.classList.add('holiday'); } 
+                else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) { thName.classList.add('weekend'); thNum.classList.add('weekend'); }
+
+                document.getElementById('dateHeaderRow1').appendChild(thName); document.getElementById('dateHeaderRow2').appendChild(thNum);
+            }
+
+            const scheduleBody = document.getElementById('scheduleBody');
+            scheduleBody.innerHTML = ''; 
+            
             savedJobRoles.forEach((role, i) => {
-                const tr = document.createElement('tr'); if (forceReset && jobRolesTemplate[i] && jobRolesTemplate[i].separator) tr.classList.add('red-separator'); else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
-                const tdRole = document.createElement('td'); tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; tdRole.innerText = role.name; tdRole.style.color = role.headerColor; if (role.isBold) tdRole.style.fontWeight = "bold"; tr.appendChild(tdRole);
-                let dataColor = "#000"; if(forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; else if (!forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; 
-                for (let day = 1; day <= daysInMonth; day++) { const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay(); const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false"; if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday'); else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend'); td.style.color = dataColor; td.style.fontWeight = "bold"; if(role.name.trim() === "") td.style.backgroundColor = "#fff"; tr.appendChild(td); } scheduleBody.appendChild(tr);
+                const tr = document.createElement('tr');
+                if (forceReset && jobRolesTemplate[i] && jobRolesTemplate[i].separator) tr.classList.add('red-separator');
+                else if (!forceReset && tbodyRows[i] && tbodyRows[i].classList.contains('red-separator')) tr.classList.add('red-separator');
+                
+                const tdRole = document.createElement('td');
+                tdRole.classList.add('header-col'); tdRole.contentEditable = isEditMode ? "true" : "false"; 
+                tdRole.innerText = role.name; tdRole.style.color = role.headerColor;
+                if (role.isBold) tdRole.style.fontWeight = "bold";
+                tr.appendChild(tdRole);
+
+                let dataColor = "#000";
+                if(forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor;
+                else if (!forceReset && jobRolesTemplate[i]) dataColor = jobRolesTemplate[i].dataColor; 
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayOfWeekIndex = new Date(yearNum, monthNum, day).getDay();
+                    const td = document.createElement('td'); td.contentEditable = isEditMode ? "true" : "false";
+
+                    if (checkIsHoliday(yearNum, monthNum, day)) td.classList.add('holiday');
+                    else if (dayOfWeekIndex === 0 || dayOfWeekIndex === 6) td.classList.add('weekend');
+                    
+                    td.style.color = dataColor; td.style.fontWeight = "bold";
+                    if(role.name.trim() === "") td.style.backgroundColor = "#fff";
+                    tr.appendChild(td);
+                }
+                scheduleBody.appendChild(tr);
             });
-            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection(); historyStack = []; currentStep = -1; syncScrollbars(true); 
+
+            updateRowSelectDropdown(); updateCropPreview(); toggleRoleCol(); closePopup(); clearSelection();
+            historyStack = []; currentStep = -1; setTimeout(saveState, 100); 
         }
 
-        function toggleCaptureInputs() { document.getElementById('weekSelectGroup').style.display = document.getElementById('captureMode').value === 'week' ? 'inline-block' : 'none'; document.getElementById('dateSelectGroup').style.display = document.getElementById('captureMode').value === 'date' ? 'inline-block' : 'none'; }
-        function toggleRoleCol() { const isChecked = document.getElementById('showRoleCol').checked; document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => { if (row.children.length > 0) row.children[0].style.display = isChecked ? '' : 'none'; }); syncScrollbars(true); closePopup(); }
-        function updateCropPreview() {
-            const mode = document.getElementById('captureMode').value; const rowEndValue = document.getElementById('rowSelectEnd').value;
-            const pickerValue = document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value; if (!pickerValue) return;
-            const [year, month] = pickerValue.split('-'); const daysInMonth = new Date(year, parseInt(month), 0).getDate(); let startDay = 1, endDay = daysInMonth; 
-            if (mode === 'week') { const w = parseInt(document.getElementById('weekSelect').value); startDay = (w - 1) * 7 + 1; endDay = Math.min(w * 7, daysInMonth); } else if (mode === 'date') { startDay = parseInt(document.getElementById('startDay').value) || 1; endDay = parseInt(document.getElementById('endDay').value) || daysInMonth; }
-            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr'); let maxRowIndex = tbodyRows.length - 1; if (rowEndValue !== 'all') maxRowIndex = parseInt(rowEndValue);
-            tbodyRows.forEach((row, rowIndex) => { if (rowIndex > maxRowIndex) row.style.display = 'none'; else { row.style.display = ''; const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all') cells[i].style.display = ''; else cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; } } });
-            document.querySelectorAll('thead tr').forEach(row => { const cells = row.children; for (let i = 1; i < cells.length; i++) { if (mode === 'all') cells[i].style.display = ''; else cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; } });
+        function toggleCaptureInputs() {
+            const mode = document.getElementById('captureMode').value;
+            document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
+            document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'inline-block' : 'none';
+        }
+
+        function toggleRoleCol() {
+            const isChecked = document.getElementById('showRoleCol').checked;
+            document.getElementById('scheduleTable').querySelectorAll('tr').forEach(row => {
+                if (row.children.length > 0) row.children[0].style.display = isChecked ? '' : 'none';
+            });
             syncScrollbars(true); closePopup();
         }
 
-        async function takeScreenshot(actionType) {
-            closePopup(); const backupSelection = [...selectedCells]; clearSelection();
-            const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level'); document.documentElement.style.setProperty('--zoom-level', 1);
-            showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
-            const table = document.getElementById('scheduleTable');
-            const [year, month] = (document.getElementById('monthYearPicker').value || document.getElementById('mobileMonthPicker').value).split('-');
-            const mode = document.getElementById('captureMode').value; let fileNameBase = `Lich_Truc_${month}_${year}`;
-            if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`; else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
-
-            // Timeout để tránh treo html2canvas trên máy yếu
-            const capturePromise = html2canvas(table, { scale: 2, backgroundColor: "#ffffff", windowWidth: table.scrollWidth + 50 });
-            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout chụp ảnh')), 15000));
+        function updateCropPreview() {
+            const mode = document.getElementById('captureMode').value;
+            const rowEndValue = document.getElementById('rowSelectEnd').value;
+            const pickerValue = document.getElementById('monthYearPicker').value;
+            if (!pickerValue) return;
             
-            try {
-                const canvas = await Promise.race([capturePromise, timeoutPromise]);
+            const [year, month] = pickerValue.split('-');
+            const daysInMonth = new Date(year, parseInt(month), 0).getDate();
+            let startDay = 1, endDay = daysInMonth; 
+            
+            if (mode === 'week') {
+                const w = parseInt(document.getElementById('weekSelect').value);
+                startDay = (w - 1) * 7 + 1; endDay = Math.min(w * 7, daysInMonth);
+            } else if (mode === 'date') {
+                startDay = parseInt(document.getElementById('startDay').value) || 1;
+                endDay = parseInt(document.getElementById('endDay').value) || daysInMonth;
+            }
+
+            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            let maxRowIndex = tbodyRows.length - 1; 
+            if (rowEndValue !== 'all') maxRowIndex = parseInt(rowEndValue);
+
+            tbodyRows.forEach((row, rowIndex) => {
+                if (rowIndex > maxRowIndex) { row.style.display = 'none'; } 
+                else {
+                    row.style.display = '';
+                    const cells = row.children;
+                    for (let i = 1; i < cells.length; i++) {
+                        if (mode === 'all') { cells[i].style.display = ''; } 
+                        else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; }
+                    }
+                }
+            });
+
+            document.querySelectorAll('thead tr').forEach(row => {
+                const cells = row.children;
+                for (let i = 1; i < cells.length; i++) {
+                    if (mode === 'all') { cells[i].style.display = ''; } 
+                    else { cells[i].style.display = (i < startDay || i > endDay) ? 'none' : ''; }
+                }
+            });
+            syncScrollbars(true); closePopup();
+        }
+
+        function showMessage(type, text) {
+            const status = document.getElementById('statusMessage');
+            status.className = type; status.innerText = text; status.style.display = 'block';
+            if(type !== 'loading') setTimeout(() => { status.style.display = 'none'; }, 4000);
+        }
+
+        function takeScreenshot(actionType) {
+            closePopup(); 
+            const backupSelection = [...selectedCells];
+            clearSelection();
+            
+            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
+            const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
+            document.documentElement.style.setProperty('--zoom-level', 1);
+            
+            showMessage('loading', 'Đang tạo ảnh, vui lòng chờ...');
+            
+            const table = document.getElementById('scheduleTable');
+            const [year, month] = document.getElementById('monthYearPicker').value.split('-');
+            const mode = document.getElementById('captureMode').value;
+            let fileNameBase = `Lich_Truc_${month}_${year}`;
+            
+            if (mode === 'week') fileNameBase += `_Tuan_${document.getElementById('weekSelect').value}`;
+            else if (mode === 'date') fileNameBase += `_Ngay_${document.getElementById('startDay').value}_den_${document.getElementById('endDay').value}`;
+
+            html2canvas(table, { scale: 2, backgroundColor: "#ffffff", windowWidth: table.scrollWidth + 50 }).then(canvas => {
                 if (actionType === 'download') {
-                    canvas.toBlob(blob => { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Đã tải xuống ảnh JPG!'); }, 'image/jpeg', 0.92);
+                    canvas.toBlob(blob => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.jpg`; link.click(); URL.revokeObjectURL(url);
+                        showMessage('success', 'Đã tải xuống ảnh JPG thành công!');
+                    }, 'image/jpeg', 0.92);
                 } else if (actionType === 'share') {
                     canvas.toBlob(blob => {
+                        if (!blob) throw new Error('Lỗi tạo ảnh');
                         const file = new File([blob], `${fileNameBase}.png`, { type: 'image/png' });
-                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) { navigator.share({ title: 'Lịch Trực', files: [file] }).then(() => showMessage('success', 'Đã mở bảng chia sẻ ảnh!')).catch(() => document.getElementById('statusMessage').style.display = 'none'); } 
-                        else { const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url); showMessage('success', 'Không hỗ trợ share. Đã tự tải ảnh!'); }
+                        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                            navigator.share({ title: 'Lịch Trực', files: [file] })
+                                .then(() => showMessage('success', 'Đã mở bảng chia sẻ ảnh!'))
+                                .catch(() => document.getElementById('statusMessage').style.display = 'none');
+                        } else {
+                            const url = URL.createObjectURL(blob);
+                            const link = document.createElement('a'); link.href = url; link.download = `${fileNameBase}.png`; link.click(); URL.revokeObjectURL(url);
+                            showMessage('success', 'Thiết bị không hỗ trợ share. Đã tự động tải ảnh!');
+                        }
                     }, 'image/png');
                 }
-            } catch(err) {
-                showMessage('error', 'Lỗi: ' + err.message); 
-            } finally {
+                
+                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
-                if(backupSelection.length > 0) selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
+                if(backupSelection.length > 0) {
+                    selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
+                }
+            }).catch(err => { 
+                document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
+                showMessage('error', 'Có lỗi xảy ra khi chụp ảnh.'); 
+            });
+        }
+
+        function saveToGoogleSheets() {
+            closePopup(); clearSelection();
+            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
+            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
+            
+            const table = document.getElementById('scheduleTable');
+            const [year, month] = document.getElementById('monthYearPicker').value.split('-');
+            const sheetName = `Thang_${month}_${year}`;
+            
+            const payloadData = [];
+            const payloadBgColors = [];
+            const payloadFontColors = [];
+            const payloadFontWeights = [];
+
+            table.querySelectorAll('tr').forEach(row => {
+                const rowData = [];
+                const rowBg = [];
+                const rowFont = [];
+                const rowWeight = [];
+
+                row.querySelectorAll('th, td').forEach(cell => {
+                    if(cell.style.display === 'none') {
+                        rowData.push(""); rowBg.push("#ffffff"); rowFont.push("#000000"); rowWeight.push("normal");
+                    } else {
+                        rowData.push(cell.innerText.trim());
+                        
+                        let computedStyle = window.getComputedStyle(cell);
+                        let bg = computedStyle.backgroundColor;
+                        let hexBg = (bg === 'rgba(0, 0, 0, 0)' || bg === 'transparent') ? "#ffffff" : rgbToHex(bg);
+                        rowBg.push(hexBg);
+
+                        let color = computedStyle.color;
+                        let hexColor = color ? rgbToHex(color) : "#000000";
+                        rowFont.push(hexColor);
+                        
+                        let fw = computedStyle.fontWeight;
+                        rowWeight.push((fw === 'bold' || fw >= 700) ? "bold" : "normal");
+                    }
+                });
+
+                payloadData.push(rowData);
+                payloadBgColors.push(rowBg);
+                payloadFontColors.push(rowFont);
+                payloadFontWeights.push(rowWeight);
+            });
+
+            const payload = { 
+                action: "save",
+                username: authUsername,
+                token: authToken,
+                sheetName: sheetName, 
+                data: payloadData, 
+                styles: {
+                    bgColors: payloadBgColors,
+                    fontColors: payloadFontColors,
+                    fontWeights: payloadFontWeights
+                }
+            };
+
+            showMessage('loading', 'Đang cập nhật Sheet...');
+            fetchWithTimeout(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+            .then(response => response.json())
+            .then(result => {
+                if(result.status === 'success') showMessage('success', 'Đã lưu xong vào Google Sheets!');
+                else showMessage('error', 'Lỗi từ Server: ' + result.message);
+            })
+            .catch((error) => showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.'));
+        }
+
+        const modal = document.getElementById("holidayModal");
+        function openHolidayModal() { modal.style.display = "block"; renderHolidayList(); }
+        function closeHolidayModal() { 
+            modal.style.display = "none"; 
+            
+            let currentPayload = { text: [], bgColors: [], fontColors: [], fontWeights: [] };
+            
+            const tbodyRows = document.getElementById('scheduleBody').querySelectorAll('tr');
+            if(tbodyRows.length > 0) {
+                 const header1Text = []; const header1Bg = []; const header1Color = []; const header1Weight = [];
+                 Array.from(document.getElementById('dateHeaderRow1').children).forEach(th => {
+                     let comp = window.getComputedStyle(th);
+                     header1Text.push(th.innerText); 
+                     header1Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
+                     header1Color.push(rgbToHex(comp.color)); 
+                     header1Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
+                 });
+                 currentPayload.text.push(header1Text); currentPayload.bgColors.push(header1Bg); currentPayload.fontColors.push(header1Color); currentPayload.fontWeights.push(header1Weight);
+                 
+                 const header2Text = []; const header2Bg = []; const header2Color = []; const header2Weight = [];
+                 Array.from(document.getElementById('dateHeaderRow2').children).forEach(th => {
+                     let comp = window.getComputedStyle(th);
+                     header2Text.push(th.innerText); 
+                     header2Bg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
+                     header2Color.push(rgbToHex(comp.color)); 
+                     header2Weight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
+                 });
+                 currentPayload.text.push(header2Text); currentPayload.bgColors.push(header2Bg); currentPayload.fontColors.push(header2Color); currentPayload.fontWeights.push(header2Weight);
+
+                 tbodyRows.forEach(row => {
+                     const rText = []; const rBg = []; const rColor = []; const rWeight = [];
+                     Array.from(row.children).forEach(td => {
+                         let comp = window.getComputedStyle(td);
+                         rText.push(td.innerText); 
+                         rBg.push((comp.backgroundColor === 'rgba(0, 0, 0, 0)' || comp.backgroundColor === 'transparent') ? '#ffffff' : rgbToHex(comp.backgroundColor));
+                         rColor.push(rgbToHex(comp.color)); 
+                         rWeight.push((comp.fontWeight === 'bold' || comp.fontWeight >= 700) ? 'bold' : 'normal');
+                     });
+                     currentPayload.text.push(rText); currentPayload.bgColors.push(rBg); currentPayload.fontColors.push(rColor); currentPayload.fontWeights.push(rWeight);
+                 });
+                 renderTableFromData(currentPayload);
+            } else {
+                 handleGenerateNewTable(true); 
             }
         }
+        
+        function renderHolidayList() {
+            const list = document.getElementById('holidayList'); list.innerHTML = '';
+            holidays.sort((a, b) => a.date.localeCompare(b.date));
+            holidays.forEach((h, index) => {
+                const li = document.createElement('li');
+                let displayDate = "";
+                if(h.date.length === 10) {
+                    const [y, m, d] = h.date.split('-');
+                    displayDate = `${d}/${m}/${y}`;
+                } else if(h.date.length === 5) {
+                    const [m, d] = h.date.split('-');
+                    displayDate = `${d}/${m} (Hàng năm)`;
+                } else displayDate = h.date;
+                
+                li.innerHTML = `<span><b>${displayDate}</b> - ${h.name}</span> <button onclick="removeHoliday(${index})">Xóa</button>`;
+                list.appendChild(li);
+            });
+            localStorage.setItem('holidays', JSON.stringify(holidays));
+        }
+
+        function addHoliday() {
+            const dateInput = document.getElementById('newHolidayDate').value; 
+            const nameInput = document.getElementById('newHolidayName').value;
+            if (!dateInput || !nameInput) return alert("Nhập đủ ngày và tên lễ!");
+            holidays.push({ date: dateInput, name: nameInput }); 
+            renderHolidayList();
+            document.getElementById('newHolidayName').value = '';
+        }
+        function removeHoliday(index) { holidays.splice(index, 1); renderHolidayList(); }
     </script>
 </body>
 </html>
