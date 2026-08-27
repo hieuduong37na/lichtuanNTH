@@ -933,6 +933,7 @@
                 }
                 isEditMode = false; authUsername = ""; authToken = ""; sessionToken = "";
                 clearTimeout(autoSaveTimer);
+                hasUnsavedChanges = false;
                 document.getElementById('autoSaveStatus').classList.remove('show');
                 localStorage.removeItem('savedUser');
                 localStorage.removeItem('savedToken');
@@ -1290,10 +1291,12 @@
         // làm gián đoạn thao tác đang gõ (không đóng popup/bỏ chọn ô như khi bấm nút Lưu thủ công).
         let autoSaveTimer = null;
         let isAutoSaving = false;
+        let hasUnsavedChanges = false; // theo dõi để cảnh báo nếu thoát trang lúc chưa lưu xong
         const AUTO_SAVE_DELAY_MS = 2500;
 
         function scheduleAutoSave() {
             if (!isEditMode || !authToken) return; // chỉ tự lưu khi đang sửa và đã đăng nhập
+            hasUnsavedChanges = true;
             showAutoSaveStatus('pending');
             clearTimeout(autoSaveTimer);
             autoSaveTimer = setTimeout(runAutoSave, AUTO_SAVE_DELAY_MS);
@@ -1305,6 +1308,16 @@
             isAutoSaving = true;
             saveToGoogleSheets(true, () => { isAutoSaving = false; });
         }
+
+        // Cảnh báo trình duyệt nếu người dùng thoát/đóng trang trong khi còn thay đổi CHƯA lưu
+        // xong (đang debounce chờ, hoặc request lưu đang chạy dở, hoặc lần lưu gần nhất bị lỗi).
+        window.addEventListener('beforeunload', (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = ''; // bắt buộc phải có dòng này để một số trình duyệt hiện hộp thoại cảnh báo
+                return '';
+            }
+        });
 
         // Badge nhỏ báo trạng thái lưu (giống Google Docs: "Đang lưu..." / "Đã lưu lúc..."), để
         // người dùng yên tâm là dữ liệu đã lên server mà không cần tự bấm Lưu.
@@ -1322,10 +1335,12 @@
                 const now = new Date();
                 el.innerText = '✓ Đã lưu lúc ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
                 el.className = 'show saved';
+                hasUnsavedChanges = false;
                 showAutoSaveStatus._hideTimer = setTimeout(() => el.classList.remove('show'), 3000);
             } else if (state === 'error') {
                 el.innerText = '⚠️ Tự động lưu thất bại, sẽ thử lại';
                 el.className = 'show error';
+                hasUnsavedChanges = true; // vẫn còn thay đổi chưa lưu thành công, giữ cảnh báo
             }
         }
 
@@ -2715,13 +2730,16 @@
             .then(response => response.json())
             .then(result => {
                 if(result.status === 'success') {
+                    hasUnsavedChanges = false;
                     if (isAuto) showAutoSaveStatus('saved'); else showMessage('success', 'Đã lưu xong vào Google Sheets!');
                 } else {
+                    hasUnsavedChanges = true;
                     if (isAuto) showAutoSaveStatus('error'); else showMessage('error', 'Lỗi từ Server: ' + result.message);
                 }
                 if (onDone) onDone();
             })
             .catch((error) => {
+                hasUnsavedChanges = true;
                 if (isAuto) showAutoSaveStatus('error'); else showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.');
                 if (onDone) onDone();
             });
