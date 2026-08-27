@@ -2,7 +2,12 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bỏ maximum-scale=1.0 + user-scalable=no: khóa zoom trình duyệt gây khó chịu cho người
+         khiếm thị/thị lực kém và vi phạm accessibility. Bảng lịch đã có cơ chế pinch-zoom riêng
+         (CSS "zoom" + touchmove 2 ngón, preventDefault trong vùng bảng) nên không lo bị double-zoom
+         khi người dùng pinch trên chính bảng; chỉ khi pinch NGOÀI bảng thì trình duyệt mới zoom cả
+         trang — đúng như mong đợi cho accessibility. -->
     <title>Bảng Xếp Lịch Trực Tùy Chỉnh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
@@ -37,6 +42,7 @@
             max-width: 1500px; margin: 0 auto;
             display: flex; flex-direction: column;
             height: calc(100vh - 20px);
+            height: calc(100dvh - 20px); /* dvh: trừ đúng phần bị che bởi thanh địa chỉ trình duyệt di động khi đang hiện, tránh bảng bị cắt/thừa khoảng trống khi thanh địa chỉ ẩn/hiện */
         }
 
         h2 { text-align: center; color: var(--primary-color); margin: 0 0 10px 0; font-size: 24px; user-select: text; position: relative;}
@@ -260,7 +266,7 @@
         .warning-toast { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
 
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text;}
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 90%; max-width: 450px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); user-select: text; max-height: 80vh; overflow-y: auto; }
         .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px;}
         .close-modal:hover { color: black; }
         .holiday-list { list-style-type: none; padding: 0; max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 4px;}
@@ -278,7 +284,13 @@
             .dashboard, h2, .auth-container, .view-controls, .collapsible-header { display: none !important; }
             
             /* Cấu trúc Full màn hình cho Mobile */
-            .container { padding: 0; padding-bottom: 60px; height: 100vh; background-color: #fff;}
+            .container {
+                padding: 0;
+                padding-bottom: calc(60px + env(safe-area-inset-bottom)); /* bottom-nav cao 60px + phần tai thỏ/home-indicator, tránh bảng bị che khuất phía dưới */
+                height: 100vh;
+                height: 100dvh; /* trừ đúng phần bị che bởi thanh địa chỉ trình duyệt di động */
+                background-color: #fff;
+            }
             .master-wrapper { border: none; border-radius: 0; border-top: 1px solid #ccc; height: 100%;}
             .left-scrollbar, .top-scrollbar { display: none !important; }
 
@@ -296,9 +308,11 @@
 
             /* Action Sheets (Khay trượt từ dưới lên) */
             .action-sheet { 
-                display: block; position: fixed; bottom: -500px; left: 0; width: 100%; background: #fff; 
+                display: flex; flex-direction: column;
+                position: fixed; bottom: -600px; left: 0; width: 100%; background: #fff; 
                 border-top-left-radius: 16px; border-top-right-radius: 16px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); 
-                z-index: 2999; padding: 20px; padding-bottom: 80px; transition: bottom 0.3s ease; visibility: hidden;
+                z-index: 2999; transition: bottom 0.3s ease; visibility: hidden;
+                max-height: 85vh; max-height: 85dvh; /* khay dài (nhiều nút) sẽ tự cuộn thay vì tràn khỏi màn hình */
             }
             .action-sheet.show { bottom: 0; visibility: visible; }
             .bottom-nav-overlay { 
@@ -307,9 +321,18 @@
             }
             .bottom-nav-overlay.show { display: block; }
             
-            .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+            .sheet-header { 
+                display: flex; justify-content: space-between; align-items: center; 
+                border-bottom: 1px solid #eee; padding: 15px 20px 10px 20px; margin-bottom: 0;
+                position: sticky; top: 0; background: #fff; flex-shrink: 0; z-index: 1;
+                border-top-left-radius: 16px; border-top-right-radius: 16px;
+            }
             .sheet-header h4 { margin: 0; font-size: 16px; color: var(--primary-color);}
             .sheet-close { font-size: 28px; color: #888; cursor: pointer; line-height: 1;}
+            .sheet-body {
+                overflow-y: auto; -webkit-overflow-scrolling: touch;
+                padding: 15px 20px calc(20px + env(safe-area-inset-bottom) + 60px);
+            }
             .list-btn { width: 100%; height: 44px; margin-bottom: 8px; font-size: 14px; text-align: left; padding-left: 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f8f9fa; color: #333;}
             .list-btn.primary { background-color: var(--primary-color); color: #fff; border: none;}
             
@@ -319,8 +342,9 @@
             #fabBtn { bottom: 80px; z-index: 2990;}
             #quickActionBar { bottom: 80px; z-index: 2990; }
 
-            /* Mở rộng Touch Targets */
-            button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
+            /* Mở rộng Touch Targets — đồng bộ tối thiểu 44px cho MỌI control thao tác chính
+               (kể cả input màu, trước đây bị bỏ sót nên vẫn chỉ 34px) */
+            button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"], input[type="color"] {
                 height: 44px !important; font-size: 14px !important;
             }
             .popup-row button { font-size: 13px; }
@@ -369,15 +393,16 @@
            Banner gợi ý xoay ngang cũng tự ẩn vì lúc này không còn cần thiết nữa. */
         @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
             #orientationHint { display: none !important; }
-            .bottom-nav { height: 40px; }
+            .bottom-nav { height: 44px; } /* giữ tối thiểu 44px cho touch target dù đang thu gọn */
             .nav-icon { font-size: 14px; margin-bottom: 0; }
             .nav-text { display: none; }
-            .container { padding-bottom: 40px !important; }
-            #fabBtn { bottom: 52px; }
-            #quickActionBar { bottom: 52px; }
+            .container { padding-bottom: 44px !important; }
+            #fabBtn { bottom: 56px; }
+            #quickActionBar { bottom: 56px; }
             #weekNavBar { padding: 4px 8px; }
             #weekNavBar .week-nav-btn, #weekNavBar .zoom-controls button { width: 26px; height: 26px; font-size: 14px; line-height: 26px; }
-            .action-sheet { padding-bottom: 55px; }
+            .action-sheet { max-height: 92vh; max-height: 92dvh; }
+            .sheet-body { padding-bottom: calc(20px + env(safe-area-inset-bottom) + 44px); }
         }
     </style>
 </head>
@@ -1370,6 +1395,22 @@
                     if (Math.abs(dx) > 40) shiftWeek(dx < 0 ? 1 : -1);
                 });
             })();
+
+            // BÀN PHÍM ẢO CHE Ô ĐANG GÕ (iPhone/Android): khi bàn phím bật lên, visualViewport co
+            // lại nhưng layout viewport (100vh) thì không — khiến ô nhập liệu trong popup/modal có
+            // thể bị bàn phím che khuất. Khi phát hiện viewport co lại đột ngột trong lúc đang gõ
+            // vào 1 ô input/textarea nằm trong popup/modal/action-sheet, tự cuộn ô đó vào giữa vùng
+            // nhìn thấy còn lại.
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    const active = document.activeElement;
+                    if (!active || (active.tagName !== 'TEXTAREA' && active.tagName !== 'INPUT')) return;
+                    if (!active.closest('#cellPopupMenu') && !active.closest('.modal') && !active.closest('.action-sheet')) return;
+                    setTimeout(() => {
+                        active.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }, 80);
+                });
+            }
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -1471,7 +1512,14 @@
             }
         }
 
-        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS 300MS
+        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS
+        // Tăng thời gian giữ lên 420ms (thay vì 300ms) + thêm NGƯỠNG DI CHUYỂN: chỉ hủy long-press
+        // khi ngón tay di chuyển vượt quá MOVE_CANCEL_THRESHOLD, để rung tay/nhiễu cảm biến nhỏ khi
+        // đang cố giữ yên không vô tình bị coi là "định vuốt cuộn bảng" rồi hủy mất thao tác chọn ô.
+        const LONG_PRESS_MS = 420;
+        const MOVE_CANCEL_THRESHOLD = 10; // px
+        let touchStartX = 0, touchStartY = 0;
+
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
             if (e.touches.length > 1) return; 
@@ -1480,6 +1528,8 @@
             if (!cell) return;
             
             isScrolling = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
             
             longPressTimer = setTimeout(() => {
                 isSelecting = true;
@@ -1487,15 +1537,20 @@
                 closePopup();
                 selectRange(cell, cell);
                 if (navigator.vibrate) navigator.vibrate(50); 
-            }, 300);
+            }, LONG_PRESS_MS);
         }, { passive: true });
 
         table.addEventListener('touchmove', (e) => {
             if (e.touches.length > 1) { clearTimeout(longPressTimer); return; }
             
             if (!isSelecting) {
-                isScrolling = true; 
-                clearTimeout(longPressTimer);
+                const touch = e.touches[0];
+                const dx = touch.clientX - touchStartX;
+                const dy = touch.clientY - touchStartY;
+                if (Math.hypot(dx, dy) > MOVE_CANCEL_THRESHOLD) {
+                    isScrolling = true; 
+                    clearTimeout(longPressTimer);
+                }
                 return;
             }
             
@@ -2098,6 +2153,14 @@
             return "#000000";
         }
 
+        // Singleton: ResizeObserver + 4 scroll listener chỉ được tạo/gắn ĐÚNG 1 LẦN DUY NHẤT, dù
+        // syncScrollbars() được gọi lại rất nhiều lần (mỗi lần zoom, sửa bảng, tải dữ liệu...).
+        // Bản cũ tạo mới ResizeObserver + gắn thêm listener ở MỖI lần gọi mà không bao giờ gỡ bỏ
+        // listener cũ — tích tụ dần theo thời gian sử dụng, khiến thao tác zoom/cuộn nặng dần lên.
+        // Các phần tử liên quan (bottomScroll, topScroll, leftScroll, scheduleTable...) là phần tử
+        // TĨNH cố định trong HTML (chỉ nội dung bên trong bảng bị thay khi tải/tạo lại), nên gắn
+        // listener 1 lần là đủ dùng cho cả vòng đời trang.
+        let scrollbarsInitialized = false;
         function syncScrollbars(forceUpdate = false) {
             const table = document.getElementById('scheduleTable');
             const bottomScroll = document.getElementById('bottomScroll'); 
@@ -2113,6 +2176,8 @@
             };
 
             if(forceUpdate) updateScrollDimensions();
+            if (scrollbarsInitialized) return;
+            scrollbarsInitialized = true;
 
             const resizeObserver = new ResizeObserver(updateScrollDimensions);
             resizeObserver.observe(table); resizeObserver.observe(bottomScroll);
