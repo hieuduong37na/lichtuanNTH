@@ -146,6 +146,11 @@
         table { border-collapse: collapse; width: 100%; min-width: max-content; background-color: white; table-layout: auto;}
         
         #scheduleTable {
+            /* Dùng CSS "zoom" thay vì transform:scale — vì transform tạo "containing block" mới
+               cho các phần tử con, khiến position:sticky (cột đầu / dòng tiêu đề) bị lệch vị trí,
+               dẫn tới bị cắt nội dung (đặc biệt thấy rõ trên iOS Safari). "zoom" không có vấn đề
+               này. Đánh đổi: Firefox không hỗ trợ "zoom" nên trên Firefox tính năng phóng to/thu
+               nhỏ bảng sẽ không hoạt động (bảng luôn hiển thị 100%), nhưng mọi thứ khác vẫn đúng. */
             zoom: var(--zoom-level);
             transform-origin: top left;
         }
@@ -185,6 +190,28 @@
             cursor: pointer; z-index: 2000; transition: transform 0.2s, background-color 0.2s;
         }
         #fabBtn:hover { background-color: #0b5ed7; transform: scale(1.05); }
+
+        #autoSaveStatus {
+            display: none; position: fixed; top: 10px; left: 10px; z-index: 4000;
+            font-size: 11px; padding: 5px 10px; border-radius: 20px; color: #fff;
+            background: rgba(0,0,0,0.7); pointer-events: none; transition: opacity 0.3s;
+        }
+        #autoSaveStatus.show { display: block; }
+        #autoSaveStatus.saved { background: rgba(40,167,69,0.9); }
+        #autoSaveStatus.error { background: rgba(220,53,69,0.9); }
+        #autoSaveStatus.saving, #autoSaveStatus.pending { background: rgba(0,0,0,0.7); }
+
+        #quickActionBar {
+            display: none; position: fixed; left: 50%; transform: translateX(-50%);
+            bottom: 20px; z-index: 1999; background: #ffffff; border: 1px solid #ced4da;
+            border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 8px 10px; align-items: center; gap: 10px; max-width: 94%;
+        }
+        #quickActionBar.show { display: flex; }
+        #quickActionBar #quickActionLabel { font-size: 12px; color: #555; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        #quickActionBar .quick-action-buttons { display: flex; gap: 6px; }
+        #quickActionBar button { border: none; background: #f1f3f5; border-radius: 8px; padding: 9px 12px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+        #quickActionBar button:active { background: #dfe3e6; }
 
         #cellPopupMenu {
             display: none; position: fixed; z-index: 2001; bottom: -400px; 
@@ -244,6 +271,7 @@
         /* CSS MỚI CHO BOTTOM NAVIGATION (MOBILE CHUẨN APP) */
         .bottom-nav, .bottom-nav-overlay, .action-sheet { display: none; }
         #orientationHint { display: none; }
+        #weekNavBar { display: none; }
 
         @media (max-width: 768px), (max-height: 500px) and (pointer: coarse) {
             /* Ẩn các công cụ điều khiển Desktop */
@@ -289,6 +317,7 @@
             #cellPopupMenu { bottom: -500px; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
             #cellPopupMenu.show { bottom: 0; }
             #fabBtn { bottom: 80px; z-index: 2990;}
+            #quickActionBar { bottom: 80px; z-index: 2990; }
 
             /* Mở rộng Touch Targets */
             button, select, input[type="month"], input[type="number"], input[type="text"], input[type="password"], input[type="date"] {
@@ -315,6 +344,22 @@
             }
             #orientationHint.hidden { display: none !important; }
             #orientationHint .hint-close { margin-left: auto; font-size: 18px; cursor: pointer; line-height: 1; padding: 0 4px; }
+            #autoSaveStatus { top: 52px; }
+
+            /* Thanh điều hướng "Tuần hiện tại" + nút zoom rõ ràng, thay vì bắt người dùng phải biết vuốt 2 ngón */
+            #weekNavBar {
+                display: flex; flex-direction: column; gap: 6px;
+                background: #fff; border: 1px solid #e0e0e0; border-radius: 10px;
+                padding: 8px 10px; margin: 0 0 8px 0;
+            }
+            #weekNavBar .week-nav-row { display: flex; align-items: center; justify-content: center; gap: 8px; }
+            #weekNavBar .week-nav-btn { border: none; background: #f1f3f5; border-radius: 8px; width: 34px; height: 34px; font-size: 18px; line-height: 34px; text-align: center; padding: 0; flex-shrink: 0; }
+            #weekNavBar .week-nav-btn:active { background: #dfe3e6; }
+            #weekNavBar #weekNavLabel { font-size: 13px; font-weight: bold; color: var(--primary-color); flex: 1; text-align: center; }
+            #weekNavBar #todayBtn { border: none; background: var(--primary-color); color: #fff; border-radius: 8px; padding: 8px 10px; font-size: 12px; flex-shrink: 0; }
+            #weekNavBar .zoom-controls { gap: 10px; }
+            #weekNavBar .zoom-controls button { border: none; background: #f1f3f5; border-radius: 8px; width: 30px; height: 30px; font-size: 16px; padding: 0; }
+            #weekNavBar #zoomLevelLabel { font-size: 12px; color: #555; min-width: 40px; text-align: center; }
         }
 
         /* Điện thoại đang XOAY NGANG (kể cả máy có bề ngang > 768px khi xoay): thu gọn thanh điều
@@ -327,6 +372,9 @@
             .nav-text { display: none; }
             .container { padding-bottom: 40px !important; }
             #fabBtn { bottom: 52px; }
+            #quickActionBar { bottom: 52px; }
+            #weekNavBar { padding: 4px 8px; }
+            #weekNavBar .week-nav-btn, #weekNavBar .zoom-controls button { width: 26px; height: 26px; font-size: 14px; line-height: 26px; }
             .action-sheet { padding-bottom: 55px; }
         }
     </style>
@@ -338,6 +386,7 @@
             <span>🔄 Xoay ngang máy để xem bao quát bảng lịch hơn</span>
             <span class="hint-close" onclick="dismissOrientationHint()">&times;</span>
         </div>
+        <div id="autoSaveStatus"></div>
         <h2>
             Bảng Xếp Lịch Trực Tùy Chỉnh
             <div class="auth-container">
@@ -403,13 +452,39 @@
         </div>
 
         <div class="view-controls">
-            <button class="secondary" onclick="setQuickViewMode('week')">📅 Xem 1 Tuần</button>
+            <button class="secondary" onclick="resetToCurrentWeek()">📅 Xem 1 Tuần</button>
             <button class="secondary" onclick="setQuickViewMode('month')">🗓️ Xem Cả Tháng</button>
             <span style="font-size: 11px; color: #666; font-style: italic; display: inline-block;">(💡 Giữ 1 ô để bôi đen - Vuốt 2 ngón để thu phóng)</span>
             <button class="save-btn edit-only quick-save-btn" onclick="saveToGoogleSheets()">💾 Lưu Lên Máy Chủ</button>
         </div>
 
-        <div id="fabBtn" class="edit-only" onclick="openPopup()" title="Chỉnh sửa">✏️</div>
+        <div id="fabBtn" class="edit-only" onclick="handleFabClick()" title="Thêm nhanh">✚</div>
+
+        <!-- Thanh thao tác nhanh (mobile): xuất hiện ngay khi chạm chọn 1 ô, không cần bấm FAB
+             trước rồi mới thấy tùy chọn — giúp luồng "chạm để sửa" tự nhiên hơn. -->
+        <div id="quickActionBar" class="edit-only">
+            <span id="quickActionLabel">Ô đã chọn</span>
+            <div class="quick-action-buttons">
+                <button onclick="openPopup('basicTab')">✏️ Sửa</button>
+                <button onclick="openPopup('basicTab')">🎨 Màu</button>
+                <button onclick="openPopup('structTab')">⋯</button>
+            </div>
+        </div>
+
+        <!-- Thêm nhanh (mobile): FAB giờ dùng cho thao tác chèn hàng/cột cạnh ô đang chọn -->
+        <div id="sheetQuickAdd" class="action-sheet">
+            <div class="sheet-header">
+                <h4>✚ Thêm nhanh</h4>
+                <span class="sheet-close" onclick="closeAllActionSheets()">&times;</span>
+            </div>
+            <div class="sheet-body">
+                <p style="font-size: 12px; color: #777; margin: 0 0 10px;">Áp dụng cạnh ô đang chọn trên bảng. Hãy chạm chọn 1 ô trước.</p>
+                <button class="list-btn" onclick="insertRow('above'); closeAllActionSheets();">⬆️ Thêm Hàng Lên Trên</button>
+                <button class="list-btn" onclick="insertRow('below'); closeAllActionSheets();">⬇️ Thêm Hàng Xuống Dưới</button>
+                <button class="list-btn" onclick="insertColumn('left'); closeAllActionSheets();">⬅️ Thêm Cột Bên Trái</button>
+                <button class="list-btn" onclick="insertColumn('right'); closeAllActionSheets();">➡️ Thêm Cột Bên Phải</button>
+            </div>
+        </div>
 
         <div id="cellPopupMenu">
             <div class="popup-header">
@@ -417,35 +492,25 @@
                 <span class="popup-close" onclick="closePopup()">&times;</span>
             </div>
             <div class="popup-tabs">
-                <div class="popup-tab active" onclick="switchPopupTab('formatTab')">🎨 Định dạng</div>
-                <div class="popup-tab" onclick="switchPopupTab('structTab')">⚙️ Khung Bảng</div>
+                <div class="popup-tab active" data-tab="basicTab" onclick="switchPopupTab('basicTab')">✏️ Thường dùng</div>
+                <div class="popup-tab" data-tab="advancedTab" onclick="switchPopupTab('advancedTab')">⚙️ Nâng cao</div>
+                <div class="popup-tab" data-tab="structTab" onclick="switchPopupTab('structTab')">📐 Cấu trúc</div>
             </div>
             <div class="popup-body">
-                <div id="formatTab" class="popup-section active">
+                <!-- TẦNG 1: thao tác thường dùng nhất (90% trường hợp chỉ cần dừng ở đây) -->
+                <div id="basicTab" class="popup-section active">
                     <div class="popup-item" id="quickEditGroup">
                         <span class="popup-title">Nội dung ô (dễ gõ hơn ô nhỏ trên bảng)</span>
                         <textarea id="cellTextEditor" rows="2" oninput="applyCellTextEdit()" onblur="saveState()" placeholder="Nhập nội dung ca trực..." style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; font-size:14px; resize:vertical; box-sizing:border-box;"></textarea>
                     </div>
                     <div class="popup-item">
-                        <span class="popup-title">Phạm vi áp dụng</span>
-                        <select id="colorScope" style="width:100%;" onchange="updateSelectedScope()">
-                            <option value="cell">Vùng đang chọn</option>
-                            <option value="row">Toàn bộ Hàng của ô chọn</option>
-                            <option value="col">Toàn bộ Cột của ô chọn</option>
-                        </select>
-                    </div>
-                    
-                    <div class="popup-item">
-                        <span class="popup-title">Cỡ chữ & Kiểu chữ</span>
+                        <span class="popup-title">Kiểu chữ</span>
                         <div class="popup-row">
-                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
                             <button id="btnBold" class="font-style-btn" onclick="toggleFormat('fontWeight', 'bold', 'normal')" style="font-weight:bold;">B</button>
                             <button id="btnItalic" class="font-style-btn" onclick="toggleFormat('fontStyle', 'italic', 'normal')" style="font-style:italic; font-family:serif;">I</button>
                             <button id="btnUnderline" class="font-style-btn" onclick="toggleFormat('textDecoration', 'underline', 'none')" style="text-decoration:underline;">U</button>
-                            <button class="secondary" onclick="forceLineBreak()" style="flex:1;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
                         </div>
                     </div>
-                    
                     <div class="popup-item">
                         <span class="popup-title">Màu sắc</span>
                         <div class="popup-row">
@@ -457,7 +522,26 @@
                                 <label>Nền</label>
                                 <input type="color" id="bgColorPicker" value="#ffffff" onchange="applyColorFormat('bg')">
                             </div>
-                            <button class="secondary" onclick="clearCellFormat()" style="flex:0.8; color:#000; background:#e2e6ea;">Xóa Màu</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TẦNG 2: thao tác nâng cao, ít dùng hơn -->
+                <div id="advancedTab" class="popup-section">
+                    <div class="popup-item">
+                        <span class="popup-title">Phạm vi áp dụng (cho Kiểu chữ/Màu ở tầng "Thường dùng")</span>
+                        <select id="colorScope" style="width:100%;" onchange="updateSelectedScope()">
+                            <option value="cell">Vùng đang chọn</option>
+                            <option value="row">Toàn bộ Hàng của ô chọn</option>
+                            <option value="col">Toàn bộ Cột của ô chọn</option>
+                        </select>
+                    </div>
+                    <div class="popup-item">
+                        <span class="popup-title">Cỡ chữ & Xuống dòng</span>
+                        <div class="popup-row">
+                            <input type="number" id="fontSizePicker" value="13" min="8" max="72" onchange="applyFontSize()" style="width: 50px; text-align: center; border: 1px solid #ccc; border-radius: 4px;" title="Cỡ chữ">
+                            <button class="secondary" onclick="forceLineBreak()" style="flex:1;" title="Thêm dấu xuống dòng vào ô">↵ Xuống dòng</button>
+                            <button class="secondary" onclick="clearCellFormat()" style="flex:1; color:#000; background:#e2e6ea;">Xóa định dạng</button>
                         </div>
                     </div>
                     <div class="popup-item" style="margin-top: 5px; border-top: 1px dashed #ccc; padding-top: 10px;">
@@ -486,6 +570,7 @@
                     </div>
                 </div>
 
+                <!-- TẦNG 3: thao tác cấu trúc bảng (gộp ô, thêm/xóa hàng cột) -->
                 <div id="structTab" class="popup-section">
                     <div class="popup-item">
                         <span class="popup-title">Gộp ô (Merge Cells)</span>
@@ -516,6 +601,20 @@
         </div>
 
         <div id="statusMessage"></div>
+
+        <div id="weekNavBar">
+            <div class="week-nav-row">
+                <button class="week-nav-btn" onclick="shiftWeek(-1)" title="Tuần trước">‹</button>
+                <span id="weekNavLabel">--/-- - --/--</span>
+                <button id="todayBtn" onclick="goToToday()">📍 Hôm nay</button>
+                <button class="week-nav-btn" onclick="shiftWeek(1)" title="Tuần sau">›</button>
+            </div>
+            <div class="week-nav-row zoom-controls">
+                <button onclick="adjustZoom(-0.1)" title="Thu nhỏ">−</button>
+                <span id="zoomLevelLabel">100%</span>
+                <button onclick="adjustZoom(0.1)" title="Phóng to">+</button>
+            </div>
+        </div>
 
         <div class="master-wrapper" id="masterWrapper">
             <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Bật/Tắt Toàn Màn Hình">⛶</button>
@@ -565,7 +664,7 @@
         </div>
         <div class="sheet-body">
             <button class="list-btn" onclick="setQuickViewMode('month'); closeAllActionSheets();">🗓️ Căn vừa lịch Cả Tháng</button>
-            <button class="list-btn" onclick="setQuickViewMode('week'); closeAllActionSheets();">📅 Căn vừa lịch 1 Tuần</button>
+            <button class="list-btn" onclick="resetToCurrentWeek(); closeAllActionSheets();">📅 Căn vừa lịch 1 Tuần</button>
             <button class="list-btn edit-only" onclick="openHolidayModal(); closeAllActionSheets();">🏖️ Quản lý Ngày Lễ</button>
             <button class="list-btn" onclick="openCropSheet();" style="color: var(--capture-color);">📸 Cắt & Xuất Ảnh...</button>
             
@@ -620,7 +719,7 @@
         <div class="nav-item active" id="navLich" onclick="activateNav('lich')">
             <div class="nav-icon">📅</div><div class="nav-text">Lịch</div>
         </div>
-        <div class="nav-item" id="navSua" onclick="activateNav('sua')">
+        <div class="nav-item" id="navSua" onclick="handleEditNavClick()">
             <div class="nav-icon">✏️</div><div class="nav-text">Sửa</div>
         </div>
         <div class="nav-item" id="navBang" onclick="activateNav('bang')">
@@ -679,9 +778,11 @@
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlaF3gVNhm_s-kAilknWyeUM5eaIHERNPazL7mklG6FHQYnpuC10wp3SO26MFnGzyZRw/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAC7spiDz9YmKSy_ZZUsZPSR_aGkUwHW623IWCYzjm21r8LIkPhlt6Ob4hwYgycYVVoA/exec'; 
 
         // Bọc fetch() với timeout để tránh treo vô thời hạn khi mạng di động chập chờn.
+        // Trả về cùng dạng Promise như fetch() bình thường, nhưng tự huỷ (AbortError) nếu
+        // quá lâu không có phản hồi, để .catch() có thể báo lỗi rõ ràng cho người dùng.
         function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -690,6 +791,7 @@
         }
 
         // Thông báo lỗi mạng thân thiện, phân biệt trường hợp timeout với lỗi mạng khác.
+        // context là một cụm từ mô tả hành động, ví dụ: "đăng nhập", "lưu dữ liệu".
         function networkErrorMessage(error, context) {
             const action = context ? ' khi ' + context : '';
             if (error && error.name === 'AbortError') {
@@ -704,31 +806,41 @@
         let isEditMode = false;
         let authUsername = "";
         let authToken = "";
-
-        // --- HỆ THỐNG AUTO SAVE ---
-        let autoSaveTimeout = null;
-
-        function triggerAutoSave() {
-            // Chỉ tự động lưu khi đang ở chế độ sửa và đã đăng nhập
-            if (!isEditMode || !authToken) return;
-
-            // Hủy lệnh lưu trước đó nếu người dùng vẫn đang tiếp tục thao tác
-            if (autoSaveTimeout) {
-                clearTimeout(autoSaveTimeout);
-            }
-
-            // Thiết lập đếm ngược 3 giây (3000ms) sau khi ngừng thao tác
-            autoSaveTimeout = setTimeout(() => {
-                saveToGoogleSheets(true); // Truyền true để báo đây là Auto-save
-            }, 3000);
-        }
-        // -------------------------
+        // Token phiên đăng nhập (session) do server cấp sau khi login thành công, dùng thay cho
+        // việc gửi lại mật khẩu (đã băm) ở MỌI lần lưu dữ liệu như trước — giảm số lần "mật khẩu"
+        // di chuyển qua mạng, và có thời hạn (server tự hết hạn sau một khoảng thời gian).
+        // Không lưu vào localStorage: mỗi lần mở lại trang, đăng nhập lại (kể cả tự động bằng mật
+        // khẩu đã lưu) sẽ luôn xin cấp session mới từ server.
+        let sessionToken = "";
 
         // Đồng bộ ô tháng năm giữa Desktop và Mobile
-        function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; }
-        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; }
+        function syncMonthToMobile(val) { document.getElementById('mobileMonthPicker').value = val; weekAnchorDay = null; }
+        function syncMonthToDesktop(val) { document.getElementById('monthYearPicker').value = val; weekAnchorDay = null; }
 
         /* HỆ THỐNG ĐIỀU HƯỚNG BOTTOM NAV (MOBILE) */
+        // Nút "Sửa" trên thanh điều hướng đổi thành "💾 Lưu" ngay khi đang ở chế độ sửa, để bấm 1
+        // lần là lưu lên Google Sheets luôn — không cần mở thêm tab "Bảng" chỉ để bấm Lưu.
+        function updateEditNavUI() {
+            const icon = document.querySelector('#navSua .nav-icon');
+            const text = document.querySelector('#navSua .nav-text');
+            if (!icon || !text) return;
+            if (isEditMode) {
+                icon.innerText = '💾';
+                text.innerText = 'Lưu';
+            } else {
+                icon.innerText = '✏️';
+                text.innerText = 'Sửa';
+            }
+        }
+        function handleEditNavClick() {
+            if (isEditMode) {
+                saveToGoogleSheets();
+                activateNav('lich');
+            } else {
+                activateNav('sua');
+            }
+        }
+
         function activateNav(tab) {
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
@@ -740,6 +852,9 @@
                 lockTableEditing();
                 clearSelection();
                 autoFitMobileOverview();
+                updateEditNavUI();
+                clearTimeout(autoSaveTimer);
+                document.getElementById('autoSaveStatus').classList.remove('show');
             } 
             else if (tab === 'sua') {
                 closeAllActionSheets();
@@ -750,6 +865,7 @@
                     isEditMode = true;
                     document.body.classList.remove('view-only-mode');
                     unlockTableEditing();
+                    updateEditNavUI();
                 }
             }
             else if (tab === 'bang') {
@@ -779,7 +895,18 @@
             closeAllActionSheets();
             if (authToken) {
                 // Logout Logic
-                isEditMode = false; authUsername = ""; authToken = "";
+                // Báo cho server hủy session hiện tại (best-effort — không chặn luồng đăng xuất
+                // phía client nếu mạng lỗi, vì session cũng sẽ tự hết hạn sau một khoảng thời gian).
+                if (sessionToken) {
+                    fetchWithTimeout(SCRIPT_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: "logout", username: authUsername, sessionToken: sessionToken })
+                    }).catch(() => {});
+                }
+                isEditMode = false; authUsername = ""; authToken = ""; sessionToken = "";
+                clearTimeout(autoSaveTimer);
+                document.getElementById('autoSaveStatus').classList.remove('show');
                 localStorage.removeItem('savedUser');
                 localStorage.removeItem('savedToken');
                 document.getElementById('authBtn').innerText = "Đăng nhập";
@@ -834,11 +961,13 @@
             .then(result => {
                 if (result.status === 'success') {
                     isEditMode = true; authUsername = user; authToken = hashedPass;
+                    sessionToken = result.sessionToken || "";
                     document.getElementById('authBtn').innerText = "Đăng xuất (" + user + ")";
                     document.getElementById('mobileAuthBtn').innerText = "Đăng xuất (" + user + ")";
                     document.body.classList.remove('view-only-mode');
                     closeLoginModal();
                     unlockTableEditing();
+                    updateEditNavUI();
                     
                     if (!isAutoLogin && document.getElementById('rememberMe').checked) {
                         localStorage.setItem('savedUser', user);
@@ -888,6 +1017,7 @@
                 body: JSON.stringify({ 
                     action: "changePassword", 
                     username: authUsername, 
+                    sessionToken: sessionToken,
                     oldToken: hashedOldPass,
                     newToken: hashedNewPass
                 }) 
@@ -896,6 +1026,7 @@
             .then(result => {
                 if (result.status === 'success') {
                     authToken = hashedNewPass; 
+                    if (result.sessionToken) sessionToken = result.sessionToken;
                     if(localStorage.getItem('savedUser')) {
                         localStorage.setItem('savedToken', hashedNewPass);
                     }
@@ -910,10 +1041,12 @@
 
         function lockTableEditing() {
             document.querySelectorAll('th[contenteditable], td[contenteditable]').forEach(el => { el.setAttribute('contenteditable', 'false'); });
+            updateFabVisibility();
         }
         function unlockTableEditing() {
             if(!isEditMode) return;
             document.querySelectorAll('th, td').forEach(el => { el.setAttribute('contenteditable', 'true'); });
+            updateFabVisibility();
         }
 
         /* HỆ THỐNG THU PHÓNG CẢM ỨNG BẰNG GPU (MƯỢT MÀ 60FPS) */
@@ -954,6 +1087,22 @@
         });
 
         /* HÀM XEM NHANH 1 TUẦN / 1 THÁNG */
+        // Neo "tuần đang xem" trên mobile: null nghĩa là "mặc định" (hôm nay nếu đang xem đúng
+        // tháng hiện tại, ngược lại là ngày 1). Có giá trị khi người dùng đã bấm ‹ › để chuyển tuần.
+        let weekAnchorDay = null;
+
+        function getDefaultWeekAnchorDay() {
+            const today = new Date();
+            const pickerVal = document.getElementById('monthYearPicker').value;
+            if (pickerVal) {
+                const [y, m] = pickerVal.split('-');
+                if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) {
+                    return today.getDate();
+                }
+            }
+            return 1;
+        }
+
         function setQuickViewMode(mode) {
             document.getElementById('captureMode').value = 'all';
             toggleCaptureInputs();
@@ -966,6 +1115,8 @@
             const headerRow = table.rows[1]; 
             if (!headerRow || headerRow.cells.length < 2) return;
 
+            // Với CSS "zoom", offsetWidth đã tự bao gồm hệ số zoom hiện tại -> cần chia lại để có
+            // kích thước GỐC (1x) trước khi tính hệ số zoom mục tiêu vừa khít khung nhìn.
             const currentZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             const containerWidth = container.clientWidth;
             const hw = headerRow.cells[0].offsetWidth / currentZoom;
@@ -978,31 +1129,121 @@
                 document.documentElement.style.setProperty('--zoom-level', targetZoom);
                 syncScrollbars(true);
                 container.scrollLeft = 0; 
+                updateZoomLabel();
             } else if (mode === 'week') {
                 let targetZoom = containerWidth / (hw + 7 * dw);
                 targetZoom = Math.max(0.25, Math.min(2.5, targetZoom));
                 document.documentElement.style.setProperty('--zoom-level', targetZoom);
                 syncScrollbars(true);
+                updateZoomLabel();
 
-                const today = new Date();
-                const pickerVal = document.getElementById('monthYearPicker').value;
-                let targetDay = 1;
-                
-                if(pickerVal) {
-                    const [y, m] = pickerVal.split('-');
-                    if (today.getFullYear() === parseInt(y) && (today.getMonth() + 1) === parseInt(m)) {
-                        targetDay = today.getDate();
-                    }
-                }
+                const targetDay = Math.min(weekAnchorDay || getDefaultWeekAnchorDay(), totalDays);
 
                 setTimeout(() => {
                     if (headerRow.cells[targetDay]) {
+                        // Với CSS "zoom", offsetLeft/offsetWidth đã ở đúng không gian toạ độ
+                        // (đã phóng to) khớp với scrollLeft -> không cần nhân thêm targetZoom.
                         const cellLeft = headerRow.cells[targetDay].offsetLeft;
                         const headerWidth = headerRow.cells[0].offsetWidth;
                         container.scrollLeft = cellLeft - headerWidth;
                     }
+                    updateWeekNavLabel();
                 }, 50); 
             }
+        }
+
+        // Đặt lại về đúng "tuần hiện tại" (mặc định) rồi canh vừa khung nhìn 1 tuần — dùng cho nút
+        // "📅 Xem 1 Tuần" bấm thủ công, để luôn quay về đúng tuần chứa hôm nay (nếu có).
+        function resetToCurrentWeek() {
+            weekAnchorDay = null;
+            setQuickViewMode('week');
+        }
+
+        // Chuyển tuần đang xem sang trước/sau 7 ngày (delta = -1 hoặc 1). Nếu vượt quá đầu/cuối
+        // tháng đang xem thì tự động chuyển sang tháng trước/sau tương ứng.
+        function shiftWeek(delta) {
+            const table = document.getElementById('scheduleTable');
+            if (table.rows.length < 2) return;
+            const headerRow = table.rows[1];
+            const totalDays = headerRow.cells.length - 1;
+            if (totalDays < 1) return;
+
+            const currentAnchor = weekAnchorDay || getDefaultWeekAnchorDay();
+            const nextAnchor = currentAnchor + delta * 7;
+
+            if (nextAnchor > totalDays) {
+                changeDisplayedMonth(1, 1);
+            } else if (nextAnchor < 1) {
+                changeDisplayedMonth(-1, 1);
+            } else {
+                weekAnchorDay = nextAnchor;
+                setQuickViewMode('week');
+            }
+        }
+
+        // Đổi tháng đang hiển thị (deltaMonths = -1/1), rồi tải lại dữ liệu tháng đó. anchorDay là
+        // ngày neo (thường là 1) để canh vừa khung nhìn 1 tuần ngay khi tải xong (autoFitMobileOverview
+        // sẽ tự gọi setQuickViewMode('week') sau khi renderTableFromData/handleGenerateNewTable chạy).
+        function changeDisplayedMonth(deltaMonths, anchorDay) {
+            const val = document.getElementById('monthYearPicker').value;
+            if (!val) return;
+            let [y, m] = val.split('-').map(Number);
+            m += deltaMonths;
+            if (m > 12) { m = 1; y++; }
+            if (m < 1) { m = 12; y--; }
+            const newVal = `${y}-${String(m).padStart(2, '0')}`;
+            document.getElementById('monthYearPicker').value = newVal;
+            document.getElementById('mobileMonthPicker').value = newVal;
+            weekAnchorDay = anchorDay;
+            loadFromGoogleSheets();
+        }
+
+        // Quay về đúng tuần chứa NGÀY HÔM NAY. Nếu tháng đang xem không phải tháng hiện tại, sẽ tự
+        // chuyển sang đúng tháng đó rồi tải lại dữ liệu trước khi canh vừa khung nhìn.
+        function goToToday() {
+            const today = new Date();
+            const todayVal = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            const currentVal = document.getElementById('monthYearPicker').value;
+            weekAnchorDay = null;
+            if (currentVal !== todayVal) {
+                document.getElementById('monthYearPicker').value = todayVal;
+                document.getElementById('mobileMonthPicker').value = todayVal;
+                loadFromGoogleSheets();
+            } else {
+                setQuickViewMode('week');
+            }
+        }
+
+        // Cập nhật nhãn "dd/mm - dd/mm" trên thanh điều hướng tuần (chỉ hiển thị trong phạm vi
+        // tháng đang tải, vì dữ liệu tháng kế cận chưa có sẵn để hiển thị chính xác hơn).
+        function updateWeekNavLabel() {
+            const label = document.getElementById('weekNavLabel');
+            if (!label) return;
+            const table = document.getElementById('scheduleTable');
+            if (table.rows.length < 2) return;
+            const headerRow = table.rows[1];
+            const totalDays = headerRow.cells.length - 1;
+            if (totalDays < 1) return;
+            const startDay = Math.min(weekAnchorDay || getDefaultWeekAnchorDay(), totalDays);
+            const endDay = Math.min(startDay + 6, totalDays);
+            const pickerVal = document.getElementById('monthYearPicker').value;
+            const m = pickerVal ? pickerVal.split('-')[1] : '--';
+            label.innerText = `${String(startDay).padStart(2, '0')}/${m} - ${String(endDay).padStart(2, '0')}/${m}`;
+        }
+
+        // Nút +/− zoom rõ ràng, thay vì bắt người dùng phải biết "vuốt 2 ngón để thu phóng".
+        function adjustZoom(delta) {
+            let z = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+            z = Math.max(0.25, Math.min(3.0, z + delta));
+            document.documentElement.style.setProperty('--zoom-level', z);
+            syncScrollbars(true);
+            updateZoomLabel();
+        }
+        function updateZoomLabel() {
+            const el = document.getElementById('zoomLevelLabel');
+            if (!el) return;
+            const z = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
+            el.innerText = Math.round(z * 100) + '%';
         }
 
         function toggleFullscreen() {
@@ -1013,6 +1254,51 @@
                 });
             } else {
                 document.exitFullscreen();
+            }
+        }
+
+        /* TỰ ĐỘNG LƯU (AUTO-SAVE) SAU KHI CHỈNH SỬA */
+        // Không lưu ngay mỗi lần gõ 1 ký tự (sẽ gọi API liên tục, dễ bị chậm/giới hạn) — thay vào
+        // đó chờ người dùng NGỪNG chỉnh sửa một khoảng ngắn (debounce) rồi mới tự lưu ngầm, không
+        // làm gián đoạn thao tác đang gõ (không đóng popup/bỏ chọn ô như khi bấm nút Lưu thủ công).
+        let autoSaveTimer = null;
+        let isAutoSaving = false;
+        const AUTO_SAVE_DELAY_MS = 2500;
+
+        function scheduleAutoSave() {
+            if (!isEditMode || !authToken) return; // chỉ tự lưu khi đang sửa và đã đăng nhập
+            showAutoSaveStatus('pending');
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(runAutoSave, AUTO_SAVE_DELAY_MS);
+        }
+
+        function runAutoSave() {
+            if (!isEditMode || !authToken) return;
+            if (isAutoSaving) { autoSaveTimer = setTimeout(runAutoSave, 1000); return; } // đợi lượt lưu trước xong
+            isAutoSaving = true;
+            saveToGoogleSheets(true, () => { isAutoSaving = false; });
+        }
+
+        // Badge nhỏ báo trạng thái lưu (giống Google Docs: "Đang lưu..." / "Đã lưu lúc..."), để
+        // người dùng yên tâm là dữ liệu đã lên server mà không cần tự bấm Lưu.
+        function showAutoSaveStatus(state) {
+            const el = document.getElementById('autoSaveStatus');
+            if (!el) return;
+            clearTimeout(showAutoSaveStatus._hideTimer);
+            if (state === 'pending') {
+                el.innerText = '● Có thay đổi chưa lưu…';
+                el.className = 'show pending';
+            } else if (state === 'saving') {
+                el.innerText = '⏳ Đang tự động lưu…';
+                el.className = 'show saving';
+            } else if (state === 'saved') {
+                const now = new Date();
+                el.innerText = '✓ Đã lưu lúc ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                el.className = 'show saved';
+                showAutoSaveStatus._hideTimer = setTimeout(() => el.classList.remove('show'), 3000);
+            } else if (state === 'error') {
+                el.innerText = '⚠️ Tự động lưu thất bại, sẽ thử lại';
+                el.className = 'show error';
             }
         }
 
@@ -1027,9 +1313,8 @@
             currentStep++;
 
             if (historyStack.length > 50) { historyStack.shift(); currentStep--; }
-            
-            // --- GỌI HÀM AUTO SAVE TẠI ĐÂY ---
-            triggerAutoSave();
+
+            scheduleAutoSave();
         }
 
         function undo() {
@@ -1037,7 +1322,7 @@
                 currentStep--;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã hoàn tác thao tác!');
-                triggerAutoSave(); // Kích hoạt auto save sau khi Undo
+                scheduleAutoSave();
             } else { showMessage('warning-toast', 'Không có thao tác nào để hoàn tác!'); }
         }
 
@@ -1046,7 +1331,7 @@
                 currentStep++;
                 document.getElementById('scheduleTable').innerHTML = historyStack[currentStep];
                 clearSelection(); showMessage('success', 'Đã khôi phục thao tác!');
-                triggerAutoSave(); // Kích hoạt auto save sau khi Redo
+                scheduleAutoSave();
             } else { showMessage('warning-toast', 'Đang ở thao tác mới nhất!'); }
         }
 
@@ -1064,8 +1349,25 @@
             renderHolidayList();
             syncScrollbars();
             updateOrientationHint();
-            window.addEventListener('resize', updateOrientationHint);
-            window.addEventListener('orientationchange', () => setTimeout(() => { updateOrientationHint(); if (isMobileView()) setQuickViewMode('week'); }, 200));
+            window.addEventListener('resize', () => { updateOrientationHint(); updateFabVisibility(); });
+            window.addEventListener('orientationchange', () => setTimeout(() => { updateOrientationHint(); updateFabVisibility(); if (isMobileView()) setQuickViewMode('week'); }, 200));
+
+            // Vuốt trái/phải TRÊN THANH ĐIỀU HƯỚNG TUẦN (không phải trên bảng) để đổi tuần — tách
+            // biệt hẳn khỏi các cử chỉ chọn ô/cuộn/pinch-zoom vốn đã có sẵn trên chính bảng lịch.
+            (function initWeekNavSwipe() {
+                const bar = document.getElementById('weekNavBar');
+                if (!bar) return;
+                let touchStartX = null;
+                bar.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
+                }, { passive: true });
+                bar.addEventListener('touchend', (e) => {
+                    if (touchStartX === null) return;
+                    const dx = e.changedTouches[0].clientX - touchStartX;
+                    touchStartX = null;
+                    if (Math.abs(dx) > 40) shiftWeek(dx < 0 ? 1 : -1);
+                });
+            })();
             
             const savedUser = localStorage.getItem('savedUser');
             const savedToken = localStorage.getItem('savedToken');
@@ -1082,6 +1384,8 @@
         document.getElementById('scheduleTable').addEventListener('focusin', (e) => {
             if (e.target.isContentEditable) {
                 if (isMobileView()) {
+                    // Trên mobile: không cho gõ trực tiếp vào ô bảng (quá nhỏ, dễ gõ nhầm và bị
+                    // bàn phím ảo che mất ô đang gõ) -> huỷ focus và mở popup có ô nhập liệu to hơn.
                     e.target.blur();
                     const cell = e.target.closest('td, th');
                     if (cell) {
@@ -1094,13 +1398,13 @@
                 const popup = document.getElementById('cellPopupMenu');
                 popup.classList.remove('show');
                 setTimeout(() => { popup.style.display = 'none'; }, 300);
-                document.getElementById('fabBtn').style.display = 'none';
+                hideSelectionUI();
             }
         });
 
         document.getElementById('scheduleTable').addEventListener('focusout', (e) => {
             if (selectedCells.length > 0 && isEditMode) {
-                document.getElementById('fabBtn').style.display = 'block';
+                showSelectionUI();
             }
         });
 
@@ -1118,7 +1422,7 @@
                 cell.classList.remove('selected-cell', 'selection-top', 'selection-bottom', 'selection-left', 'selection-right');
             });
             selectedCells = [];
-            document.getElementById('fabBtn').style.display = 'none';
+            hideSelectionUI();
         }
 
         function getCellCoords(cell) {
@@ -1161,11 +1465,11 @@
             }
 
             if(selectedCells.length > 0) {
-                document.getElementById('fabBtn').style.display = 'block';
-                updatePopupUI();
+                showSelectionUI();
             }
         }
 
+        // TÁCH BIỆT LOGIC CUỘN (SCROLL) VÀ BÔI ĐEN (SELECT) BẰNG CƠ CHẾ LONG-PRESS 300MS
         table.addEventListener('touchstart', (e) => {
             if (!isEditMode) return; 
             if (e.touches.length > 1) return; 
@@ -1249,12 +1553,14 @@
         document.addEventListener('mousedown', function(event) {
             const popup = document.getElementById('cellPopupMenu');
             const fab = document.getElementById('fabBtn');
+            const quickActionBar = document.getElementById('quickActionBar');
             const modalElement = document.getElementById('holidayModal');
             const loginModal = document.getElementById('loginModal');
             const changePassModal = document.getElementById('changePassModal');
             const isClickInsideTable = table.contains(event.target);
+            const isClickInsideActionSheet = !!event.target.closest('.action-sheet');
             
-            if (!popup.contains(event.target) && !fab.contains(event.target) && !isClickInsideTable) {
+            if (!popup.contains(event.target) && !fab.contains(event.target) && !quickActionBar.contains(event.target) && !isClickInsideTable && !isClickInsideActionSheet) {
                 closePopup();
                 clearSelection();
             }
@@ -1263,16 +1569,57 @@
             if (event.target == changePassModal) { closeChangePassModal(); }
         });
 
+        // Nhận biết đang ở chế độ giao diện mobile (cùng breakpoint với CSS @media max-width:768px,
+        // và cả trường hợp điện thoại xoay ngang có bề ngang lớn nhưng chiều cao thấp)
         function isMobileView() {
             return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
         }
 
+        // FAB: trên mobile là nút "✚ Thêm nhanh" (chèn hàng/cột), luôn hiện khi đang ở chế độ Sửa,
+        // không phụ thuộc có đang chọn ô hay không. Trên desktop vẫn giữ vai trò cũ: nút mở popup,
+        // chỉ hiện khi có ô đang được chọn.
+        function updateFabVisibility() {
+            const fab = document.getElementById('fabBtn');
+            if (!isEditMode) { fab.style.display = 'none'; return; }
+            fab.style.display = isMobileView() ? 'flex' : (selectedCells.length > 0 ? 'block' : 'none');
+        }
+        function handleFabClick() {
+            if (isMobileView()) {
+                openActionSheet('sheetQuickAdd');
+            } else {
+                openPopup();
+            }
+        }
+
+        // Thanh thao tác nhanh (mobile) xuất hiện ngay khi chọn ô — thay cho việc phải bấm FAB rồi
+        // mới thấy tùy chọn, theo góp ý UX: "chạm 1 lần vào ô -> chọn ô -> hiện thanh thao tác ngay".
+        function showSelectionUI() {
+            if (selectedCells.length === 0) return;
+            updatePopupUI();
+            updateFabVisibility();
+            if (isMobileView()) {
+                const cell = selectedCells[0];
+                const row = cell.closest('tr');
+                const roleLabel = row && row.children[0] ? row.children[0].innerText.trim() : '';
+                document.getElementById('quickActionLabel').innerText = selectedCells.length > 1 ? `${selectedCells.length} ô đã chọn` : (roleLabel || 'Ô đã chọn');
+                document.getElementById('quickActionBar').classList.add('show');
+            }
+        }
+        function hideSelectionUI() {
+            document.getElementById('quickActionBar').classList.remove('show');
+            updateFabVisibility();
+        }
+
+        // Tự động canh vừa khung nhìn "7 ngày trong tuần hiện tại" trên mobile mỗi khi bảng được
+        // tải/tạo mới hoặc vào lại chế độ xem, để luôn thấy trọn vẹn tuần đang trực ngay từ đầu.
         function autoFitMobileOverview() {
             if (isMobileView()) {
                 setTimeout(() => setQuickViewMode('week'), 60);
             }
         }
 
+        // Gợi ý xoay ngang máy để xem bao quát hơn: chỉ hiện trên mobile (portrait, vì landscape
+        // CSS đã tự ẩn), và chỉ nếu người dùng chưa từng bấm tắt gợi ý này trước đây.
         function updateOrientationHint() {
             const hint = document.getElementById('orientationHint');
             const shouldShow = isMobileView() && localStorage.getItem('hideOrientationHint') !== '1';
@@ -1283,9 +1630,11 @@
             document.getElementById('orientationHint').classList.add('hidden');
         }
 
+        // Gõ nội dung ô đang chọn (chỉ áp dụng khi chọn đúng 1 ô) thông qua ô nhập liệu lớn trong popup
         function applyCellTextEdit() {
             if (selectedCells.length !== 1) return;
             selectedCells[0].innerText = document.getElementById('cellTextEditor').value;
+            scheduleAutoSave(); // tự lưu ngầm sau khi ngừng gõ 1 chút, không cần đợi rời khỏi ô nhập liệu
         }
 
         function updatePopupUI() {
@@ -1340,21 +1689,27 @@
             document.getElementById('popupCellName').innerText = cellName;
         }
 
+        // Biến lưu ID của setTimeout ẩn popup (trong closePopup), để openPopup có thể huỷ nó nếu
+        // được gọi lại gần như ngay sau đó — tránh lỗi popup "hiện lên rồi mất" do timeout ẩn cũ
+        // (300ms) chạy đè lên sau khi popup đã được mở lại.
         let popupHideTimer = null;
 
-        function openPopup() {
+        function openPopup(tabId) {
             if(selectedCells.length === 0) return;
             clearTimeout(popupHideTimer);
             updatePopupUI();
+            activatePopupTab(tabId || 'basicTab');
             const popup = document.getElementById('cellPopupMenu');
             popup.style.display = 'block';
             setTimeout(() => { 
                 popup.classList.add('show'); 
-                if (isMobileView() && selectedCells.length === 1) {
+                // Trên mobile, khi chỉ chọn 1 ô và đang mở tab "Thường dùng": tự đưa con trỏ vào ô
+                // nhập liệu lớn để gõ ngay, thay vì phải gõ trực tiếp vào ô bảng nhỏ.
+                if (isMobileView() && selectedCells.length === 1 && (!tabId || tabId === 'basicTab')) {
                     document.getElementById('cellTextEditor').focus();
                 }
             }, 10);
-            document.getElementById('fabBtn').style.display = 'none';
+            hideSelectionUI();
         }
 
         function closePopup() {
@@ -1362,14 +1717,15 @@
             popup.classList.remove('show');
             clearTimeout(popupHideTimer);
             popupHideTimer = setTimeout(() => { popup.style.display = 'none'; }, 300);
-            if(selectedCells.length > 0) document.getElementById('fabBtn').style.display = 'block';
+            if(selectedCells.length > 0) showSelectionUI();
         }
 
+        function activatePopupTab(tabId) {
+            document.querySelectorAll('.popup-tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tabId));
+            document.querySelectorAll('.popup-section').forEach(el => el.classList.toggle('active', el.id === tabId));
+        }
         function switchPopupTab(tabId) {
-            document.querySelectorAll('.popup-tab').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.popup-section').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            activatePopupTab(tabId);
         }
 
         function getCellsToFormat() {
@@ -1748,6 +2104,7 @@
             const leftScrollContent = document.getElementById('leftScrollContent');
 
             const updateScrollDimensions = () => {
+                // Với CSS "zoom", offsetWidth/offsetHeight đã tự bao gồm hệ số phóng to sẵn rồi.
                 topScrollContent.style.width = table.offsetWidth + 'px';
                 leftScrollContent.style.height = table.offsetHeight + 'px';
                 leftScroll.style.height = bottomScroll.clientHeight + 'px';
@@ -2082,6 +2439,7 @@
             document.getElementById('weekSelectGroup').style.display = mode === 'week' ? 'inline-block' : 'none';
             document.getElementById('dateSelectGroup').style.display = mode === 'date' ? 'inline-block' : 'none';
 
+            // Đồng bộ hiển thị/giá trị sang bảng điều khiển Cắt & Xuất Ảnh bên mobile (nếu có)
             const mobileCaptureMode = document.getElementById('mobileCaptureMode');
             if (mobileCaptureMode) {
                 mobileCaptureMode.value = mode;
@@ -2090,6 +2448,8 @@
             }
         }
 
+        // Mở màn hình "Cắt & Xuất Ảnh" trên mobile: đồng bộ giá trị hiện tại từ bộ điều khiển
+        // gốc (desktop, bị ẩn trên mobile) sang các ô chọn hiển thị cho mobile rồi mở action-sheet.
         function openCropSheet() {
             document.getElementById('mobileCaptureMode').value = document.getElementById('captureMode').value;
             document.getElementById('mobileWeekSelect').value = document.getElementById('weekSelect').value;
@@ -2103,6 +2463,7 @@
             openActionSheet('sheetCrop');
         }
 
+        // Ô chọn "Toàn bộ/Tuần/Khoảng ngày" bên mobile ghi lại vào ô gốc rồi chạy lại logic cũ
         function syncCaptureModeToDesktop(value) {
             document.getElementById('captureMode').value = value;
             toggleCaptureInputs();
@@ -2172,6 +2533,7 @@
             const backupSelection = [...selectedCells];
             clearSelection();
             
+            // XÓA ZOOM ĐỂ XUẤT ẢNH RÕ NÉT
             const currentZoom = document.documentElement.style.getPropertyValue('--zoom-level');
             document.documentElement.style.setProperty('--zoom-level', 1);
             
@@ -2208,6 +2570,7 @@
                     }, 'image/png');
                 }
                 
+                // PHỤC HỒI LẠI ZOOM VÀ VÙNG CHỌN
                 document.documentElement.style.setProperty('--zoom-level', currentZoom || 1);
                 if(backupSelection.length > 0) {
                     selectRange(backupSelection[0], backupSelection[backupSelection.length-1]);
@@ -2218,13 +2581,13 @@
             });
         }
 
-        // HÀM SAVE ĐÃ ĐƯỢC CẬP NHẬT ĐỂ HỖ TRỢ AUTO SAVE VÀ VƯỢ QUA KIỂM TRA BẢO MẬT (HMAC SIGNATURE)
-        async function saveToGoogleSheets(isAutoSave = false) {
-            if (!isAutoSave) {
-                closePopup(); clearSelection();
-                document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
-                document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
-            }
+        function saveToGoogleSheets(isAuto, onDone) {
+            // Lưu tự động (isAuto=true): không đóng popup / bỏ chọn ô đang thao tác dở, tránh làm
+            // gián đoạn người dùng đang gõ. Vẫn phải ép hiện lại đủ hàng/cột/cột vị trí (giống lưu
+            // thủ công) để không lỡ lưu thiếu dữ liệu nếu trước đó có dùng công cụ Cắt Ảnh ẩn bớt.
+            if (!isAuto) { closePopup(); clearSelection(); clearTimeout(autoSaveTimer); }
+            document.getElementById('captureMode').value = 'all'; document.getElementById('rowSelectEnd').value = 'all';
+            document.getElementById('showRoleCol').checked = true; toggleRoleCol(); updateCropPreview();
             
             const table = document.getElementById('scheduleTable');
             const [year, month] = document.getElementById('monthYearPicker').value.split('-');
@@ -2267,16 +2630,10 @@
                 payloadFontWeights.push(rowWeight);
             });
 
-            // --- TẠO CHỮ KÝ BẢO MẬT GỬI KÈM REQUEST ---
-            const timestamp = new Date().getTime();
-            const signature = await hashPassword(authToken + timestamp.toString());
-
             const payload = { 
                 action: "save",
                 username: authUsername,
-                token: authToken,
-                timestamp: timestamp,
-                signature: signature,
+                sessionToken: sessionToken,
                 sheetName: sheetName, 
                 data: payloadData, 
                 styles: {
@@ -2286,28 +2643,20 @@
                 }
             };
 
-            if (isAutoSave) {
-                showMessage('loading', 'Đang tự động lưu ngầm...');
-            } else {
-                showMessage('loading', 'Đang cập nhật Sheet...');
-            }
-
+            if (isAuto) { showAutoSaveStatus('saving'); } else { showMessage('loading', 'Đang cập nhật Sheet...'); }
             fetchWithTimeout(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
             .then(response => response.json())
             .then(result => {
                 if(result.status === 'success') {
-                    if (isAutoSave) {
-                        const status = document.getElementById('statusMessage');
-                        status.className = 'success'; status.innerText = 'Đã tự động lưu!'; status.style.display = 'block';
-                        setTimeout(() => { status.style.display = 'none'; }, 2000); 
-                    } else {
-                        showMessage('success', 'Đã lưu xong vào Google Sheets!');
-                    }
+                    if (isAuto) showAutoSaveStatus('saved'); else showMessage('success', 'Đã lưu xong vào Google Sheets!');
+                } else {
+                    if (isAuto) showAutoSaveStatus('error'); else showMessage('error', 'Lỗi từ Server: ' + result.message);
                 }
-                else showMessage('error', 'Lỗi từ Server: ' + result.message);
+                if (onDone) onDone();
             })
             .catch((error) => {
-                if (!isAutoSave) showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.');
+                if (isAuto) showAutoSaveStatus('error'); else showMessage('error', networkErrorMessage(error, 'lưu dữ liệu') + ' Dữ liệu CÓ THỂ CHƯA được lưu, vui lòng thử lại.');
+                if (onDone) onDone();
             });
         }
 
