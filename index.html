@@ -339,8 +339,8 @@
             /* Tối ưu Popup Menu Edit trên Mobile */
             #cellPopupMenu { bottom: -500px; padding-bottom: 60px; max-width: 100%; z-index: 2999;}
             #cellPopupMenu.show { bottom: 0; }
-            #fabBtn { bottom: 80px; z-index: 2990;}
-            #quickActionBar { bottom: 80px; z-index: 2990; }
+            #fabBtn { bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 2990;}
+            #quickActionBar { bottom: calc(80px + env(safe-area-inset-bottom)); z-index: 2990; }
 
             /* Mở rộng Touch Targets — đồng bộ tối thiểu 44px cho MỌI control thao tác chính
                (kể cả input màu, trước đây bị bỏ sót nên vẫn chỉ 34px) */
@@ -354,9 +354,9 @@
             .popup-item { gap: 10px; }
 
             /* Size bảng Mobile mặc định */
-            th, td { min-width: 40px; padding: 3px; font-size: 11px; word-break: break-word; }
-            .header-col { min-width: 75px !important; font-size: 12px !important; }
-            thead th.header-col { font-size: 12px !important; }
+            th, td { min-width: 42px; padding: 8px 4px; font-size: 12px; word-break: break-word; }
+            .header-col { min-width: 80px !important; font-size: 13px !important; }
+            thead th.header-col { font-size: 13px !important; }
             #fullscreenBtn { top: 10px; right: 10px; }
 
             /* Gợi ý xoay ngang máy để xem bao quát bảng hơn (chỉ hiện khi đang đứng dọc) */
@@ -396,9 +396,9 @@
             .bottom-nav { height: 44px; } /* giữ tối thiểu 44px cho touch target dù đang thu gọn */
             .nav-icon { font-size: 14px; margin-bottom: 0; }
             .nav-text { display: none; }
-            .container { padding-bottom: 44px !important; }
-            #fabBtn { bottom: 56px; }
-            #quickActionBar { bottom: 56px; }
+            .container { padding-bottom: calc(44px + env(safe-area-inset-bottom)) !important; }
+            #fabBtn { bottom: calc(56px + env(safe-area-inset-bottom)); }
+            #quickActionBar { bottom: calc(56px + env(safe-area-inset-bottom)); }
             #weekNavBar { padding: 4px 8px; }
             #weekNavBar .week-nav-btn, #weekNavBar .zoom-controls button { width: 26px; height: 26px; font-size: 14px; line-height: 26px; }
             .action-sheet { max-height: 92vh; max-height: 92dvh; }
