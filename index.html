@@ -1084,6 +1084,11 @@
 
         tableContainer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
+                // Gọi preventDefault() NGAY LÚC 2 ngón vừa chạm xuống (không đợi tới touchmove) để
+                // báo cho Safari/iOS biết cử chỉ này do trang tự xử lý — nếu không, từ khi bỏ
+                // user-scalable=no, trình duyệt có thể đã kịp tự nhận diện và zoom cả trang song
+                // song với JS tự zoom bảng, gây zoom bị giật/loạn (đặc biệt thấy rõ trên Safari iOS).
+                e.preventDefault();
                 initialPinchDistance = Math.hypot(
                     e.touches[0].pageX - e.touches[1].pageX,
                     e.touches[0].pageY - e.touches[1].pageY
@@ -1091,6 +1096,12 @@
                 initialPinchZoom = parseFloat(document.documentElement.style.getPropertyValue('--zoom-level')) || 1;
             }
         }, { passive: false });
+
+        // Một số phiên bản Safari/iOS còn dùng thêm bộ sự kiện "gesture*" (chỉ riêng WebKit, không
+        // phải chuẩn chung) để nhận diện pinch ở tầng thấp hơn touchstart/touchmove — chặn luôn cho
+        // chắc chắn, để trình duyệt không tự ý zoom cả trang song song với zoom bảng của JS.
+        tableContainer.addEventListener('gesturestart', (e) => e.preventDefault());
+        tableContainer.addEventListener('gesturechange', (e) => e.preventDefault());
 
         tableContainer.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2 && initialPinchDistance) {
