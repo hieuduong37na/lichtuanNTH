@@ -1542,7 +1542,7 @@
         // Tăng thời gian giữ lên 420ms (thay vì 300ms) + thêm NGƯỠNG DI CHUYỂN: chỉ hủy long-press
         // khi ngón tay di chuyển vượt quá MOVE_CANCEL_THRESHOLD, để rung tay/nhiễu cảm biến nhỏ khi
         // đang cố giữ yên không vô tình bị coi là "định vuốt cuộn bảng" rồi hủy mất thao tác chọn ô.
-        const LONG_PRESS_MS = 420;
+        const LONG_PRESS_MS = 460;
         const MOVE_CANCEL_THRESHOLD = 10; // px
         let touchStartX = 0, touchStartY = 0;
 
@@ -1658,13 +1658,18 @@
             return window.matchMedia('(max-width: 768px), (max-height: 500px) and (pointer: coarse)').matches;
         }
 
-        // FAB: trên mobile là nút "✚ Thêm nhanh" (chèn hàng/cột), luôn hiện khi đang ở chế độ Sửa,
-        // không phụ thuộc có đang chọn ô hay không. Trên desktop vẫn giữ vai trò cũ: nút mở popup,
-        // chỉ hiện khi có ô đang được chọn.
+        // FAB: trên mobile là nút "✚ Thêm nhanh" (chèn hàng/cột), hiện khi đang ở chế độ Sửa và
+        // CHƯA chọn ô nào — khi đã chọn ô, thanh thao tác nhanh (quickActionBar) đã đủ và được ưu
+        // tiên hiển thị, ẩn FAB đi để tránh 2 khối nổi cùng lúc gây rối mắt (selection > add).
+        // Trên desktop vẫn giữ vai trò cũ: nút mở popup, chỉ hiện khi có ô đang được chọn.
         function updateFabVisibility() {
             const fab = document.getElementById('fabBtn');
             if (!isEditMode) { fab.style.display = 'none'; return; }
-            fab.style.display = isMobileView() ? 'flex' : (selectedCells.length > 0 ? 'block' : 'none');
+            if (isMobileView()) {
+                fab.style.display = selectedCells.length > 0 ? 'none' : 'flex';
+            } else {
+                fab.style.display = selectedCells.length > 0 ? 'block' : 'none';
+            }
         }
         function handleFabClick() {
             if (isMobileView()) {
@@ -1685,7 +1690,17 @@
                 const row = cell.closest('tr');
                 const roleLabel = row && row.children[0] ? row.children[0].innerText.trim() : '';
                 document.getElementById('quickActionLabel').innerText = selectedCells.length > 1 ? `${selectedCells.length} ô đã chọn` : (roleLabel || 'Ô đã chọn');
-                document.getElementById('quickActionBar').classList.add('show');
+                const bar = document.getElementById('quickActionBar');
+                bar.classList.add('show');
+                // Nếu ô đang chọn nằm gần đáy màn hình, thanh thao tác có thể che mất nó — cuộn nhẹ
+                // để ô luôn nằm trong vùng nhìn thấy, phía trên thanh thao tác.
+                requestAnimationFrame(() => {
+                    const cellRect = cell.getBoundingClientRect();
+                    const barTop = bar.getBoundingClientRect().top;
+                    if (cellRect.bottom > barTop - 8) {
+                        cell.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                    }
+                });
             }
         }
         function hideSelectionUI() {
